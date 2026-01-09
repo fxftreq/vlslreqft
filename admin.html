@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FedEx Leave System - Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --fedex-purple: #4D148C;
+  --fedex-orange: #FF6600;
+  --bg-gray: #f4f4f6;
+}
+
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background: var(--bg-gray);
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+
+header, footer {
+  background: var(--fedex-purple);
+  color:white;
+  text-align:center;
+  padding:15px 20px;
+  font-size:1.2em;
+  font-weight:bold;
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header button {
+  background:var(--fedex-orange);
+  color:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+main {
+  flex:1;
+  padding:20px;
+}
+
+h2 {
+  color:var(--fedex-purple);
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.card {
+  background:white;
+  padding:25px;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.1);
+  overflow-x:auto;
+}
+
+table {
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+}
+
+th, td {
+  padding:10px;
+  border:1px solid #ddd;
+  text-align:left;
+}
+
+th {
+  background:var(--fedex-purple);
+  color:white;
+}
+
+button.approve { background:green; }
+button.pend { background:orange; }
+button.reject { background:red; }
+
+.status-Pending{ color:orange; font-weight:bold; }
+.status-Approved{ color:green; font-weight:bold; }
+.status-Rejected{ color:red; font-weight:bold; }
+
+@media(max-width:768px){
+  table, th, td { font-size:14px; }
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<header>
+  <span id="welcomeMsg">Welcome to Admin Page</span>
+  <button onclick="logout()">Logout <i class="fas fa-sign-out-alt"></i></button>
+</header>
+
+<main>
+  <div class="card">
+    <h2>Leave Requests</h2>
+    <table id="table">
+      <tr>
+        <th>Employee</th>
+        <th>Leave Type</th>
+        <th>Date Range</th>
+        <th>Reason</th>
+        <th>Status</th>
+        <th>Submitted At</th>
+        <th>Action</th>
+      </tr>
+    </table>
+  </div>
+</main>
+
+<footer>© FedEx 2026</footer>
+
+<script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+  authDomain: "fedex-attendance-system.firebaseapp.com",
+  projectId: "fedex-attendance-system",
+  storageBucket: "fedex-attendance-system.firebasestorage.app",
+  messagingSenderId: "1049424874301",
+  appId: "1:1049424874301:web:f94559159b19ee39c19354"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Current user
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+if(!currentUser){ 
+  alert("No user found"); 
+  location.href="index.html"; 
+}
+document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Admin Page`;
+
+// Logout
+function logout(){
+  localStorage.removeItem("currentUser");
+  location.href="index.html";
+}
+
+// Load leave requests
+async function loadRequests(){
+  const tableEl = document.getElementById("table");
+  tableEl.innerHTML = `<tr>
+    <th>Employee</th>
+    <th>Leave Type</th>
+    <th>Date Range</th>
+    <th>Reason</th>
+    <th>Status</th>
+    <th>Submitted At</th>
+    <th>Action</th>
+  </tr>`;
+
+  try{
+    const snapshot = await db.collection("leave_requests").orderBy("submittedAt","desc").get();
+    snapshot.forEach(doc=>{
+      const l = doc.data();
+      let submittedDate;
+      if(l.submittedAt && l.submittedAt.toDate){ submittedDate = l.submittedAt.toDate(); }
+      else submittedDate = new Date(l.submittedAt);
+
+      const dateStr = submittedDate.toLocaleString("en-PH", {
+        timeZone:"Asia/Manila",
+        year:"numeric", month:"short", day:"numeric",
+        hour:"2-digit", minute:"2-digit", second:"2-digit"
+      });
+
+      tableEl.innerHTML += `<tr>
+        <td>${l.employeeName}</td>
+        <td>${l.type}</td>
+        <td>${l.start} → ${l.end}</td>
+        <td>${l.reason}</td>
+        <td class="status-${l.status}">${l.status}</td>
+        <td>${dateStr}</td>
+        <td>
+          <button class="approve" onclick="updateStatus('${doc.id}','Approved')">Approve</button>
+          <button class="pend" onclick="updateStatus('${doc.id}','Pending')">Pend</button>
+          <button class="reject" onclick="updateStatus('${doc.id}','Rejected')">Reject</button>
+        </td>
+      </tr>`;
+    });
+  } catch(err){ alert("Error loading requests: "+err.message); }
+}
+
+// Update leave status
+async function updateStatus(docId,status){
+  try{
+    await db.collection("leave_requests").doc(docId).update({status});
+    loadRequests();
+  } catch(err){ alert("Error updating status: "+err.message); }
+}
+
+loadRequests();
+</script>
+</body>
+</html>

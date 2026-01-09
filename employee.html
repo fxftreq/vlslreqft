@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FedEx Leave System - Employee</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --fedex-purple: #4D148C;
+  --fedex-orange: #FF6600;
+  --bg-gray: #f5f7fa;
+}
+
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background: var(--bg-gray);
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+
+header, footer {
+  background: var(--fedex-purple);
+  color:white;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header .welcome {
+  flex: 1;
+  font-weight: normal;
+  font-size: 1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+header button.logout {
+  background: var(--fedex-orange);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  min-width: 80px;
+  max-width: 120px;
+}
+
+main {
+  flex:1;
+  padding:20px;
+}
+
+h2 {
+  color:var(--fedex-purple);
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.card {
+  background:white;
+  padding:25px;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.1);
+  overflow-x:auto;
+  margin-bottom:20px;
+}
+
+label {
+  font-weight:600;
+  margin-top:10px;
+  display:block;
+}
+
+input, select, textarea {
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  box-sizing:border-box;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+textarea { resize:vertical; }
+
+button.submit {
+  width:100%;
+  padding:12px;
+  margin-top:12px;
+  background:var(--fedex-orange);
+  color:white;
+  border:none;
+  border-radius:6px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button.submit:hover { background:darkorange; }
+
+button.cancel {
+  width:auto;
+  padding:5px 10px;
+  font-size:12px;
+  margin:0;
+  background:#dc2626;
+}
+
+table {
+  width:100%;
+  border-collapse:collapse;
+  min-width:600px;
+}
+
+th, td {
+  padding:10px;
+  border:1px solid #ddd;
+  text-align:left;
+}
+
+th {
+  background:var(--fedex-purple);
+  color:white;
+}
+
+.status-Pending{ color:orange; font-weight:bold; }
+.status-Approved{ color:green; font-weight:bold; }
+.status-Rejected{ color:red; font-weight:bold; }
+
+@media(max-width:768px){
+  table, th, td { font-size:14px; }
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<header>
+  <span class="welcome" id="welcomeMsg">Welcome to Employee Page</span>
+  <button class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+</header>
+
+<main>
+  <h2 id="userName">Welcome!</h2>
+
+  <div class="card">
+    <h3>File Leave Request</h3>
+    <label for="type">Leave Type</label>
+    <select id="type">
+      <option>Vacation</option>
+      <option>Sick</option>
+      <option>Emergency</option>
+    </select>
+    <label for="start">Start Date</label>
+    <input type="date" id="start">
+    <label for="end">End Date</label>
+    <input type="date" id="end">
+    <label for="reason">Reason</label>
+    <textarea id="reason" placeholder="Enter reason"></textarea>
+    <button class="submit" id="submitBtn">Submit Leave</button>
+  </div>
+
+  <div class="card">
+    <h3>My Leave Tickets</h3>
+    <table id="table">
+      <tr>
+        <th>Type</th><th>Date Range</th><th>Reason</th><th>Status</th><th>Submitted At</th><th>Actions</th>
+      </tr>
+    </table>
+  </div>
+</main>
+
+<footer>© FedEx 2026</footer>
+
+<script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+  authDomain: "fedex-attendance-system.firebaseapp.com",
+  projectId: "fedex-attendance-system",
+  storageBucket: "fedex-attendance-system.firebasestorage.app",
+  messagingSenderId: "1049424874301",
+  appId: "1:1049424874301:web:f94559159b19ee39c19354"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Current user
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+if(!currentUser){ 
+  alert("No user found"); 
+  location.href="index.html"; 
+}
+document.getElementById("userName").textContent = `Welcome! ${currentUser.name} to Employee Page`;
+document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Employee Page`;
+
+// Logout
+function logout(){
+  localStorage.removeItem("currentUser");
+  location.href="index.html";
+}
+
+// Input elements
+const typeEl = document.getElementById("type");
+const startEl = document.getElementById("start");
+const endEl = document.getElementById("end");
+const reasonEl = document.getElementById("reason");
+const submitBtn = document.getElementById("submitBtn");
+
+// Submit leave request
+submitBtn.addEventListener("click", async ()=>{
+  if(!startEl.value || !endEl.value || !reasonEl.value){ 
+    alert("Complete all fields"); 
+    return; 
+  }
+
+  const now = new Date();
+  const leaveData = {
+    employeeId: currentUser.id,
+    employeeName: currentUser.name,
+    type: typeEl.value,
+    start: startEl.value,
+    end: endEl.value,
+    reason: reasonEl.value,
+    status: "Pending",
+    submittedAt: now
+  };
+
+  try{
+    await db.collection("leave_requests").add(leaveData);
+    alert("Leave request submitted!");
+    startEl.value = "";
+    endEl.value = "";
+    reasonEl.value = "";
+  } catch(err){ alert("Error submitting leave: "+err.message); }
+});
+
+// Load leaves
+function loadLeaves() {
+  const tableEl = document.getElementById("table");
+  db.collection("leave_requests")
+    .where("employeeId","==",currentUser.id)
+    .onSnapshot(snapshot => {
+      tableEl.innerHTML = `<tr>
+        <th>Type</th><th>Date Range</th><th>Reason</th><th>Status</th><th>Submitted At</th><th>Actions</th>
+      </tr>`;
+      
+      snapshot.forEach(doc => {
+        const l = doc.data();
+        const id = doc.id;
+
+        let submittedDate;
+        if(l.submittedAt && l.submittedAt.toDate) submittedDate = l.submittedAt.toDate();
+        else submittedDate = new Date(l.submittedAt);
+
+        const dateStr = submittedDate.toLocaleString("en-PH",{
+          timeZone:"Asia/Manila",
+          year:"numeric", month:"short", day:"numeric",
+          hour:"2-digit", minute:"2-digit", second:"2-digit"
+        });
+
+        let actions = '';
+        if(l.status==="Pending"){
+          actions = `<button class="cancel" onclick="cancelLeave('${id}')">Cancel</button>`;
+        }
+
+        tableEl.innerHTML += `<tr>
+          <td>${l.type}</td>
+          <td>${l.start} → ${l.end}</td>
+          <td>${l.reason}</td>
+          <td class="status-${l.status}">${l.status}</td>
+          <td>${dateStr}</td>
+          <td>${actions}</td>
+        </tr>`;
+      });
+    }, err => { alert("Error loading leaves: "+err.message); });
+}
+
+// Cancel leave
+function cancelLeave(id){
+  if(confirm("Are you sure you want to cancel this leave?")){
+    db.collection("leave_requests").doc(id).delete()
+      .then(()=>alert("Leave cancelled!"))
+      .catch(err=>alert("Error cancelling leave: "+err.message));
+  }
+}
+
+loadLeaves();
+</script>
+</body>
+</html>

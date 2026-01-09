@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FedEx Leave System - Login</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --fedex-purple: #4D148C;
+  --fedex-orange: #FF6600;
+  --bg-gray: #f4f4f6;
+}
+
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: var(--bg-gray);
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+
+header, footer {
+  background: var(--fedex-purple);
+  color:white;
+  text-align:center;
+  padding:15px 0;
+  font-size:1.2em;
+  font-weight:bold;
+}
+
+main {
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.card {
+  background:white;
+  padding:30px;
+  width:400px;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.2);
+  position:relative;
+}
+
+.card h3 {
+  text-align:center;
+  margin-bottom:20px;
+  color:var(--fedex-purple);
+}
+
+input[type="text"], input[type="password"] {
+  width:100%;
+  padding:12px 40px 12px 12px;
+  margin:8px 0;
+  border:1px solid #ccc;
+  border-radius:6px;
+  box-sizing:border-box;
+}
+
+.password-wrapper {
+  position:relative;
+}
+
+.password-wrapper i {
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+  color:#888;
+}
+
+button {
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  background:var(--fedex-orange);
+  color:white;
+  border:none;
+  border-radius:6px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+button:hover {
+  background:darkorange;
+}
+
+.forgot-link {
+  display:block;
+  text-align:left;
+  margin-top:8px;
+  font-size:0.9em;
+  color:var(--fedex-purple);
+  cursor:pointer;
+}
+
+#errorMsg {
+  color:red;
+  font-size:0.9em;
+  margin-top:5px;
+  text-align:center;
+}
+
+/* Modal styles */
+.modal {
+  display:none;
+  position:fixed;
+  z-index:1000;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  overflow:auto;
+  background:rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background:white;
+  margin:10% auto;
+  padding:25px;
+  border-radius:10px;
+  width:350px;
+  position:relative;
+  box-shadow:0 6px 20px rgba(0,0,0,0.3);
+}
+
+.modal-content h3 {
+  color:var(--fedex-purple);
+  margin-bottom:20px;
+  text-align:center;
+}
+
+.close {
+  position:absolute;
+  right:15px;
+  top:10px;
+  font-size:22px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.modal-content input {
+  padding:12px;
+  width:100%;
+  margin:6px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
+  box-sizing:border-box;
+}
+
+.modal-content button {
+  margin-top:12px;
+  background:var(--fedex-orange);
+  color:white;
+  font-weight:bold;
+}
+
+.modal-content button:hover {
+  background:darkorange;
+}
+
+</style>
+</head>
+<body>
+
+<header>FedEx Leave Request System</header>
+
+<main>
+  <div class="card">
+    <h3>Login</h3>
+    <input type="text" id="username" placeholder="Username">
+
+    <div class="password-wrapper">
+      <input type="password" id="password" placeholder="Password">
+      <i class="fa-solid fa-eye" id="togglePassword"></i>
+    </div>
+
+    <button id="loginBtn">Login</button>
+    <p id="errorMsg"></p>
+    <span class="forgot-link" id="forgotPasswordLink">Forgot Password?</span>
+  </div>
+</main>
+
+<!-- Change Password Modal -->
+<div id="changePasswordModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeModal">&times;</span>
+    <h3>Change Temporary Password</h3>
+    <input type="password" id="newPassword" placeholder="New password">
+    <input type="password" id="confirmPassword" placeholder="Confirm password">
+    <button id="changeBtn">Change Password</button>
+    <p id="modalErrorMsg"></p>
+  </div>
+</div>
+
+<footer>© FedEx 2026</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+  authDomain: "fedex-attendance-system.firebaseapp.com",
+  projectId: "fedex-attendance-system",
+  storageBucket: "fedex-attendance-system.firebasestorage.app",
+  messagingSenderId: "1049424874301",
+  appId: "1:1049424874301:web:f94559159b19ee39c19354"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Elements
+const loginBtn = document.getElementById("loginBtn");
+const errorMsg = document.getElementById("errorMsg");
+const togglePassword = document.getElementById("togglePassword");
+const passwordInput = document.getElementById("password");
+
+// Modal
+const modal = document.getElementById("changePasswordModal");
+const closeModal = document.getElementById("closeModal");
+const newPassword = document.getElementById("newPassword");
+const confirmPassword = document.getElementById("confirmPassword");
+const changeBtn = document.getElementById("changeBtn");
+const modalErrorMsg = document.getElementById("modalErrorMsg");
+
+// Toggle password visibility
+togglePassword.addEventListener("click", ()=>{
+  if(passwordInput.type==="password"){ passwordInput.type="text"; togglePassword.classList.replace("fa-eye","fa-eye-slash"); }
+  else { passwordInput.type="password"; togglePassword.classList.replace("fa-eye-slash","fa-eye"); }
+});
+
+// Login
+loginBtn.addEventListener("click", async ()=>{
+  const username = document.getElementById("username").value.trim();
+  const password = passwordInput.value.trim();
+  errorMsg.textContent="";
+
+  if(!username || !password){ errorMsg.textContent="Enter username & password."; return; }
+
+  try{
+    const docRef = db.collection("leave_users").doc(username);
+    const doc = await docRef.get();
+    if(!doc.exists){ errorMsg.textContent="User not found."; return; }
+    const data = doc.data();
+
+    if(password !== data.tempPassword){ errorMsg.textContent="Incorrect password."; return; }
+
+    localStorage.setItem("currentUser", JSON.stringify({...data,id:doc.id}));
+
+    if(data.isTempPassword){ modal.style.display="block"; return; }
+
+    if(data.role==="admin") location.href="admin.html"; else location.href="employee.html";
+
+  } catch(err){ errorMsg.textContent="Error: "+err.message; }
+});
+
+// Forgot Password
+document.getElementById("forgotPasswordLink").addEventListener("click", async ()=>{
+  const username = document.getElementById("username").value.trim();
+  if(!username){ alert("Enter username first."); return; }
+
+  try{
+    const docRef = db.collection("leave_users").doc(username);
+    const doc = await docRef.get();
+    if(!doc.exists){ alert("User not found."); return; }
+
+    const email = doc.data().email;
+    if(!email){ alert("No email registered."); return; }
+
+    const inputEmail = prompt(`Enter registered email:`);
+    if(!inputEmail || inputEmail!==email){ alert("Email does not match."); return; }
+
+    const tempPassword = Math.random().toString(36).slice(-8);
+    await docRef.update({ tempPassword, isTempPassword:true });
+
+    alert(`Temporary password: ${tempPassword}\nUse this to log in and change password.`);
+
+  } catch(err){ alert("Error: "+err.message); }
+});
+
+// Modal controls
+closeModal.onclick = ()=>{ modal.style.display="none"; }
+window.onclick = (event)=>{ if(event.target == modal) modal.style.display="none"; }
+
+// Change password in modal
+changeBtn.addEventListener("click", async ()=>{
+  modalErrorMsg.textContent="";
+  if(!newPassword.value || !confirmPassword.value){ modalErrorMsg.textContent="Fill all fields"; return; }
+  if(newPassword.value!==confirmPassword.value){ modalErrorMsg.textContent="Passwords do not match"; return; }
+
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  if(!currentUser){ alert("No user logged in."); location.href="index.html"; }
+
+  try{
+    await db.collection("leave_users").doc(currentUser.id).update({
+      tempPassword: newPassword.value,
+      isTempPassword:false
+    });
+    alert("Password changed successfully! Please login again.");
+    localStorage.removeItem("currentUser");
+    modal.style.display="none";
+    location.reload();
+  } catch(err){ modalErrorMsg.textContent="Error: "+err.message; }
+});
+</script>
+</body>
+</html>
