@@ -10,131 +10,26 @@
   --fedex-orange: #FF6600;
   --bg-gray: #f5f7fa;
 }
-
-body {
-  margin:0;
-  font-family:Arial, sans-serif;
-  background: var(--bg-gray);
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-}
-
-header, footer {
-  background: var(--fedex-purple);
-  color:white;
-  padding: 12px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-header .welcome {
-  flex: 1;
-  font-weight: normal;
-  font-size: 1em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-header button.logout {
-  background: var(--fedex-orange);
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  flex: 0 0 auto;
-  white-space: nowrap;
-  min-width: 80px;
-  max-width: 120px;
-}
-
-main {
-  flex:1;
-  padding:20px;
-}
-
-h2 {
-  color:var(--fedex-purple);
-  text-align:center;
-  margin-bottom:20px;
-}
-
-.card {
-  background:white;
-  padding:25px;
-  border-radius:12px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.1);
-  overflow-x:auto;
-  margin-bottom:20px;
-}
-
-label {
-  font-weight:600;
-  margin-top:10px;
-  display:block;
-}
-
-input, select, textarea {
-  width:100%;
-  padding:12px;
-  margin:6px 0;
-  box-sizing:border-box;
-  border-radius:6px;
-  border:1px solid #ccc;
-}
-
+body { margin:0; font-family:Arial,sans-serif; background: var(--bg-gray); display:flex; flex-direction:column; min-height:100vh; }
+header, footer { background: var(--fedex-purple); color:white; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; }
+header .welcome { flex:1; font-weight: normal; font-size:1em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+header button.logout { background: var(--fedex-orange); color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; min-width:80px; max-width:120px; }
+main { flex:1; padding:20px; }
+h2 { color:var(--fedex-purple); text-align:center; margin-bottom:20px; }
+.card { background:white; padding:25px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); overflow-x:auto; margin-bottom:20px; }
+label { font-weight:600; margin-top:10px; display:block; }
+input, select, textarea { width:100%; padding:12px; margin:6px 0; box-sizing:border-box; border-radius:6px; border:1px solid #ccc; }
 textarea { resize:vertical; }
-
-button.submit {
-  width:100%;
-  padding:12px;
-  margin-top:12px;
-  background:var(--fedex-orange);
-  color:white;
-  border:none;
-  border-radius:6px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
+button.submit { width:100%; padding:12px; margin-top:12px; background:var(--fedex-orange); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; }
 button.submit:hover { background:darkorange; }
-
-button.cancel {
-  width:auto;
-  padding:5px 10px;
-  font-size:12px;
-  margin:0;
-  background:#dc2626;
-}
-
-table {
-  width:100%;
-  border-collapse:collapse;
-  min-width:600px;
-}
-
-th, td {
-  padding:10px;
-  border:1px solid #ddd;
-  text-align:left;
-}
-
-th {
-  background:var(--fedex-purple);
-  color:white;
-}
-
+button.cancel { width:auto; padding:5px 10px; font-size:12px; margin:0; background:#dc2626; }
+table { width:100%; border-collapse:collapse; min-width:600px; }
+th, td { padding:10px; border:1px solid #ddd; text-align:left; }
+th { background:var(--fedex-purple); color:white; }
 .status-Pending{ color:orange; font-weight:bold; }
 .status-Approved{ color:green; font-weight:bold; }
 .status-Rejected{ color:red; font-weight:bold; }
-
-@media(max-width:768px){
-  table, th, td { font-size:14px; }
-}
+@media(max-width:768px){ table, th, td { font-size:14px; } }
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -157,10 +52,8 @@ th {
       <option>Sick</option>
       <option>Emergency</option>
     </select>
-    <label for="start">Start Date</label>
-    <input type="date" id="start">
-    <label for="end">End Date</label>
-    <input type="date" id="end">
+    <label for="date">Leave Date</label>
+    <input type="date" id="date">
     <label for="reason">Reason</label>
     <textarea id="reason" placeholder="Enter reason"></textarea>
     <button class="submit" id="submitBtn">Submit Leave</button>
@@ -170,7 +63,7 @@ th {
     <h3>My Leave Tickets</h3>
     <table id="table">
       <tr>
-        <th>Type</th><th>Date Range</th><th>Reason</th><th>Status</th><th>Submitted At</th><th>Actions</th>
+        <th>Type</th><th>Date</th><th>Reason</th><th>Status</th><th>Submitted At</th><th>Actions</th>
       </tr>
     </table>
   </div>
@@ -191,31 +84,32 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Current user
+// Check login
 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 if(!currentUser){ 
-  alert("No user found"); 
+  alert("Please login first"); 
   location.href="index.html"; 
-}
+} 
 document.getElementById("userName").textContent = `Welcome! ${currentUser.name} to Employee Page`;
 document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Employee Page`;
 
 // Logout
-function logout(){
-  localStorage.removeItem("currentUser");
-  location.href="index.html";
+function logout() {
+  if(confirm("Are you sure you want to logout?")){
+    localStorage.removeItem("currentUser");
+    location.href="index.html";
+  }
 }
 
-// Input elements
+// Elements
 const typeEl = document.getElementById("type");
-const startEl = document.getElementById("start");
-const endEl = document.getElementById("end");
+const dateEl = document.getElementById("date");
 const reasonEl = document.getElementById("reason");
 const submitBtn = document.getElementById("submitBtn");
 
 // Submit leave request
 submitBtn.addEventListener("click", async ()=>{
-  if(!startEl.value || !endEl.value || !reasonEl.value){ 
+  if(!dateEl.value || !reasonEl.value){ 
     alert("Complete all fields"); 
     return; 
   }
@@ -225,18 +119,16 @@ submitBtn.addEventListener("click", async ()=>{
     employeeId: currentUser.id,
     employeeName: currentUser.name,
     type: typeEl.value,
-    start: startEl.value,
-    end: endEl.value,
+    date: dateEl.value,
     reason: reasonEl.value,
     status: "Pending",
     submittedAt: now
   };
 
   try{
-    await db.collection("leave_requests").add(leaveData);
+    await db.collection("single_day_leave").add(leaveData);
     alert("Leave request submitted!");
-    startEl.value = "";
-    endEl.value = "";
+    dateEl.value = "";
     reasonEl.value = "";
   } catch(err){ alert("Error submitting leave: "+err.message); }
 });
@@ -244,20 +136,18 @@ submitBtn.addEventListener("click", async ()=>{
 // Load leaves
 function loadLeaves() {
   const tableEl = document.getElementById("table");
-  db.collection("leave_requests")
+  db.collection("single_day_leave")
     .where("employeeId","==",currentUser.id)
     .onSnapshot(snapshot => {
       tableEl.innerHTML = `<tr>
-        <th>Type</th><th>Date Range</th><th>Reason</th><th>Status</th><th>Submitted At</th><th>Actions</th>
+        <th>Type</th><th>Date</th><th>Reason</th><th>Status</th><th>Submitted At</th><th>Actions</th>
       </tr>`;
       
       snapshot.forEach(doc => {
         const l = doc.data();
         const id = doc.id;
 
-        let submittedDate;
-        if(l.submittedAt && l.submittedAt.toDate) submittedDate = l.submittedAt.toDate();
-        else submittedDate = new Date(l.submittedAt);
+        let submittedDate = l.submittedAt && l.submittedAt.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt);
 
         const dateStr = submittedDate.toLocaleString("en-PH",{
           timeZone:"Asia/Manila",
@@ -272,7 +162,7 @@ function loadLeaves() {
 
         tableEl.innerHTML += `<tr>
           <td>${l.type}</td>
-          <td>${l.start} → ${l.end}</td>
+          <td>${l.date}</td>
           <td>${l.reason}</td>
           <td class="status-${l.status}">${l.status}</td>
           <td>${dateStr}</td>
@@ -285,7 +175,7 @@ function loadLeaves() {
 // Cancel leave
 function cancelLeave(id){
   if(confirm("Are you sure you want to cancel this leave?")){
-    db.collection("leave_requests").doc(id).delete()
+    db.collection("single_day_leave").doc(id).delete()
       .then(()=>alert("Leave cancelled!"))
       .catch(err=>alert("Error cancelling leave: "+err.message));
   }
