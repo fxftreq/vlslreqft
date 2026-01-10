@@ -1,16 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>FedEx Leave System - Admin</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    /* Your existing styles here... */
-  </style>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<meta charset="UTF-8">
+<title>FedEx Leave System - Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root {
+  --fedex-purple: #4D148C;
+  --fedex-orange: #FF6600;
+  --bg-gray: #f4f4f6;
+}
+
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background: var(--bg-gray);
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+
+header, footer {
+  background: var(--fedex-purple);
+  color:white;
+  padding:15px 20px;
+  font-size:1.2em;
+  font-weight:bold;
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header button {
+  background:var(--fedex-orange);
+  color:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+main {
+  flex:1;
+  padding:20px;
+}
+
+h2 {
+  color:var(--fedex-purple);
+  text-align:center;
+}
+
+.card {
+  background:white;
+  padding:25px;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.1);
+  overflow-x:auto;
+}
+
+button.approve { background:green; color:white; padding:5px 8px; border-radius:4px; border:none; margin:2px; cursor:pointer; }
+button.pend { background:orange; color:white; padding:5px 8px; border-radius:4px; border:none; margin:2px; cursor:pointer; }
+button.reject { background:red; color:white; padding:5px 8px; border-radius:4px; border:none; margin:2px; cursor:pointer; }
+
+.status-Pending{ color:orange; font-weight:bold; }
+.status-Approved{ color:green; font-weight:bold; }
+.status-Rejected{ color:red; font-weight:bold; }
+
+.controls{
+  text-align:center;
+  margin-bottom:15px;
+}
+
+.controls button, .controls select{
+  padding:6px 10px;
+  margin:4px;
+  border-radius:4px;
+  border:1px solid #ccc;
+  cursor:pointer;
+}
+
+/* Calendar */
+.calendar-wrapper {
+  text-align:center;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+
+.calendar {
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap:2px;
+}
+
+.cal-header{
+  font-weight:bold;
+  background: var(--fedex-purple);
+  color:white;
+  padding:6px 0;
+  border-radius:4px;
+}
+
+/* Fixed size cells */
+.cal-cell {
+  background:white;
+  border:1px solid #ddd;
+  min-height:90px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  padding:4px;
+  position:relative;
+  box-sizing:border-box;
+  font-size:12px;
+  overflow:hidden;
+}
+.cal-cell .cal-day {
+  font-weight:bold;
+  margin-bottom:4px;
+}
+.cal-cell:hover {
+  background:#f0f0f0;
+}
+
+/* Indicator for calendar (show name) */
+.calendar .indicator {
+  display:block;
+  padding:2px 4px;
+  margin-bottom:2px;
+  border-radius:4px;
+  color:white;
+  font-size:11px;
+  font-weight:bold;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.calendar .indicator:hover{
+  transform: scale(1.05);
+  box-shadow:0 3px 6px rgba(0,0,0,0.3);
+}
+
+/* Table view indicator circle with letters */
+.table-indicator {
+  display:inline-block;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  color:white;
+  font-weight:bold;
+  text-align:center;
+  line-height:22px;
+  margin:2px;
+  font-size:12px;
+}
+.A{background:green;}
+.P{background:orange;}
+.R{background:red;}
+
+/* Table improvements */
+#table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+#table th, #table td {
+  border:1px solid #ddd;
+  padding:8px;
+  text-align:left;
+}
+#table th {
+  background: var(--fedex-purple);
+  color:white;
+}
+#table tr:nth-child(even){ background:#f9f9f9; }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
+
 <body>
 
 <header>
@@ -19,274 +193,273 @@
 </header>
 
 <main>
-  <div class="controls">
-    <button onclick="setFilter('All')">All</button>
-    <button onclick="setFilter('Approved')">Approved</button>
-    <button onclick="setFilter('Pending')">Pending</button>
-    <button onclick="setFilter('Rejected')">Rejected</button>
+<div class="controls">
+  <button onclick="setFilter('All')">All</button>
+  <button onclick="setFilter('Approved')">Approved</button>
+  <button onclick="setFilter('Pending')">Pending</button>
+  <button onclick="setFilter('Rejected')">Rejected</button>
 
-    <select id="viewSelect" onchange="setView(this.value)">
-      <option value="list">View by: List</option>
-      <option value="table">View by: Table</option>
-      <option value="calendar">View by: Calendar</option>
-    </select>
-  </div>
+  <select id="viewSelect" onchange="setView(this.value)">
+    <option value="list">View by: List</option>
+    <option value="table">View by: Table</option>
+    <option value="calendar">View by: Calendar</option>
+  </select>
+</div>
 
-  <div id="monthSelector" style="text-align:center;margin-bottom:10px;">
-    <label for="monthSelect">Select Month: </label>
-    <select id="monthSelect" onchange="render()">
-      <option value="0">January</option>
-      <option value="1">February</option>
-      <option value="2">March</option>
-      <option value="3">April</option>
-      <option value="4">May</option>
-      <option value="5">June</option>
-      <option value="6">July</option>
-      <option value="7">August</option>
-      <option value="8">September</option>
-      <option value="9">October</option>
-      <option value="10">November</option>
-      <option value="11">December</option>
-    </select>
-  </div>
+<div id="monthSelector" style="text-align:center;margin-bottom:10px;">
+  <label for="monthSelect">Select Month: </label>
+  <select id="monthSelect" onchange="render()">
+    <option value="0">January</option>
+    <option value="1">February</option>
+    <option value="2">March</option>
+    <option value="3">April</option>
+    <option value="4">May</option>
+    <option value="5">June</option>
+    <option value="6">July</option>
+    <option value="7">August</option>
+    <option value="8">September</option>
+    <option value="9">October</option>
+    <option value="10">November</option>
+    <option value="11">December</option>
+  </select>
+</div>
 
-  <div class="calendar-wrapper" id="calendarControls">
-    <button onclick="changeCalendarMonth(-1)">◀</button>
-    <span id="calendarMonthLabel"></span>
-    <button onclick="changeCalendarMonth(1)">▶</button>
-  </div>
+<div class="calendar-wrapper" id="calendarControls">
+  <button onclick="changeCalendarMonth(-1)">◀</button>
+  <span id="calendarMonthLabel"></span>
+  <button onclick="changeCalendarMonth(1)">▶</button>
+</div>
 
-  <div class="card">
-    <h2>Leave Requests</h2>
-    <div id="calendarContainer">
-      <div class="calendar" id="calendarGrid"></div>
-    </div>
-    <table id="table"></table>
+<div class="card">
+  <h2>Leave Requests</h2>
+  <div id="calendarContainer">
+    <div class="calendar" id="calendarGrid"></div>
   </div>
+  <table id="table"></table>
+</div>
 </main>
 
 <footer>© FedEx 2026</footer>
 
 <script>
-  // Firebase config
-  firebase.initializeApp({
-    apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
-    authDomain: "fedex-attendance-system.firebaseapp.com",
-    projectId: "fedex-attendance-system"
-  });
+// Firebase
+firebase.initializeApp({
+  apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+  authDomain: "fedex-attendance-system.firebaseapp.com",
+  projectId: "fedex-attendance-system"
+});
+const db = firebase.firestore();
 
-  const db = firebase.firestore();
-  const auth = firebase.auth();
+// LOGIN CHECK
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+if(!currentUser){
+  alert("Please login first");
+  location.href="index.html";
+}
+document.getElementById("welcomeMsg").textContent =
+  `Welcome ${currentUser.name} to Admin Page`;
 
-  // Set Firebase Authentication Persistence to LOCAL to persist the login session
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+// STATE
+let cachedRequests = [];
+let currentFilter = "All";
+let currentView = "list";
+let calendarMonth = new Date().getMonth();
+let calendarYear = new Date().getFullYear();
 
-  // STATE
-  let cachedRequests = [];
-  let currentFilter = "All";
-  let currentView = "list";
-  let calendarMonth = new Date().getMonth();
-  let calendarYear = new Date().getFullYear();
-  let currentUser = null;
-
-  // LOGIN CHECK USING FIREBASE AUTH
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      currentUser = { id: user.uid, name: user.displayName || user.email };
-      document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Admin Page`;
-      loadRequests();
-    } else {
-      // redirect to login page if not signed in
-      location.href = "index.html";
-    }
-  });
-
-  // LOGOUT
-  function logout() {
-    if (confirm("Are you sure you want to logout?")) {
-      auth.signOut().then(() => location.href = "index.html");
-    }
-  }
-
-  // LOAD LEAVE REQUESTS
-  function loadRequests() {
-    db.collection("single_day_leave").onSnapshot(snap => {
-      cachedRequests = [];
-      snap.forEach(d => {
-        const data = d.data();
-        if (data.submittedAt && data.submittedAt.toDate) data.submittedAt = data.submittedAt.toDate();
-        cachedRequests.push({ id: d.id, ...data });
-      });
-      render();
-    });
-  }
-
-  // FILTER / VIEW
-  function setFilter(f) { currentFilter = f; render(); }
-  function setView(v) {
-    currentView = v;
-
-    const monthSelector = document.getElementById("monthSelector");
-    const calendarControls = document.getElementById("calendarControls");
-    const calendarContainer = document.getElementById("calendarContainer");
-    const table = document.getElementById("table");
-
-    monthSelector.style.display = (v === "table") ? "block" : "none";
-    calendarControls.style.display = (v === "calendar") ? "flex" : "none";
-    calendarContainer.style.display = (v === "calendar") ? "block" : "none";
-    table.style.display = (v !== "calendar") ? "table" : "none";
-
+// LOAD DATA
+function loadRequests(){
+  db.collection("single_day_leave").onSnapshot(snap => {
+    cachedRequests = [];
+    snap.forEach(d=>cachedRequests.push({id:d.id, ...d.data()}));
     render();
-  }
+  });
+}
 
-  // MAIN RENDER
-  function render() {
-    const data = currentFilter === "All" ? cachedRequests : cachedRequests.filter(r => r.status === currentFilter);
-    if (currentView === "list") renderList(data);
-    else if (currentView === "table") renderTableView(data);
-    else if (currentView === "calendar") renderCalendar(data);
-  }
+// FILTER / VIEW
+function setFilter(f){ currentFilter=f; render(); }
+function setView(v){
+  currentView=v;
 
-  // LIST VIEW
-  function renderList(data) {
-    const t = document.getElementById("table");
-    t.style.display = "table";
-    t.innerHTML = `<tr>
-      <th>Employee</th><th>Leave Type</th><th>Date</th><th>Submitted At</th><th>Reason</th><th>Status</th><th>Action</th>
+  const monthSelector = document.getElementById("monthSelector");
+  const calendarControls = document.getElementById("calendarControls");
+  const calendarContainer = document.getElementById("calendarContainer");
+  const table = document.getElementById("table");
+
+  monthSelector.style.display = (v === "table") ? "block" : "none";
+  calendarControls.style.display = (v === "calendar") ? "flex" : "none";
+  calendarContainer.style.display = (v === "calendar") ? "block" : "none";
+  table.style.display = (v !== "calendar") ? "table" : "none";
+
+  render();
+}
+
+// LOGOUT
+function logout(){
+  if(confirm("Are you sure you want to logout?")){
+    localStorage.removeItem("currentUser");
+    location.href="index.html";
+  }
+}
+
+// MAIN RENDER
+function render(){
+  const data = currentFilter === "All" ? cachedRequests : cachedRequests.filter(r => r.status === currentFilter);
+
+  if(currentView === "list") renderList(data);
+  else if(currentView === "table") renderTableView(data);
+  else if(currentView === "calendar") renderCalendar(data);
+}
+
+// LIST VIEW WITH CORRECT SUBMITTED AT
+function renderList(data){
+  const t = document.getElementById("table");
+  t.style.display="table";
+  t.innerHTML = `
+    <tr>
+      <th>Employee</th>
+      <th>Leave Type</th>
+      <th>Date</th>
+      <th>Submitted At</th>
+      <th>Reason</th>
+      <th>Status</th>
+      <th>Action</th>
     </tr>`;
 
-    data.forEach(l => {
-      let submittedDate = l.submittedAt && l.submittedAt.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt);
-      let submittedStr = submittedDate.toLocaleString("en-PH", {
-        timeZone: "Asia/Manila",
-        year: "numeric", month: "short", day: "numeric",
-        hour: "2-digit", minute: "2-digit", second: "2-digit"
-      });
-
-      t.innerHTML += `
-        <tr>
-          <td>${l.employeeName}</td>
-          <td>${l.type}</td>
-          <td>${l.date}</td>
-          <td>${submittedStr}</td>
-          <td>${l.reason}</td>
-          <td class="status-${l.status}">${l.status}</td>
-          <td>
-            <button class="approve" onclick="updateStatus('${l.id}', 'Approved')">Approve</button>
-            <button class="pend" onclick="updateStatus('${l.id}', 'Pending')">Pend</button>
-            <button class="reject" onclick="updateStatus('${l.id}', 'Rejected')">Reject</button>
-          </td>
-        </tr>`;
+  data.forEach(l=>{
+    let submittedDate = l.submittedAt && l.submittedAt.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt);
+    let submittedStr = submittedDate.toLocaleString("en-PH",{
+      timeZone:"Asia/Manila",
+      year:"numeric", month:"short", day:"numeric",
+      hour:"2-digit", minute:"2-digit", second:"2-digit"
     });
-  }
 
-  // TABLE VIEW
-  function renderTableView(data) {
-    const t = document.getElementById("table");
-    t.style.display = "table";
-    const month = parseInt(document.getElementById("monthSelect").value);
-    const y = new Date().getFullYear();
+    t.innerHTML += `
+      <tr>
+        <td>${l.employeeName}</td>
+        <td>${l.type}</td>
+        <td>${l.date}</td>
+        <td>${submittedStr}</td>
+        <td>${l.reason}</td>
+        <td class="status-${l.status}">${l.status}</td>
+        <td>
+          <button class="approve" onclick="updateStatus('${l.id}','Approved')">Approve</button>
+          <button class="pend" onclick="updateStatus('${l.id}','Pending')">Pend</button>
+          <button class="reject" onclick="updateStatus('${l.id}','Rejected')">Reject</button>
+        </td>
+      </tr>`;
+  });
+}
 
-    const tlnames = [...new Set(data.map(l => l.tlName || l.employeeName))];
-    const daysInMonth = new Date(y, month + 1, 0).getDate();
+// TABLE VIEW
+function renderTableView(data){
+  const t = document.getElementById("table");
+  t.style.display="table";
+  const month = parseInt(document.getElementById("monthSelect").value);
+  const y = new Date().getFullYear();
 
-    let html = `<tr><th>TL Name</th>`;
-    for (let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
-    html += `</tr>`;
+  const tlnames = [...new Set(data.map(l=>l.tlName || l.employeeName))];
 
-    tlnames.forEach(tl => {
-      html += `<tr><td>${tl}</td>`;
-      for (let d = 1; d <= daysInMonth; d++) {
-        const cellDate = new Date(y, month, d);
-        let letter = "";
-        let colorClass = "";
-        data.forEach(l => {
-          if ((l.tlName || l.employeeName) === tl) {
-            const leaveDate = new Date(l.date);
-            if (cellDate.getFullYear() === leaveDate.getFullYear() &&
-              cellDate.getMonth() === leaveDate.getMonth() &&
-              cellDate.getDate() === leaveDate.getDate()) {
-              letter = l.status === "Approved" ? "A" : l.status === "Rejected" ? "R" : "P";
-              colorClass = letter;
-            }
+  const daysInMonth = new Date(y, month+1,0).getDate();
+
+  let html = `<tr><th>TL Name</th>`;
+  for(let d=1; d<=daysInMonth; d++) html += `<th>${d}</th>`;
+  html += `</tr>`;
+
+  tlnames.forEach(tl=>{
+    html += `<tr><td>${tl}</td>`;
+    for(let d=1; d<=daysInMonth; d++){
+      const cellDate = new Date(y, month, d);
+      let letter = "";
+      let colorClass = "";
+      data.forEach(l=>{
+        if((l.tlName || l.employeeName)===tl){
+          const leaveDate = new Date(l.date);
+          if(cellDate.getFullYear()===leaveDate.getFullYear() &&
+             cellDate.getMonth()===leaveDate.getMonth() &&
+             cellDate.getDate()===leaveDate.getDate()){
+            letter = l.status==="Approved"?"A": l.status==="Rejected"?"R":"P";
+            colorClass = letter;
           }
-        });
-        html += letter ? `<td><span class="table-indicator ${colorClass}">${letter}</span></td>` : "<td></td>";
-      }
-      html += "</tr>";
-    });
-
-    t.innerHTML = html;
-  }
-
-  // CALENDAR VIEW
-  function renderCalendar(data) {
-    const grid = document.getElementById("calendarGrid");
-    grid.innerHTML = "";
-    const y = calendarYear;
-    const m = calendarMonth;
-    const days = new Date(y, m + 1, 0).getDate();
-    const startDay = new Date(y, m, 1).getDay();
-
-    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    dayNames.forEach(d => {
-      const header = document.createElement("div");
-      header.className = "cal-header";
-      header.textContent = d;
-      grid.appendChild(header);
-    });
-
-    for (let i = 0; i < startDay; i++) {
-      const emptyCell = document.createElement("div");
-      emptyCell.className = "cal-cell";
-      grid.appendChild(emptyCell);
-    }
-
-    for (let d = 1; d <= days; d++) {
-      const cell = document.createElement("div");
-      cell.className = "cal-cell";
-      const dayDiv = document.createElement("div");
-      dayDiv.className = "cal-day";
-      dayDiv.textContent = d;
-      cell.appendChild(dayDiv);
-
-      const cellDate = new Date(y, m, d);
-      data.forEach(l => {
-        const leaveDate = new Date(l.date);
-        if (cellDate.getFullYear() === leaveDate.getFullYear() &&
-          cellDate.getMonth() === leaveDate.getMonth() &&
-          cellDate.getDate() === leaveDate.getDate()) {
-          const c = l.status === "Approved" ? "A" : l.status === "Rejected" ? "R" : "P";
-          const span = document.createElement("span");
-          span.className = "indicator " + c;
-          span.textContent = l.tlName || l.employeeName;
-          span.title = `${l.employeeName}: ${l.date} - ${l.status}`;
-          cell.appendChild(span);
         }
       });
-
-      grid.appendChild(cell);
+      html += letter ? `<td><span class="table-indicator ${colorClass}">${letter}</span></td>` : "<td></td>";
     }
+    html += "</tr>";
+  });
 
-    document.getElementById("calendarMonthLabel").textContent =
-      `${new Date(y, m).toLocaleString('default', { month: 'long' })} ${y}`;
+  t.innerHTML = html;
+}
+
+// CALENDAR VIEW
+function renderCalendar(data){
+  const grid = document.getElementById("calendarGrid");
+  grid.innerHTML="";
+  const y = calendarYear;
+  const m = calendarMonth;
+
+  const days = new Date(y,m+1,0).getDate();
+  const startDay = new Date(y,m,1).getDay();
+
+  const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  dayNames.forEach(d=>{
+    const header = document.createElement("div");
+    header.className="cal-header";
+    header.textContent=d;
+    grid.appendChild(header);
+  });
+
+  for(let i=0;i<startDay;i++){
+    const emptyCell = document.createElement("div");
+    emptyCell.className="cal-cell";
+    grid.appendChild(emptyCell);
   }
 
-  // CALENDAR NAV
-  function changeCalendarMonth(diff) {
-    calendarMonth += diff;
-    if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
-    if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
-    render();
+  for(let d=1; d<=days; d++){
+    const cell = document.createElement("div");
+    cell.className="cal-cell";
+    const dayDiv = document.createElement("div");
+    dayDiv.className="cal-day";
+    dayDiv.textContent=d;
+    cell.appendChild(dayDiv);
+
+    const cellDate = new Date(y,m,d);
+    data.forEach(l=>{
+      const leaveDate = new Date(l.date);
+      if(cellDate.getFullYear()===leaveDate.getFullYear() &&
+         cellDate.getMonth()===leaveDate.getMonth() &&
+         cellDate.getDate()===leaveDate.getDate()){
+        const c = l.status==="Approved"?"A":l.status==="Rejected"?"R":"P";
+        const span = document.createElement("span");
+        span.className="indicator "+c;
+        span.textContent = l.tlName || l.employeeName;
+        span.title = `${l.employeeName}: ${l.date} - ${l.status}`;
+        cell.appendChild(span);
+      }
+    });
+
+    grid.appendChild(cell);
   }
 
-  // UPDATE STATUS
-  async function updateStatus(id, status) {
-    await db.collection("single_day_leave").doc(id).update({ status });
-  }
+  document.getElementById("calendarMonthLabel").textContent =
+    `${new Date(y,m).toLocaleString('default',{month:'long'})} ${y}`;
+}
 
-  // INIT
-  setView('list');
+// CALENDAR NAV
+function changeCalendarMonth(diff){
+  calendarMonth += diff;
+  if(calendarMonth<0){ calendarMonth=11; calendarYear--; }
+  if(calendarMonth>11){ calendarMonth=0; calendarYear++; }
+  render();
+}
+
+// UPDATE STATUS
+async function updateStatus(id,status){
+  await db.collection("single_day_leave").doc(id).update({status});
+}
+
+// INIT
+setView('list');
+loadRequests();
 </script>
 
 </body>
