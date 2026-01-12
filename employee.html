@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>FedEx Leave System - Employee</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 <style>
 :root {
   --fedex-purple:#4D148C;
@@ -88,10 +87,12 @@ th{
 .status-Pending{ color:orange; font-weight:bold; }
 .status-Approved{ color:green; font-weight:bold; }
 .status-Rejected{ color:red; font-weight:bold; }
+#emptyMsg{ text-align:center; color:#555; margin-top:10px; display:none; }
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
 
 <body>
@@ -114,6 +115,7 @@ th{
     <option value="Vacation">Vacation</option>
     <option value="CTO">CTO</option>
     <option value="RDCO">RDCO</option>
+    <option value="Others">Others</option>
   </select>
 
   <label>Leave Date</label>
@@ -136,81 +138,119 @@ th{
       <th>Submitted At</th>
     </tr>
   </table>
+  <div id="emptyMsg">No leave requests found.</div>
 </div>
 </main>
 
 <footer>© FedEx 2026</footer>
 
 <script>
-// Firebase
+// Firebase config
 firebase.initializeApp({
   apiKey:"AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain:"fedex-attendance-system.firebaseapp.com",
   projectId:"fedex-attendance-system"
 });
-const db=firebase.firestore();
+const db = firebase.firestore();
+const auth = firebase.auth();
 
-// login
-const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-if(!currentUser){ 
-  alert("Please login first"); 
-  location.href="index.html"; 
-} 
-document.getElementById("userName").textContent = `Welcome! ${currentUser.name} to Employee Page`;
-document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Employee Page`;
+// Check user login
+auth.onAuthStateChanged(user => {
+  if(!user){
+    alert("Please login first");
+    location.href = "index.html";
+    return;
+  }
 
+  const currentUser = {
+    id: user.uid,
+    name: user.displayName || user.email
+  };
+  localStorage.setItem("currentUser", JSON.stringify(currentUser));
+  document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Employee Page`;
+
+  loadLeaves(currentUser);
+});
 
 // Logout
 function logout(){
   if(confirm("Logout?")){
+    auth.signOut();
     localStorage.removeItem("currentUser");
     location.href="index.html";
   }
 }
 
 // Submit leave
-document.getElementById("submitBtn").onclick=async ()=>{
-  if(!date.value || !reason.value){
+document.getElementById("submitBtn").onclick = async () => {
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const typeEl = document.getElementById("type");
+  const dateEl = document.getElementById("date");
+  const reasonEl = document.getElementById("reason");
+
+  if(!dateEl.value || !reasonEl.value){
     alert("Complete all fields");
     return;
   }
+
   await db.collection("single_day_leave").add({
-    employeeId:currentUser.id,
-    employeeName:currentUser.name,
-    type:type.value,
-    date:date.value,
-    reason:reason.value,
-    status:"Pending",
-    submittedAt:new Date()
+    employeeId: currentUser.id,
+    employeeName: currentUser.name,
+    type: typeEl.value,
+    date: dateEl.value,
+    reason: reasonEl.value,
+    status: "Pending",
+    submittedAt: new Date()
   });
-  alert("Leave submitted");
-  date.value=""; reason.value="";
+
+  alert("Leave submitted!");
+  dateEl.value = "";
+  reasonEl.value = "";
 };
 
-// Load leaves
-db.collection("single_day_leave")
-.where("employeeId","==",currentUser.id)
-.onSnapshot(snap=>{
-  table.innerHTML=`<tr>
-    <th>Type</th>
-    <th>Date</th>
-    <th>Reason</th>
-    <th>Status</th>
-    <th>Submitted At</th>
-  </tr>`;
-  snap.forEach(doc=>{
-    const l=doc.data();
-    const d=l.submittedAt?.toDate?.() || new Date(l.submittedAt);
-    table.innerHTML+=`
-      <tr>
-        <td>${l.type}</td>
-        <td>${l.date}</td>
-        <td>${l.reason}</td>
-        <td class="status-${l.status}">${l.status}</td>
-        <td>${d.toLocaleString("en-PH",{timeZone:"Asia/Manila"})}</td>
-      </tr>`;
-  });
-});
+// Load employee leaves
+function loadLeaves(currentUser){
+  const table = document.getElementById("table");
+  const emptyMsg = document.getElementById("emptyMsg");
+
+  db.collection("single_day_leave")
+    .where("employeeId","==", currentUser.id)
+    .orderBy("submittedAt","desc")
+    .onSnapshot(snapshot => {
+      table.innerHTML = `
+        <tr>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Submitted At</th>
+        </tr>
+      `;
+
+      if(snapshot.empty){
+        emptyMsg.style.display = "block";
+      } else {
+        emptyMsg.style.display = "none";
+      }
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const submitted = data.submittedAt?.toDate?.() || new Date(data.submittedAt);
+        table.innerHTML += `
+          <tr>
+            <td>${data.type}</td>
+            <td>${data.date}</td>
+            <td>${data.reason}</td>
+            <td class="status-${data.status}">${data.status}</td>
+            <td>${submitted.toLocaleString("en-PH",{timeZone:"Asia/Manila"})}</td>
+          </tr>
+        `;
+      });
+    }, err => {
+      console.error("Error loading leaves:", err);
+      alert("Failed to load leaves. Check Firestore rules.");
+    });
+}
 </script>
 
 </body>
