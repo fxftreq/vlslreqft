@@ -173,7 +173,7 @@ function loadLeaves() {
     .where("employeeId","==",currentUser.id)
     .onSnapshot(snapshot => {
       tableEl.innerHTML = `<tr>
-        <th>Type</th><th>Date</th><th>Reason</th><th>Status</th><th>Submitted At</th>
+        <th>Type</th><th>Date</th><th>Reason</th><th>Status</th><th>Submitted Date</th>
       </tr>`;
       
       snapshot.forEach(doc => {
@@ -210,4 +210,5 @@ loadLeaves();
 </script>
 </body>
 </html>
+
 
