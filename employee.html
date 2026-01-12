@@ -6,252 +6,207 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root {
-  --fedex-purple:#4D148C;
-  --fedex-orange:#FF6600;
-  --bg-gray:#f5f7fa;
+  --fedex-purple: #4D148C;
+  --fedex-orange: #FF6600;
+  --bg-gray: #f5f7fa;
+  --table-header-bg: #4D148C;
+  --table-border: #ddd;
+  --status-cancelled: #888888; /* grey for cancelled */
 }
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:var(--bg-gray);
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
+body { 
+  margin:0; font-family:Arial,sans-serif; background: var(--bg-gray); display:flex; flex-direction:column; min-height:100vh; 
 }
-header,footer{
-  background:var(--fedex-purple);
-  color:white;
-  padding:12px 20px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+header, footer { 
+  background: var(--fedex-purple); color:white; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; 
 }
-header .welcome{
-  flex:1;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+header .welcome { 
+  flex:1; font-weight: normal; font-size:1em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; 
 }
-header button.logout{
-  background:var(--fedex-orange);
-  color:white;
-  border:none;
-  padding:6px 12px;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:bold;
+header button.logout { 
+  background: var(--fedex-orange); color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; min-width:80px; max-width:120px; 
 }
-main{ flex:1; padding:20px; }
-h2{ color:var(--fedex-purple); text-align:center; }
-.card{
+main { flex:1; padding:20px; }
+h2 { color:var(--fedex-purple); text-align:center; margin-bottom:20px; }
+.card { 
+  background:white; padding:25px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); overflow-x:auto; margin-bottom:20px; 
+}
+label { font-weight:600; margin-top:10px; display:block; }
+input, select, textarea { width:100%; padding:12px; margin:6px 0; box-sizing:border-box; border-radius:6px; border:1px solid #ccc; }
+textarea { resize:vertical; }
+button.submit { width:100%; padding:12px; margin-top:12px; background:var(--fedex-orange); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; }
+button.submit:hover { background:darkorange; }
+table { 
+  width:100%; 
+  border-collapse:collapse; 
+  min-width:600px; 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   background:white;
-  padding:25px;
-  border-radius:12px;
-  box-shadow:0 6px 20px rgba(0,0,0,.1);
-  margin-bottom:20px;
+  border-radius:8px;
+  overflow:hidden;
 }
-label{ font-weight:600; margin-top:10px; display:block; }
-input,select,textarea{
-  width:100%;
-  padding:12px;
-  margin:6px 0;
-  border-radius:6px;
-  border:1px solid #ccc;
-  box-sizing:border-box;
+th, td { 
+  padding:12px 10px; 
+  border-bottom:1px solid var(--table-border); 
+  text-align:left; 
 }
-textarea{ resize:vertical; }
-button.submit{
-  width:100%;
-  padding:12px;
-  margin-top:12px;
-  background:var(--fedex-orange);
-  color:white;
-  border:none;
-  border-radius:6px;
-  font-weight:bold;
-  cursor:pointer;
+th { 
+  background: var(--table-header-bg); 
+  color:white; 
+  font-weight:600;
 }
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:600px;
-}
-th,td{
-  border:1px solid #ddd;
-  padding:10px;
-}
-th{
-  background:var(--fedex-purple);
-  color:white;
-}
-.status-Pending{ color:orange; font-weight:bold; }
-.status-Approved{ color:green; font-weight:bold; }
-.status-Rejected{ color:red; font-weight:bold; }
-#emptyMsg{ text-align:center; color:#555; margin-top:10px; display:none; }
+tr:last-child td { border-bottom:none; }
+
+.status-Pending { color:orange; font-weight:bold; }
+.status-Approved { color:green; font-weight:bold; }
+.status-Rejected { color:red; font-weight:bold; }
+.status-Cancelled { color: var(--status-cancelled); font-weight:bold; font-style:italic; }
+
+@media(max-width:768px){ table, th, td { font-size:14px; } }
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
-
 <body>
 
 <header>
-  <span class="welcome" id="welcomeMsg">Welcome</span>
-  <button class="logout" onclick="logout()">
-    <i class="fas fa-sign-out-alt"></i> Logout
-  </button>
+  <span class="welcome" id="welcomeMsg">Welcome to Leave Request Page</span>
+  <button class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
 </header>
 
 <main>
-<h2>TL Leave Request</h2>
+  <h2 id="userName">Welcome!</h2>
 
-<div class="card">
-  <h3>File Leave Request</h3>
+  <div class="card">
+    <h3>File Leave Request</h3>
+    <label for="type">Leave Type</label>
+    <select id="type">
+      <option>Vacation</option>
+      <option>CTO</option>
+      <option>RDCO</option>
+    </select>
+    <label for="date">Leave Date</label>
+    <input type="date" id="date">
+    <label for="reason">Reason</label>
+    <textarea id="reason" placeholder="Enter reason"></textarea>
+    <button class="submit" id="submitBtn">Submit Leave</button>
+  </div>
 
-  <label>Leave Type</label>
-  <select id="type">
-    <option value="Vacation">Vacation</option>
-    <option value="CTO">CTO</option>
-    <option value="RDCO">RDCO</option>
-    <option value="Others">Others</option>
-  </select>
-
-  <label>Leave Date</label>
-  <input type="date" id="date">
-
-  <label>Reason</label>
-  <textarea id="reason"></textarea>
-
-  <button class="submit" id="submitBtn">Submit Leave</button>
-</div>
-
-<div class="card">
-  <h3>My Leave Tickets</h3>
-  <table id="table">
-    <tr>
-      <th>Type</th>
-      <th>Date</th>
-      <th>Reason</th>
-      <th>Status</th>
-      <th>Submitted At</th>
-    </tr>
-  </table>
-  <div id="emptyMsg">No leave requests found.</div>
-</div>
+  <div class="card">
+    <h3>My Leave Tickets</h3>
+    <table id="table">
+      <tr>
+        <th>Type</th><th>Date</th><th>Reason</th><th>Status</th><th>Submitted At</th>
+      </tr>
+    </table>
+  </div>
 </main>
 
 <footer>© FedEx 2026</footer>
 
 <script>
 // Firebase config
-firebase.initializeApp({
-  apiKey:"AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
-  authDomain:"fedex-attendance-system.firebaseapp.com",
-  projectId:"fedex-attendance-system"
-});
+const firebaseConfig = {
+  apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+  authDomain: "fedex-attendance-system.firebaseapp.com",
+  projectId: "fedex-attendance-system",
+  storageBucket: "fedex-attendance-system.firebasestorage.app",
+  messagingSenderId: "1049424874301",
+  appId: "1:1049424874301:web:f94559159b19ee39c19354"
+};
+firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const auth = firebase.auth();
 
-// Check user login
-auth.onAuthStateChanged(user => {
-  if(!user){
-    alert("Please login first");
-    location.href = "index.html";
-    return;
-  }
-
-  const currentUser = {
-    id: user.uid,
-    name: user.displayName || user.email
-  };
-  localStorage.setItem("currentUser", JSON.stringify(currentUser));
-  document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Employee Page`;
-
-  loadLeaves(currentUser);
-});
+// Check login
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+if(!currentUser){ 
+  alert("Please login first"); 
+  location.href="index.html"; 
+} 
+document.getElementById("userName").textContent = `Welcome! ${currentUser.name} to Employee Page`;
+document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Employee Page`;
 
 // Logout
-function logout(){
-  if(confirm("Logout?")){
-    auth.signOut();
+function logout() {
+  if(confirm("Are you sure you want to logout?")){
     localStorage.removeItem("currentUser");
     location.href="index.html";
   }
 }
 
-// Submit leave
-document.getElementById("submitBtn").onclick = async () => {
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-  const typeEl = document.getElementById("type");
-  const dateEl = document.getElementById("date");
-  const reasonEl = document.getElementById("reason");
+// Elements
+const typeEl = document.getElementById("type");
+const dateEl = document.getElementById("date");
+const reasonEl = document.getElementById("reason");
+const submitBtn = document.getElementById("submitBtn");
 
-  if(!dateEl.value || !reasonEl.value){
-    alert("Complete all fields");
-    return;
+// Submit leave request
+submitBtn.addEventListener("click", async ()=>{
+  if(!dateEl.value || !reasonEl.value){ 
+    alert("Complete all fields"); 
+    return; 
   }
 
-  await db.collection("single_day_leave").add({
+  const now = new Date();
+  const leaveData = {
     employeeId: currentUser.id,
     employeeName: currentUser.name,
     type: typeEl.value,
     date: dateEl.value,
     reason: reasonEl.value,
     status: "Pending",
-    submittedAt: new Date()
-  });
+    submittedAt: now
+  };
 
-  alert("Leave submitted!");
-  dateEl.value = "";
-  reasonEl.value = "";
-};
+  try{
+    await db.collection("single_day_leave").add(leaveData);
+    alert("Leave request submitted!");
+    dateEl.value = "";
+    reasonEl.value = "";
+  } catch(err){ alert("Error submitting leave: "+err.message); }
+});
 
-// Load employee leaves
-function loadLeaves(currentUser){
-  const table = document.getElementById("table");
-  const emptyMsg = document.getElementById("emptyMsg");
-
+// Load leaves
+function loadLeaves() {
+  const tableEl = document.getElementById("table");
   db.collection("single_day_leave")
-    .where("employeeId","==", currentUser.id)
-    .orderBy("submittedAt","desc")
+    .where("employeeId","==",currentUser.id)
     .onSnapshot(snapshot => {
-      table.innerHTML = `
-        <tr>
-          <th>Type</th>
-          <th>Date</th>
-          <th>Reason</th>
-          <th>Status</th>
-          <th>Submitted At</th>
-        </tr>
-      `;
-
-      if(snapshot.empty){
-        emptyMsg.style.display = "block";
-      } else {
-        emptyMsg.style.display = "none";
-      }
-
+      tableEl.innerHTML = `<tr>
+        <th>Type</th><th>Date</th><th>Reason</th><th>Status</th><th>Submitted At</th>
+      </tr>`;
+      
       snapshot.forEach(doc => {
-        const data = doc.data();
-        const submitted = data.submittedAt?.toDate?.() || new Date(data.submittedAt);
-        table.innerHTML += `
-          <tr>
-            <td>${data.type}</td>
-            <td>${data.date}</td>
-            <td>${data.reason}</td>
-            <td class="status-${data.status}">${data.status}</td>
-            <td>${submitted.toLocaleString("en-PH",{timeZone:"Asia/Manila"})}</td>
-          </tr>
-        `;
-      });
-    }, err => {
-      console.error("Error loading leaves:", err);
-      alert("Failed to load leaves. Check Firestore rules.");
-    });
-}
-</script>
+        const l = doc.data();
+        const id = doc.id;
 
+        let submittedDate = l.submittedAt && l.submittedAt.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt);
+
+        const dateStr = submittedDate.toLocaleString("en-PH",{
+          timeZone:"Asia/Manila",
+          year:"numeric", month:"short", day:"numeric",
+          hour:"2-digit", minute:"2-digit", second:"2-digit"
+        });
+
+        let actions = '';
+        if(l.status==="Pending"){
+          actions = `<button class="cancel" onclick="cancelLeave('${id}')"></button>`;
+        }
+
+        tableEl.innerHTML += `<tr>
+          <td>${l.type}</td>
+          <td>${l.date}</td>
+          <td>${l.reason}</td>
+          <td class="status-${l.status}">${l.status}</td>
+          <td>${dateStr}</td>
+
+        </tr>`;
+      });
+    }, err => { alert("Error loading leaves: "+err.message); });
+}
+
+
+loadLeaves();
+</script>
 </body>
 </html>
