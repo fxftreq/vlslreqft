@@ -8,8 +8,13 @@
 :root {
   --fedex-purple: #4D148C;
   --fedex-orange: #FF6600;
-  --bg-gray: #f4f4f6;
+  --bg-gray: #f5f5f7;
+  --input-border: #ccc;
+  --input-focus: #4D148C;
+  --error-color: #dc2626;
 }
+
+* { box-sizing: border-box; }
 
 body {
   margin:0;
@@ -34,30 +39,39 @@ main {
   display:flex;
   justify-content:center;
   align-items:center;
+  padding:20px;
 }
 
 .card {
   background:white;
-  padding:30px;
-  width:400px;
+  padding:30px 25px;
+  width:100%;
+  max-width:400px;
   border-radius:12px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.2);
+  box-shadow:0 8px 25px rgba(0,0,0,0.15);
   position:relative;
 }
 
 .card h3 {
   text-align:center;
-  margin-bottom:20px;
+  margin-bottom:25px;
   color:var(--fedex-purple);
+  font-size:1.5em;
 }
 
 input[type="text"], input[type="password"] {
   width:100%;
   padding:12px 40px 12px 12px;
-  margin:8px 0;
-  border:1px solid #ccc;
+  margin:10px 0;
+  border:1px solid var(--input-border);
   border-radius:6px;
-  box-sizing:border-box;
+  transition:0.2s;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+  border-color: var(--input-focus);
+  outline:none;
+  box-shadow:0 0 5px rgba(77,20,140,0.3);
 }
 
 .password-wrapper {
@@ -76,33 +90,34 @@ input[type="text"], input[type="password"] {
 button {
   width:100%;
   padding:12px;
-  margin-top:15px;
+  margin-top:20px;
   background:var(--fedex-orange);
   color:white;
   border:none;
   border-radius:6px;
   font-weight:bold;
   cursor:pointer;
-  transition:0.2s;
+  transition:0.3s;
 }
 
 button:hover {
-  background:darkorange;
+  background:#e65a00;
 }
 
 .forgot-link {
   display:block;
-  text-align:left;
-  margin-top:8px;
+  text-align:right;
+  margin-top:10px;
   font-size:0.9em;
   color:var(--fedex-purple);
   cursor:pointer;
+  text-decoration:underline;
 }
 
 #errorMsg {
-  color:red;
+  color: var(--error-color);
   font-size:0.9em;
-  margin-top:5px;
+  margin-top:8px;
   text-align:center;
 }
 
@@ -124,15 +139,39 @@ button:hover {
   margin:10% auto;
   padding:25px;
   border-radius:10px;
-  width:350px;
+  width:90%;
+  max-width:350px;
   position:relative;
-  box-shadow:0 6px 20px rgba(0,0,0,0.3);
+  box-shadow:0 8px 25px rgba(0,0,0,0.3);
 }
 
 .modal-content h3 {
   color:var(--fedex-purple);
   margin-bottom:20px;
   text-align:center;
+}
+
+.modal-content input {
+  padding:12px;
+  width:100%;
+  margin:6px 0;
+  border-radius:6px;
+  border:1px solid var(--input-border);
+  box-sizing:border-box;
+}
+
+.modal-content button {
+  margin-top:12px;
+  background:var(--fedex-orange);
+  color:white;
+  font-weight:bold;
+  width:100%;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.modal-content button:hover {
+  background:#e65a00;
 }
 
 .close {
@@ -143,27 +182,6 @@ button:hover {
   font-weight:bold;
   cursor:pointer;
 }
-
-.modal-content input {
-  padding:12px;
-  width:100%;
-  margin:6px 0;
-  border-radius:6px;
-  border:1px solid #ccc;
-  box-sizing:border-box;
-}
-
-.modal-content button {
-  margin-top:12px;
-  background:var(--fedex-orange);
-  color:white;
-  font-weight:bold;
-}
-
-.modal-content button:hover {
-  background:darkorange;
-}
-
 </style>
 </head>
 <body>
@@ -174,12 +192,10 @@ button:hover {
   <div class="card">
     <h3>Login</h3>
     <input type="text" id="username" placeholder="Username">
-
     <div class="password-wrapper">
       <input type="password" id="password" placeholder="Password">
       <i class="fa-solid fa-eye" id="togglePassword"></i>
     </div>
-
     <button id="loginBtn">Login</button>
     <p id="errorMsg"></p>
     <span class="forgot-link" id="forgotPasswordLink">Forgot Password?</span>
