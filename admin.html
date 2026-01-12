@@ -337,7 +337,7 @@ function renderList(data){
 
 function exportCSV(){
   const data = cachedRequests; // export all cached
-  let csv="Employee,Type,Date,Submitted At,Reason,Status\n";
+  let csv="Employee,Type,Date,Submitted Date,Time,Reason,Status\n";
   data.forEach(l=>{
     let s=l.submittedAt && l.submittedAt.toDate?l.submittedAt.toDate():new Date(l.submittedAt);
     csv+=`${l.employeeName},${l.type},${l.date},${s.toLocaleString()},${l.reason},${l.status}\n`;
