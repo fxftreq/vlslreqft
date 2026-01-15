@@ -129,6 +129,118 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   box-shadow: 0 0 0 3px rgba(255,102,0,0.2);
 }
 
+.year-month .mini-grid:first-of-type .day-cell {
+  font-size: 9px;
+  color: #555;
+  background: none;
+  height: auto;
+}
+/* ===== Improved Year View ===== */
+.year-month {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 10px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.year-month:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.year-month-label {
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--fedex-purple);
+  margin-bottom: 6px;
+}
+
+.year-month .mini-grid {
+  gap: 3px;
+}
+
+.year-month .day-cell {
+  background: #fafafa;
+}
+
+.year-month .day-cell:hover {
+  background: #f0f0f0;
+}
+
+.year-month .mini-grid:first-of-type .day-cell {
+  background: none;
+  font-size: 9px;
+  color: #666;
+  cursor: default;
+}
+
+/* Year navigation */
+.year-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.year-nav button {
+  background: var(--fedex-purple);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.year-nav span {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #333;
+}
+
+/* ===== Month View Leave Tooltip ===== */
+.leave-tooltip {
+  position: absolute;
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 240px;
+  max-width: 320px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  font-size: 12px;
+  z-index: 9999;
+  display: none;
+  pointer-events: none;
+}
+
+.leave-tooltip h4 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--fedex-purple);
+}
+
+.leave-tooltip .leave-item {
+  border-top: 1px solid #eee;
+  padding-top: 6px;
+  margin-top: 6px;
+}
+
+.leave-tooltip .Approved { color: green; font-weight: bold; }
+.leave-tooltip .Rejected { color: red; font-weight: bold; }
+.leave-tooltip .Pending  { color: orange; font-weight: bold; }
+.leave-tooltip .Cancelled{ color: #555; font-weight: bold; }
+.leave-tooltip {
+  pointer-events: none;
+}
+
+/*table*/
+.table-indicator {
+  position: relative;
+  display: inline-block;
+}
+
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -223,6 +335,7 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 
 </main>
 <footer>© FedEx 2026</footer>
+<div id="leaveTooltip" class="leave-tooltip"></div>
 
 <script>
 firebase.initializeApp({
@@ -235,6 +348,7 @@ const db=firebase.firestore();
 const currentUser=JSON.parse(localStorage.getItem("currentUser"));
 if(!currentUser){ alert("Please login first"); location.href="index.html"; }
 document.getElementById("welcomeMsg").textContent=`Welcome ${currentUser.name} to Admin Page`;
+
 
 let cachedRequests=[], currentFilter="All", currentView="list", calendarMonth=new Date().getMonth(), calendarYear=new Date().getFullYear(), calendarMode="month";
 
@@ -348,94 +462,274 @@ function exportCSV(){
   URL.revokeObjectURL(url);
 }
 
+
 // Table view
 function renderTableView(data){
-  const t=document.getElementById("table");
-  t.style.display="table";
+  const t = document.getElementById("table");
+  t.style.display = "table";
 
-  const month = parseInt(document.getElementById("monthSelect").value); // Use selected month
+  const month = parseInt(document.getElementById("monthSelect").value); // selected month
   const y = new Date().getFullYear();
 
-  const tlnames=[...new Set(data.map(l=>l.tlName || l.employeeName))];
-  const daysInMonth=new Date(y,month+1,0).getDate();
-  let html=`<tr><th>TL Name</th>`;
-  for(let d=1;d<=daysInMonth;d++) html+=`<th>${d}</th>`;
-  html+="</tr>";
+  // Get unique TL names
+  const tlnames = [...new Set(data.map(l => l.tlName || l.employeeName))];
+  const daysInMonth = new Date(y, month + 1, 0).getDate();
 
-  tlnames.forEach(tl=>{
-    html+=`<tr><td>${tl}</td>`;
-    for(let d=1;d<=daysInMonth;d++){
-      const cellDate=new Date(y,month,d);
-      let letter="", colorClass="";
-      data.forEach(l=>{
-        if((l.tlName||l.employeeName)===tl){
-          const ld=new Date(l.date);
-          if(ld.getFullYear()===cellDate.getFullYear() && ld.getMonth()===cellDate.getMonth() && ld.getDate()===cellDate.getDate()){
-            letter=l.status==="Approved"?"A":l.status==="Rejected"?"R":"P";
-            colorClass=letter;
-          }
-        }
+  // Table header
+  let html = `<tr><th>TL Name</th>`;
+  for(let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
+  html += `</tr>`;
+
+  tlnames.forEach(tl => {
+    html += `<tr><td>${tl}</td>`;
+
+    for(let d = 1; d <= daysInMonth; d++){
+      const cellDate = new Date(y, month, d);
+
+      // Filter leaves for this TL & day, ignoring Cancelled
+      const leavesForCell = data.filter(l => {
+        const ld = new Date(l.date);
+        return (l.tlName || l.employeeName) === tl &&
+               ld.getFullYear() === y &&
+               ld.getMonth() === month &&
+               ld.getDate() === d &&
+               l.status !== "Cancelled"; // ignore Cancelled
       });
-      html+=letter?`<td><span class="table-indicator ${colorClass}" title="${tl} ${letter}">${letter}</span></td>`:"<td></td>";
+
+      if(leavesForCell.length){
+        // Determine the letter by priority: Approved > Pending > Rejected
+        let letter = "";
+        if(leavesForCell.some(l => l.status === "Approved")) letter = "A";
+        else if(leavesForCell.some(l => l.status === "Pending")) letter = "P";
+        else if(leavesForCell.some(l => l.status === "Rejected")) letter = "R";
+
+        html += `<td>
+          <span class="table-indicator ${letter}" 
+                data-leaves='${JSON.stringify(leavesForCell)}'>
+            ${letter}
+          </span>
+        </td>`;
+      } else {
+        html += "<td></td>";
+      }
     }
-    html+="</tr>";
+
+    html += "</tr>";
   });
-  t.innerHTML=html;
+
+  t.innerHTML = html;
+
+  // Re-add hover tooltip listeners after table is rendered
+  document.querySelectorAll(".table-indicator").forEach(span => {
+    const leaves = JSON.parse(span.dataset.leaves);
+    span.addEventListener("mouseenter", e => showLeaveTooltip(leaves, e));
+    span.addEventListener("mousemove", moveLeaveTooltip);
+    span.addEventListener("mouseleave", hideLeaveTooltip);
+  });
 }
+
 
 // Month Calendar
 function renderCalendar(data){
-  const grid=document.getElementById("calendarGrid");
-  grid.innerHTML=""; grid.style.gridTemplateColumns="repeat(7,1fr)"; grid.className="calendar";
-  const y=calendarYear, m=calendarMonth;
-  const days=new Date(y,m+1,0).getDate();
-  const start=new Date(y,m,1).getDay();
-  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{ const h=document.createElement("div"); h.className="cal-header"; h.textContent=d; grid.appendChild(h); });
-  for(let i=0;i<start;i++){ const e=document.createElement("div"); e.className="cal-cell"; grid.appendChild(e); }
-  for(let d=1;d<=days;d++){
-    const cell=document.createElement("div"); cell.className="cal-cell";
-    const dayDiv=document.createElement("div"); dayDiv.className="cal-day"; dayDiv.textContent=d; cell.appendChild(dayDiv);
-    const cd=new Date(y,m,d);
-    data.forEach(l=>{
-      const ld=new Date(l.date);
-      if(ld.getFullYear()===cd.getFullYear() && ld.getMonth()===cd.getMonth() && ld.getDate()===cd.getDate()){
-        const c=l.status==="Approved"?"A":l.status==="Rejected"?"R":"P";
-        const span=document.createElement("span"); span.className="indicator "+c; span.textContent=l.tlName||l.employeeName; span.title=`${l.employeeName}: ${l.date} - ${l.status}`;
-        cell.appendChild(span);
-      }
+  const grid = document.getElementById("calendarGrid");
+  grid.innerHTML = ""; 
+  grid.style.gridTemplateColumns = "repeat(7,1fr)"; 
+  grid.className = "calendar";
+
+  const y = calendarYear, m = calendarMonth;
+  const days = new Date(y, m + 1, 0).getDate();
+  const start = new Date(y, m, 1).getDay();
+
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{
+    const h = document.createElement("div"); 
+    h.className = "cal-header"; 
+    h.textContent = d; 
+    grid.appendChild(h); 
+  });
+
+  for(let i = 0; i < start; i++){
+    const empty = document.createElement("div"); 
+    empty.className = "cal-cell"; 
+    grid.appendChild(empty);
+  }
+
+  for(let d = 1; d <= days; d++){
+    const cell = document.createElement("div"); 
+    cell.className = "cal-cell";
+
+    const dayDiv = document.createElement("div"); 
+    dayDiv.className = "cal-day"; 
+    dayDiv.textContent = d; 
+    cell.appendChild(dayDiv);
+
+    const cd = new Date(y, m, d);
+
+    // Filter leaves for this date, ignoring Cancelled
+    const dayLeaves = data.filter(l => {
+      const ld = new Date(l.date);
+      return ld.getFullYear() === cd.getFullYear() &&
+             ld.getMonth() === cd.getMonth() &&
+             ld.getDate() === cd.getDate() &&
+             l.status !== "Cancelled"; // ignore Cancelled
     });
+
+    dayLeaves.forEach(l => {
+      const c = l.status === "Approved" ? "A" :
+                l.status === "Rejected" ? "R" : "P";
+      const span = document.createElement("span");
+      span.className = "indicator " + c;
+      span.textContent = l.tlName || l.employeeName;
+      cell.appendChild(span);
+    });
+
+    // Add hover tooltip only if there are leaves
+    if(dayLeaves.length){
+      cell.addEventListener("mouseenter", e => showLeaveTooltip(dayLeaves, e));
+      cell.addEventListener("mousemove", moveLeaveTooltip);
+      cell.addEventListener("mouseleave", hideLeaveTooltip);
+    }
+
     grid.appendChild(cell);
   }
-  document.getElementById("calendarMonthLabel").textContent=`${new Date(y,m).toLocaleString('default',{month:'long'})} ${y}`;
+
+  document.getElementById("calendarMonthLabel").textContent = 
+    `${new Date(y,m).toLocaleString('default',{month:'long'})} ${y}`;
 }
+
 
 // Year View
 function renderYearView(data){
-  const grid=document.getElementById("calendarGrid");
-  grid.innerHTML=""; grid.style.gridTemplateColumns="repeat(3,1fr)"; grid.className="year-view";
-  const y=new Date().getFullYear();
-  for(let m=0;m<12;m++){
-    const monthDiv=document.createElement("div"); monthDiv.className="year-month";
-    const label=document.createElement("div"); label.className="year-month-label"; label.textContent=new Date(y,m).toLocaleString('default',{month:'short'}); monthDiv.appendChild(label);
-    const miniGrid=document.createElement("div"); miniGrid.className="mini-grid";
-    const start=new Date(y,m,1).getDay();
-    for(let i=0;i<start;i++){ const empty=document.createElement("div"); empty.className="day-cell"; miniGrid.appendChild(empty);}
-    const days=new Date(y,m+1,0).getDate();
-    for(let d=1;d<=days;d++){
-      const cell=document.createElement("div"); cell.className="day-cell"; cell.textContent=d;
-      const cd=new Date(y,m,d);
-      const leaves=data.filter(l=>{ const ld=new Date(l.date); return ld.getFullYear()===cd.getFullYear() && ld.getMonth()===cd.getMonth() && ld.getDate()===cd.getDate(); });
-      if(leaves.length>0){
-        const dotC=document.createElement("div"); dotC.className="day-dots";
-        leaves.forEach(l=>{ const dot=document.createElement("div"); dot.className="dot "+(l.status==="Approved"?"approved":l.status==="Rejected"?"rejected":"pending"); dot.title=`${l.employeeName} (${l.status})`; dotC.appendChild(dot); });
+  const grid = document.getElementById("calendarGrid");
+  grid.innerHTML = "";
+  grid.className = "year-view";
+  grid.style.gridTemplateColumns = "repeat(3,1fr)";
+
+  const y = new Date().getFullYear();
+  const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  for(let m=0; m<12; m++){
+    const monthDiv = document.createElement("div");
+    monthDiv.className = "year-month";
+
+    // Month label
+    const label = document.createElement("div");
+    label.className = "year-month-label";
+    label.textContent = new Date(y,m).toLocaleString('default',{month:'short'});
+    monthDiv.appendChild(label);
+
+    // Weekday header row
+    const headerGrid = document.createElement("div");
+    headerGrid.className = "mini-grid";
+    weekdays.forEach(d=>{
+      const w = document.createElement("div");
+      w.className = "day-cell";
+      w.style.fontWeight = "bold";
+      w.style.border = "none";
+      w.textContent = d;
+      headerGrid.appendChild(w);
+    });
+    monthDiv.appendChild(headerGrid);
+
+    // Actual days grid
+    const miniGrid = document.createElement("div");
+    miniGrid.className = "mini-grid";
+
+    const start = new Date(y,m,1).getDay();
+    for(let i=0;i<start;i++){
+      miniGrid.appendChild(document.createElement("div"));
+    }
+
+    const days = new Date(y,m+1,0).getDate();
+    for(let d=1; d<=days; d++){
+      const cell = document.createElement("div");
+      cell.className = "day-cell";
+      cell.textContent = d;
+
+      const cd = new Date(y,m,d);
+      const leaves = data.filter(l=>{
+        const ld = new Date(l.date);
+        return ld.getFullYear()===cd.getFullYear()
+          && ld.getMonth()===cd.getMonth()
+          && ld.getDate()===cd.getDate();
+      });
+
+      if(leaves.length){
+        const dotC = document.createElement("div");
+        dotC.className = "day-dots";
+
+        leaves.forEach(l=>{
+          const dot = document.createElement("div");
+          dot.className = "dot " + (
+            l.status==="Approved" ? "approved" :
+            l.status==="Rejected" ? "rejected" : "pending"
+          );
+          dot.title = `${l.employeeName} (${l.status})`;
+          dotC.appendChild(dot);
+        });
+
         cell.appendChild(dotC);
       }
+
       miniGrid.appendChild(cell);
     }
+
     monthDiv.appendChild(miniGrid);
-    monthDiv.onclick=()=>{ calendarMonth=m; setCalendarMode('month'); };
+
+    monthDiv.onclick = ()=>{
+      calendarMonth = m;
+      setCalendarMode('month');
+    };
+
     grid.appendChild(monthDiv);
   }
+}
+
+
+function setCalendarMode(mode){
+  calendarMode = mode;
+  render();
+}
+
+const leaveTooltip = document.getElementById("leaveTooltip");
+
+function showLeaveTooltip(leaves, e){
+  leaveTooltip.innerHTML = `
+    <h4>Leave Details</h4>
+    ${leaves.map(l => `
+      <div class="leave-item">
+        <div><strong>${l.employeeName}</strong></div>
+        <div>${l.type}</div>
+        <div class="${l.status}">${l.status}</div>
+        <div>Date: ${l.date}</div>
+        ${l.reason ? `<div><em>${l.reason}</em></div>` : ``}
+      </div>
+    `).join("")}
+  `;
+
+  leaveTooltip.style.display = "block";
+  leaveTooltip.style.left = e.pageX + 12 + "px";
+  leaveTooltip.style.top  = e.pageY + 12 + "px";
+}
+
+function moveLeaveTooltip(e){
+  leaveTooltip.style.left = e.pageX + 12 + "px";
+  leaveTooltip.style.top  = e.pageY + 12 + "px";
+}
+
+function hideLeaveTooltip(){
+  leaveTooltip.style.display = "none";
+}
+
+//avoid overlapped
+function moveLeaveTooltip(e){
+  const w = leaveTooltip.offsetWidth;
+  const h = leaveTooltip.offsetHeight;
+  let x = e.pageX + 12;
+  let y = e.pageY + 12;
+  if(x + w > window.innerWidth) x = e.pageX - w - 12;
+  if(y + h > window.innerHeight) y = e.pageY - h - 12;
+  leaveTooltip.style.left = x + "px";
+  leaveTooltip.style.top = y + "px";
 }
 
 let cancelTargetId = null;
@@ -451,6 +745,7 @@ function changeCalendarMonth(diff){ calendarMonth+=diff; if(calendarMonth<0){cal
 toggleCalendarControls(); render(); loadRequests();
 </script>
 
+
 <div class="modal" id="cancelModal">
   <div class="modal-content">
     <h3>Cancel Leave Request?</h3>
@@ -461,5 +756,7 @@ toggleCalendarControls(); render(); loadRequests();
     </div>
   </div>
 </div>
+
+
 </body>
 </html>
