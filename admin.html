@@ -338,6 +338,8 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 <div id="leaveTooltip" class="leave-tooltip"></div>
 
 <script>
+let currentSort = { field: null, ascending: true };
+
 firebase.initializeApp({
   apiKey:"AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain:"fedex-attendance-system.firebaseapp.com",
@@ -348,7 +350,6 @@ const db=firebase.firestore();
 const currentUser=JSON.parse(localStorage.getItem("currentUser"));
 if(!currentUser){ alert("Please login first"); location.href="index.html"; }
 document.getElementById("welcomeMsg").textContent=`Welcome ${currentUser.name} to Admin Page`;
-
 
 let cachedRequests=[], currentFilter="All", currentView="list", calendarMonth=new Date().getMonth(), calendarYear=new Date().getFullYear(), calendarMode="month";
 
@@ -428,7 +429,15 @@ function applyFilters() {
 function renderList(data){
   const t=document.getElementById("table");
   t.style.display="table";
-  t.innerHTML=`<tr><th>Employee</th><th>Leave Type</th><th>Date</th><th>Submitted At</th><th>Reason</th><th>Status</th><th>Action</th></tr>`;
+ t.innerHTML = `<tr>
+  <th onclick="sortList('employeeName')">Employee &#8597;</th>
+  <th onclick="sortList('type')">Leave Type &#8597;</th>
+  <th onclick="sortList('date')">Date &#8597;</th>
+  <th onclick="sortList('submittedAt')">Submitted Date &#8597;</th>
+  <th onclick="sortList('reason')">Reason &#8597;</th>
+  <th onclick="sortList('status')">Status &#8597;</th>
+  <th>Action</th>
+</tr>`;
   data.forEach(l=>{
     let s=l.submittedAt && l.submittedAt.toDate?l.submittedAt.toDate():new Date(l.submittedAt);
     let str=s.toLocaleString("en-PH",{timeZone:"Asia/Manila",year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
@@ -448,6 +457,61 @@ function renderList(data){
     </tr>`;
   });
 }
+
+//for sorting
+function sortList(field) {
+  // Toggle ascending if same field clicked
+  if(currentSort.field === field){
+    currentSort.ascending = !currentSort.ascending;
+  } else {
+    currentSort.field = field;
+    currentSort.ascending = true;
+  }
+
+  // Copy cachedRequests and apply filters first
+  let data = currentFilter==="All"?cachedRequests:cachedRequests.filter(r=>r.status===currentFilter);
+
+  // Apply filters from dropdowns
+  const status = document.getElementById("filterStatus").value;
+  const type = document.getElementById("filterType").value;
+  const date = document.getElementById("filterDate").value;
+  const submitted = document.getElementById("filterSubmitted").value;
+
+  if(status !== "All") data = data.filter(r => r.status === status);
+  if(type !== "All") {
+    if(type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+    else data = data.filter(r => r.type === type);
+  }
+  if(date) data = data.filter(r => r.date === date);
+  if(submitted) data = data.filter(r => {
+    let subDate = r.submittedAt && r.submittedAt.toDate ? r.submittedAt.toDate() : new Date(r.submittedAt);
+    return subDate.toISOString().split("T")[0] === submitted;
+  });
+
+  // Sort
+  data.sort((a,b)=>{
+    let valA = a[field], valB = b[field];
+
+    // handle dates
+    if(field==='submittedAt') {
+      valA = a.submittedAt && a.submittedAt.toDate ? a.submittedAt.toDate().getTime() : new Date(a.submittedAt).getTime();
+      valB = b.submittedAt && b.submittedAt.toDate ? b.submittedAt.toDate().getTime() : new Date(b.submittedAt).getTime();
+    } else if(field==='date'){
+      valA = new Date(a.date).getTime();
+      valB = new Date(b.date).getTime();
+    } else {
+      valA = valA ? valA.toString().toLowerCase() : '';
+      valB = valB ? valB.toString().toLowerCase() : '';
+    }
+
+    if(valA < valB) return currentSort.ascending ? -1 : 1;
+    if(valA > valB) return currentSort.ascending ? 1 : -1;
+    return 0;
+  });
+
+  renderList(data);
+}
+
 
 function exportCSV(){
   const data = cachedRequests; // export all cached
