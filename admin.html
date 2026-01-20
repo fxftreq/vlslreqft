@@ -436,6 +436,7 @@ function renderList(data){
   <th onclick="sortList('submittedAt')">Submitted Date &#8597;</th>
   <th onclick="sortList('reason')">Reason &#8597;</th>
   <th onclick="sortList('status')">Status &#8597;</th>
+  <th>Processed By</th>
   <th>Action</th>
 </tr>`;
   data.forEach(l=>{
@@ -448,7 +449,8 @@ function renderList(data){
       <td>${str}</td>
       <td>${l.reason}</td>
       <td class="status-${l.status}">${l.status}</td>
-      <td>
+<td>${l.actionBy || "-"}</td>
+<td>
         <button class="approve" onclick="updateStatus('${l.id}','Approved')">Approve</button>
         <button class="pend" onclick="updateStatus('${l.id}','Pending')">Pend</button>
         <button class="reject" onclick="updateStatus('${l.id}','Rejected')">Reject</button>
@@ -767,6 +769,7 @@ function showLeaveTooltip(leaves, e){
         <div>Date: ${l.date}</div>
         ${l.reason ? `<div><em>${l.reason}</em></div>` : ``}
       </div>
+      ${l.actionBy ? `<div><strong>By:</strong> ${l.actionBy}</div>` : ``}
     `).join("")}
   `;
 
@@ -774,6 +777,7 @@ function showLeaveTooltip(leaves, e){
   leaveTooltip.style.left = e.pageX + 12 + "px";
   leaveTooltip.style.top  = e.pageY + 12 + "px";
 }
+
 
 function moveLeaveTooltip(e){
   leaveTooltip.style.left = e.pageX + 12 + "px";
@@ -799,9 +803,26 @@ function moveLeaveTooltip(e){
 let cancelTargetId = null;
 function openCancelModal(id){ cancelTargetId = id; document.getElementById("cancelModal").style.display = "flex"; }
 function closeCancelModal(){ cancelTargetId = null; document.getElementById("cancelModal").style.display = "none"; }
-function confirmCancel(){ if(cancelTargetId){ db.collection("single_day_leave").doc(cancelTargetId).update({status:"Cancelled"}); closeCancelModal(); } }
 
-async function updateStatus(id,status){ await db.collection("single_day_leave").doc(id).update({status}); }
+function confirmCancel(){
+  if(cancelTargetId){
+    db.collection("single_day_leave").doc(cancelTargetId).update({
+      status: "Cancelled",
+      actionBy: currentUser.name,
+      actionAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeCancelModal();
+  }
+}
+
+
+async function updateStatus(id, status){
+  await db.collection("single_day_leave").doc(id).update({
+    status: status,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
 
 function changeCalendarMonth(diff){ calendarMonth+=diff; if(calendarMonth<0){calendarMonth=11; calendarYear--;} if(calendarMonth>11){calendarMonth=0; calendarYear++;} render(); }
 
