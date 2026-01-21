@@ -298,7 +298,10 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   color: var(--fedex-purple);
 }
 
-
+.notif-item small {
+  color: #666;
+  font-size: 0.8em;
+}
 /*notification dropdown*/
 #toastContainer {
   position: fixed;
@@ -306,6 +309,7 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   right: 20px;
   z-index: 2000;
 }
+
 
 .toast {
   background: #fff;
@@ -435,9 +439,24 @@ firebase.initializeApp({
 });
 const db=firebase.firestore();
 
+//this is for login.remembner
 const currentUser=JSON.parse(localStorage.getItem("currentUser"));
 if(!currentUser){ alert("Please login first"); location.href="index.html"; }
 document.getElementById("welcomeMsg").textContent=`Welcome ${currentUser.name} to Admin Page`;
+
+//time for notif
+function formatDateTime(ts){
+  if(!ts) return "-";
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleString("en-PH", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
 
 let cachedRequests=[], currentFilter="All", currentView="list", calendarMonth=new Date().getMonth(), calendarYear=new Date().getFullYear(), calendarMode="month";
 
@@ -474,24 +493,28 @@ function loadRequests(){
 function showToast(leave){
   const toast = document.createElement("div");
   toast.className = "toast";
+
   toast.innerHTML = `
-    <strong>New Leave Submitted</strong><br>
-    ${leave.employeeName}<br>
-    ${leave.type} – ${leave.date}
+    <strong>${leave.employeeName}</strong><br>
+    Filed leave for <b>${leave.date}</b><br>
+    <small>${formatDateTime(leave.submittedAt)}</small>
   `;
+
   document.getElementById("toastContainer").appendChild(toast);
 
   setTimeout(() => toast.remove(), 5000);
 }
-
 function addNotification(leave){
   const drop = document.getElementById("notifDropdown");
   const div = document.createElement("div");
   div.className = "notif-item";
+
   div.innerHTML = `
     <strong>${leave.employeeName}</strong><br>
-    ${leave.type} – ${leave.date}
+    Leave date: <b>${leave.date}</b><br>
+    <small>${formatDateTime(leave.submittedAt)}</small>
   `;
+
   drop.prepend(div);
 }
 
