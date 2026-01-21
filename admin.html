@@ -241,6 +241,88 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   display: inline-block;
 }
 
+
+/*notification*/
+#notifBtn {
+  position: relative;
+  background: var(--fedex-purple);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2em;
+}
+
+#notifBtn:hover {
+  background: var(--fedex-orange);
+}
+
+#notifBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7em;
+  font-weight: bold;
+  display: none;
+}
+
+/*notification dropdown*/
+.notif-dropdown {
+  position: absolute;
+  top: 85px;
+  right: 40px;
+  width: 300px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  padding: 10px;
+  z-index: 1000;
+}
+
+.notif-item {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9em;
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-item strong {
+  color: var(--fedex-purple);
+}
+
+
+/*notification dropdown*/
+#toastContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2000;
+}
+
+.toast {
+  background: #fff;
+  border-left: 6px solid var(--fedex-purple);
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  animation: slideIn 0.4s ease;
+  min-width: 260px;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -298,6 +380,10 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
       <button id="exportBtn" title="Export" onclick="exportCSV()">
         <i class="fas fa-file-export"></i>
       </button>
+      <button id="notifBtn" title="Notifications" onclick="toggleNotifDropdown()">
+    <i class="fas fa-bell"></i>
+    <span id="notifBadge">0</span>
+  </button>
     </div>
   </div>
 
@@ -339,6 +425,8 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 
 <script>
 let currentSort = { field: null, ascending: true };
+let lastSeenTimestamp = localStorage.getItem("lastSeenLeave") || 0;
+let unreadCount = 0;
 
 firebase.initializeApp({
   apiKey:"AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
@@ -353,13 +441,73 @@ document.getElementById("welcomeMsg").textContent=`Welcome ${currentUser.name} t
 
 let cachedRequests=[], currentFilter="All", currentView="list", calendarMonth=new Date().getMonth(), calendarYear=new Date().getFullYear(), calendarMode="month";
 
+//this is for notif new added
+
 function loadRequests(){
-  db.collection("single_day_leave").onSnapshot(snap=>{
-    cachedRequests=[];
-    snap.forEach(d=>cachedRequests.push({id:d.id,...d.data()}));
-    render();
-  });
+  db.collection("single_day_leave")
+    .orderBy("submittedAt", "asc")
+    .onSnapshot(snapshot => {
+
+      snapshot.docChanges().forEach(change => {
+        if (change.type === "added") {
+          const data = change.doc.data();
+          const submittedTime = data.submittedAt?.toMillis?.() || 0;
+
+          if (submittedTime > lastSeenTimestamp) {
+            showToast(data);
+            addNotification(data);
+            unreadCount++;
+          }
+        }
+      });
+
+      document.getElementById("notifBadge").style.display =
+        unreadCount > 0 ? "inline-block" : "none";
+      document.getElementById("notifBadge").textContent = unreadCount;
+
+      cachedRequests = [];
+      snapshot.forEach(d => cachedRequests.push({ id: d.id, ...d.data() }));
+      render();
+    });
 }
+
+function showToast(leave){
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerHTML = `
+    <strong>New Leave Submitted</strong><br>
+    ${leave.employeeName}<br>
+    ${leave.type} – ${leave.date}
+  `;
+  document.getElementById("toastContainer").appendChild(toast);
+
+  setTimeout(() => toast.remove(), 5000);
+}
+
+function addNotification(leave){
+  const drop = document.getElementById("notifDropdown");
+  const div = document.createElement("div");
+  div.className = "notif-item";
+  div.innerHTML = `
+    <strong>${leave.employeeName}</strong><br>
+    ${leave.type} – ${leave.date}
+  `;
+  drop.prepend(div);
+}
+
+function toggleNotifDropdown(){
+  const d = document.getElementById("notifDropdown");
+  d.style.display = d.style.display === "block" ? "none" : "block";
+
+  // Mark as read
+  unreadCount = 0;
+  document.getElementById("notifBadge").style.display = "none";
+  localStorage.setItem("lastSeenLeave", Date.now());
+}
+
+//this is for notif new added
+//until here
+
 
 function setView(v){
   currentView = v;
@@ -842,6 +990,8 @@ toggleCalendarControls(); render(); loadRequests();
   </div>
 </div>
 
+<div id="notifDropdown" style="display:none;" class="notif-dropdown"></div>
 
+<div id="toastContainer"></div>
 </body>
 </html>
