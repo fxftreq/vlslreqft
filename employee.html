@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>FedEx Leave System - Employee</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
 :root {
   --fedex-purple: #4D148C;
@@ -11,210 +12,202 @@
   --bg-gray: #f4f4f6;
   --table-header-bg: #4D148C;
   --table-border: #ddd;
-  --status-cancelled: #888888; /* grey for cancelled */
+  --status-cancelled: #888888;
 }
 
-body { 
-  margin:0; 
-  font-family: 'Arial', sans-serif; 
-  background: var(--bg-gray); 
-  display:flex; 
-  flex-direction:column; 
-  min-height:100vh; 
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: var(--bg-gray);
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
 }
 
-header, footer { 
-  background: var(--fedex-purple); 
-  color:white; 
-  padding:12px 20px; 
-  display:flex; 
-  align-items:center; 
-  justify-content:space-between; 
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+header, footer {
+  background: var(--fedex-purple);
+  color:white;
+  padding:12px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-header .welcome { 
-  flex:1; 
-  font-weight: normal; 
-  font-size:1em; 
-  white-space:nowrap; 
-  overflow:hidden; 
-  text-overflow:ellipsis; 
-}
-
-header button.logout { 
-  background: var(--fedex-orange); 
-  color:white; 
-  border:none; 
-  padding:6px 12px; 
-  border-radius:6px; 
-  cursor:pointer; 
-  font-weight:bold; 
-  min-width:80px; 
-  max-width:120px; 
-  transition: background 0.3s ease;
-}
-
-header button.logout:hover { background: darkorange; }
-
-main { 
-  flex:1; 
-  padding:20px 30px; 
-}
-
-h2 { 
-  color: var(--fedex-purple); 
-  text-align:center; 
-  margin-bottom:25px; 
-  font-size:1.6em; 
-}
-
-.card { 
-  background:white; 
-  padding:25px 30px; 
-  border-radius:12px; 
-  box-shadow:0 6px 20px rgba(0,0,0,0.1); 
-  overflow-x:auto; 
-  margin-bottom:20px; 
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover { 
-  transform: translateY(-3px); 
-  box-shadow:0 10px 25px rgba(0,0,0,0.15); 
-}
-
-label { 
-  font-weight:600; 
-  margin-top:12px; 
-  display:block; 
+header .welcome {
   font-size:0.95em;
 }
 
-input, select, textarea { 
-  width:100%; 
-  padding:12px; 
-  margin:6px 0; 
-  box-sizing:border-box; 
-  border-radius:6px; 
-  border:1px solid #ccc; 
+header button.logout {
+  background: var(--fedex-orange);
+  color:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+main {
+  flex:1;
+  padding:20px 30px;
+}
+
+h2 {
+  color: var(--fedex-purple);
+  text-align:center;
+  margin-bottom:20px;
+}
+
+/* ===== ADMIN-STYLE TOP LAYOUT (EMPLOYEE USE ONLY) ===== */
+.top-controls {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:20px;
+  background:#fff;
+  padding:16px 20px;
+  border-radius:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom:20px;
+}
+
+.control-group {
+  display:flex;
+  flex-direction:column;
+  font-size:0.85em;
+}
+
+.control-group label {
+  font-weight:bold;
+  margin-bottom:4px;
+  color:#333;
+}
+
+.control-group select,
+.control-group input {
+  padding:8px 12px;
+  border-radius:6px;
+  border:1px solid #ccc;
   font-size:0.95em;
-  transition: border 0.2s ease;
+  min-width:180px;
 }
 
-input:focus, select:focus, textarea:focus { 
-  border-color: var(--fedex-purple); 
-  outline:none; 
+.submit-inline {
+  margin-top:22px;
+  padding:10px 20px;
+  background:var(--fedex-orange);
+  color:white;
+  border:none;
+  border-radius:6px;
+  font-weight:bold;
+  cursor:pointer;
+  height:42px;
 }
 
-textarea { resize:vertical; }
-
-button.submit { 
-  width:100%; 
-  padding:12px; 
-  margin-top:16px; 
-  background:var(--fedex-orange); 
-  color:white; 
-  border:none; 
-  border-radius:6px; 
-  font-weight:bold; 
-  cursor:pointer; 
-  font-size:1em; 
-  transition: background 0.3s ease;
+.submit-inline:hover {
+  background:darkorange;
 }
 
-button.submit:hover { background: darkorange; }
-
-table { 
-  width:100%; 
-  border-collapse:collapse; 
-  min-width:600px; 
+/* ===== TABLE ===== */
+.card {
   background:white;
-  border-radius:8px; 
-  overflow:hidden;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+  padding:25px;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.1);
 }
 
-th, td { 
-  padding:14px 12px; 
-  border-bottom:1px solid var(--table-border); 
-  text-align:left; 
-  font-size:0.95em;
+table {
+  width:100%;
+  border-collapse:collapse;
+  min-width:600px;
 }
 
-th { 
-  background: var(--table-header-bg); 
-  color:white; 
-  font-weight:600;
+th, td {
+  padding:12px;
+  border-bottom:1px solid var(--table-border);
 }
 
-tr:last-child td { border-bottom:none; }
+th {
+  background:var(--table-header-bg);
+  color:white;
+}
 
 .status-Pending { color:orange; font-weight:bold; }
 .status-Approved { color:green; font-weight:bold; }
 .status-Rejected { color:red; font-weight:bold; }
-.status-Cancelled { color: var(--status-cancelled); font-weight:bold; font-style:italic; }
-
-.cancel { 
-  background: #f44336; 
-  color:white; 
-  border:none; 
-  padding:6px 10px; 
-  border-radius:6px; 
-  cursor:pointer; 
-  font-size:0.85em; 
-  transition: background 0.3s ease;
+.status-Cancelled {
+  color:var(--status-cancelled);
+  font-style:italic;
+  font-weight:bold;
 }
 
-.cancel:hover { background: darkred; }
-
-footer { 
-  text-align:center; 
-  font-size:0.85em; 
-  box-shadow:0 -2px 6px rgba(0,0,0,0.15);
-}
-
-@media(max-width:768px){ 
-  table, th, td { font-size:14px; } 
-  main { padding:15px; }
-  .card { padding:20px; }
+/* Mobile */
+@media(max-width:768px){
+  .top-controls {
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .control-group select,
+  .control-group input {
+    min-width:100%;
+  }
+  .submit-inline {
+    width:100%;
+  }
 }
 </style>
-
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
+
 <body>
 
 <header>
-  <span class="welcome" id="welcomeMsg">Welcome to Leave Request Page</span>
-  <button class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  <span class="welcome" id="welcomeMsg">Welcome</span>
+  <button class="logout" onclick="logout()">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </button>
 </header>
 
 <main>
   <h2 id="userName">Welcome!</h2>
 
-  <div class="card">
-    <h3>File Leave Request</h3>
-    <label for="type">Leave Type</label>
-    <select id="type">
-      <option>Vacation</option>
-      <option>CTO</option>
-      <option>RDCO</option>
-    </select>
-    <label for="date">Leave Date</label>
-    <input type="date" id="date">
-    <label for="reason">Reason</label>
-    <textarea id="reason" placeholder="Enter reason"></textarea>
-    <button class="submit" id="submitBtn">Submit Leave</button>
+  <!-- TOP CONTROLS = FILE LEAVE REQUEST -->
+  <div class="top-controls">
+    <div class="control-group">
+      <label for="type">Leave Type</label>
+      <select id="type">
+        <option>Vacation</option>
+        <option>CTO</option>
+        <option>RDCO</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="date">Leave Date</label>
+      <input type="date" id="date">
+    </div>
+
+    <div class="control-group" style="flex:1">
+      <label for="reason">Reason</label>
+      <input type="text" id="reason" placeholder="Enter reason">
+    </div>
+
+    <button class="submit-inline" id="submitBtn">
+      Submit Leave
+    </button>
   </div>
 
   <div class="card">
     <h3>My Leave Tickets</h3>
     <table id="table">
       <tr>
-        <th>Type</th><th>Date</th><th>Reason</th><th>Status</th><th>Submitted Date</th>
+        <th>Type</th>
+        <th>Date</th>
+        <th>Reason</th>
+        <th>Status</th>
+        <th>Submitted Date</th>
       </tr>
     </table>
   </div>
@@ -222,6 +215,7 @@ footer {
 
 <footer>© FedEx 2026</footer>
 
+<!-- 🔒 SCRIPT — LEFT COMPLETELY UNCHANGED -->
 <script>
 // Firebase config
 const firebaseConfig = {
@@ -326,6 +320,6 @@ function loadLeaves() {
 
 loadLeaves();
 </script>
+
 </body>
 </html>
-
