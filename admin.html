@@ -905,7 +905,7 @@ function openDayModal(dateStr) {
         <div style="margin-top:4px;">
           <button class="approve" onclick="updateStatus('${l.id}','Approved'); render(); openDayModal('${dateStr}')">Approve</button>
           <button class="pend" onclick="updateStatus('${l.id}','Pending'); render(); openDayModal('${dateStr}')">Pend</button>
-          <button class="reject" onclick="updateStatus('${l.id}','Rejected'); render(); openDayModal('${dateStr}')">Reject</button>
+          <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
           <button class="cancel" onclick="cancelTargetId='${l.id}'; confirmCancel(); render(); openDayModal('${dateStr}')">Cancel</button>
         </div>
       </div>
@@ -1098,8 +1098,9 @@ async function confirmReject(){
   });
 
   closeRejectModal();
-  render(); // refresh table/list
+  render(); // refresh table/list/calendar
 }
+
 
 async function updateStatus(id, status){
   await db.collection("single_day_leave").doc(id).update({
