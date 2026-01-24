@@ -327,6 +327,9 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   to { transform: translateX(0); opacity: 1; }
 }
 
+#rejectModal {
+  z-index: 2000; /* higher than dayModal */
+}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -903,10 +906,10 @@ function openDayModal(dateStr) {
         <div>Status: <span class="${l.status}">${l.status}</span></div>
         ${l.reason ? `<div>Reason: ${l.reason}</div>` : ""}
         <div style="margin-top:4px;">
-          <button class="approve" onclick="updateStatus('${l.id}','Approved'); render(); openDayModal('${dateStr}')">Approve</button>
-          <button class="pend" onclick="updateStatus('${l.id}','Pending'); render(); openDayModal('${dateStr}')">Pend</button>
+          <button class="approve" onclick="handleStatus('${l.id}','Approved','${dateStr}')">Approve</button>
+          <button class="pend" onclick="handleStatus('${l.id}','Pending','${dateStr}')">Pend</button>
           <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
-          <button class="cancel" onclick="cancelTargetId='${l.id}'; confirmCancel(); render(); openDayModal('${dateStr}')">Cancel</button>
+          <button class="cancel" onclick="handleCancel('${l.id}','${dateStr}')">Cancel</button>
         </div>
       </div>
     `).join("");
@@ -915,10 +918,57 @@ function openDayModal(dateStr) {
   modal.style.display = "flex";
 }
 
+
 function closeDayModal() {
   document.getElementById("dayModal").style.display = "none";
 }
 
+//to propery handle close modal
+async function handleStatus(id, status, dateStr){
+  await db.collection("single_day_leave").doc(id).update({
+    status: status,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  render();
+  openDayModal(dateStr); // Only reopen day modal for non-reject actions
+}
+
+function handleCancel(id, dateStr){
+  cancelTargetId = id;
+  confirmCancel();
+  openDayModal(dateStr);
+}
+
+// Reject modal stays as before
+function openRejectModal(id){
+  rejectTargetId = id;
+  document.getElementById("rejectNote").value = "";
+  document.getElementById("rejectModal").style.display = "flex";
+}
+
+async function confirmReject(){
+  if(!rejectTargetId) return;
+
+  const note = document.getElementById("rejectNote").value || "No note provided";
+
+  await db.collection("single_day_leave").doc(rejectTargetId).update({
+    status: "Rejected",
+    notes: note,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  closeRejectModal(); // Close reject modal
+
+  render(); // Refresh table/list/calendar
+
+  // Optional: close day modal after rejection
+  const dayModal = document.getElementById("dayModal");
+  if(dayModal.style.display === "flex"){
+    closeDayModal();
+  }
+}
 
 // Year View
 function renderYearView(data){
@@ -1097,8 +1147,19 @@ async function confirmReject(){
     actionAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
-  closeRejectModal();
+  closeRejectModal(); // close reject modal
+
   render(); // refresh table/list/calendar
+
+  // Close day modal if it's open
+  const dayModal = document.getElementById("dayModal");
+  if(dayModal.style.display === "flex"){
+    closeDayModal();
+  }
+
+  // reset target
+  rejectTargetId = null;
+  currentDayModalDate = null;
 }
 
 
