@@ -439,6 +439,7 @@ firebase.initializeApp({
 });
 const db=firebase.firestore();
 
+
 //this is for login.remembner
 const currentUser=JSON.parse(localStorage.getItem("currentUser"));
 if(!currentUser){ alert("Please login first"); location.href="index.html"; }
@@ -596,32 +597,37 @@ function applyFilters() {
 
   renderList(data);
 }
-
+//show list 
 function renderList(data){
-  const t=document.getElementById("table");
-  t.style.display="table";
- t.innerHTML = `<tr>
-  <th onclick="sortList('employeeName')">Employee &#8597;</th>
-  <th onclick="sortList('type')">Leave Type &#8597;</th>
-  <th onclick="sortList('date')">Date &#8597;</th>
-  <th onclick="sortList('submittedAt')">Submitted Date &#8597;</th>
-  <th onclick="sortList('reason')">Reason &#8597;</th>
-  <th onclick="sortList('status')">Status &#8597;</th>
-  <th>Processed By</th>
-  <th>Action</th>
-</tr>`;
-  data.forEach(l=>{
-    let s=l.submittedAt && l.submittedAt.toDate?l.submittedAt.toDate():new Date(l.submittedAt);
-    let str=s.toLocaleString("en-PH",{timeZone:"Asia/Manila",year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
-    t.innerHTML+=`<tr>
+  const t = document.getElementById("table");
+  t.style.display = "table";
+
+  t.innerHTML = `<tr>
+    <th onclick="sortList('employeeName')">Employee &#8597;</th>
+    <th onclick="sortList('type')">Leave Type &#8597;</th>
+    <th onclick="sortList('date')">Date &#8597;</th>
+    <th onclick="sortList('submittedAt')">Submitted Date &#8597;</th>
+    <th onclick="sortList('reason')">Reason &#8597;</th>
+    <th onclick="sortList('status')">Status &#8597;</th>
+    <th>Processed By</th>
+    <th>Notes</th>
+    <th>Action</th>
+  </tr>`;
+
+  data.forEach(l => {
+    let s = l.submittedAt && l.submittedAt.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt);
+    let str = s.toLocaleString("en-PH", {timeZone:"Asia/Manila", year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit"});
+
+    t.innerHTML += `<tr>
       <td>${l.employeeName}</td>
       <td>${l.type}</td>
       <td>${l.date}</td>
       <td>${str}</td>
       <td>${l.reason}</td>
       <td class="status-${l.status}">${l.status}</td>
-<td>${l.actionBy || "-"}</td>
-<td>
+      <td>${l.actionBy || "-"}</td>
+      <td>${l.status === "Rejected" ? (l.notes || "-") : ""}</td>
+      <td>
         <button class="approve" onclick="updateStatus('${l.id}','Approved')">Approve</button>
         <button class="pend" onclick="updateStatus('${l.id}','Pending')">Pend</button>
         <button class="reject" onclick="updateStatus('${l.id}','Rejected')">Reject</button>
@@ -629,6 +635,22 @@ function renderList(data){
       </td>
     </tr>`;
   });
+}
+
+async function updateStatus(id, status){
+  let updates = { 
+    status: status, 
+    actionBy: currentUser.name, 
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  // If rejecting, ask for a note
+  if(status === "Rejected"){
+    const note = prompt("Enter reason/note for rejection:");
+    updates.notes = note || "No note provided";
+  }
+
+  await db.collection("single_day_leave").doc(id).update(updates);
 }
 
 //for sorting
@@ -685,20 +707,35 @@ function sortList(field) {
   renderList(data);
 }
 
-
+//new export to ph time
 function exportCSV(){
-  const data = cachedRequests; // export all cached
-  let csv="Employee,Type,Date,Submitted Date,Time,Reason,Status\n";
-  data.forEach(l=>{
-    let s=l.submittedAt && l.submittedAt.toDate?l.submittedAt.toDate():new Date(l.submittedAt);
-    csv+=`${l.employeeName},${l.type},${l.date},${s.toLocaleString()},${l.reason},${l.status}\n`;
+  const data = cachedRequests;
+  let csv = "Employee,Type,Date,Submitted Date,Reason,Status\n";
+
+  data.forEach(l => {
+    const s = l.submittedAt?.toDate?.() || new Date(l.submittedAt);
+
+    const phTime = s.toLocaleString("en-PH", {
+      timeZone: "Asia/Manila",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    });
+
+    csv += `${l.employeeName},${l.type},${l.date},${phTime},${l.reason},${l.status}\n`;
   });
-  const blob = new Blob([csv],{type:"text/csv"});
+
+  const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a"); a.href=url; a.download="leave_requests.csv"; a.click();
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "leave_requests.csv";
+  a.click();
   URL.revokeObjectURL(url);
 }
-
 
 // Table view
 function renderTableView(data){
@@ -766,50 +803,62 @@ function renderTableView(data){
 }
 
 
-// Month Calendar
-function renderCalendar(data){
+
+// Utility: Convert any date input to local YYYY-MM-DD string
+function getLocalDateString(dateInput) {
+  const d = new Date(dateInput);
+  // adjust to local midnight
+  const offset = d.getTimezoneOffset();
+  d.setMinutes(d.getMinutes() - offset);
+  return d.toISOString().split("T")[0];
+}
+
+// Render month calendar
+function renderCalendar(data) {
   const grid = document.getElementById("calendarGrid");
-  grid.innerHTML = ""; 
-  grid.style.gridTemplateColumns = "repeat(7,1fr)"; 
+  grid.innerHTML = "";
+  grid.style.gridTemplateColumns = "repeat(7,1fr)";
   grid.className = "calendar";
 
   const y = calendarYear, m = calendarMonth;
   const days = new Date(y, m + 1, 0).getDate();
   const start = new Date(y, m, 1).getDay();
 
-  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{
-    const h = document.createElement("div"); 
-    h.className = "cal-header"; 
-    h.textContent = d; 
-    grid.appendChild(h); 
+  // Weekday headers
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d => {
+    const h = document.createElement("div");
+    h.className = "cal-header";
+    h.textContent = d;
+    grid.appendChild(h);
   });
 
-  for(let i = 0; i < start; i++){
-    const empty = document.createElement("div"); 
-    empty.className = "cal-cell"; 
+  // Empty cells before first day
+  for (let i = 0; i < start; i++) {
+    const empty = document.createElement("div");
+    empty.className = "cal-cell";
     grid.appendChild(empty);
   }
 
-  for(let d = 1; d <= days; d++){
-    const cell = document.createElement("div"); 
+  // Day cells
+  for (let d = 1; d <= days; d++) {
+    const cell = document.createElement("div");
     cell.className = "cal-cell";
 
-    const dayDiv = document.createElement("div"); 
-    dayDiv.className = "cal-day"; 
-    dayDiv.textContent = d; 
+    const dayDiv = document.createElement("div");
+    dayDiv.className = "cal-day";
+    dayDiv.textContent = d;
     cell.appendChild(dayDiv);
 
     const cd = new Date(y, m, d);
+    const dateStr = getLocalDateString(cd); // YYYY-MM-DD local
 
-    // Filter leaves for this date, ignoring Cancelled
+    // Filter leaves for this date (ignore Cancelled)
     const dayLeaves = data.filter(l => {
-      const ld = new Date(l.date);
-      return ld.getFullYear() === cd.getFullYear() &&
-             ld.getMonth() === cd.getMonth() &&
-             ld.getDate() === cd.getDate() &&
-             l.status !== "Cancelled"; // ignore Cancelled
+      const leaveDateStr = getLocalDateString(l.date);
+      return leaveDateStr === dateStr && l.status !== "Cancelled";
     });
 
+    // Add indicators for leaves
     dayLeaves.forEach(l => {
       const c = l.status === "Approved" ? "A" :
                 l.status === "Rejected" ? "R" : "P";
@@ -819,18 +868,55 @@ function renderCalendar(data){
       cell.appendChild(span);
     });
 
-    // Add hover tooltip only if there are leaves
-    if(dayLeaves.length){
-      cell.addEventListener("mouseenter", e => showLeaveTooltip(dayLeaves, e));
-      cell.addEventListener("mousemove", moveLeaveTooltip);
-      cell.addEventListener("mouseleave", hideLeaveTooltip);
-    }
+    // Click to open modal with all leaves for that day
+    cell.addEventListener("click", () => {
+      openDayModal(dateStr);
+    });
 
     grid.appendChild(cell);
   }
 
-  document.getElementById("calendarMonthLabel").textContent = 
-    `${new Date(y,m).toLocaleString('default',{month:'long'})} ${y}`;
+  document.getElementById("calendarMonthLabel").textContent =
+    `${new Date(y, m).toLocaleString('default',{month:'long'})} ${y}`;
+}
+
+// Open modal showing all leaves for a specific day
+function openDayModal(dateStr) {
+  const modal = document.getElementById("dayModal");
+  const title = document.getElementById("dayModalTitle");
+  const body = document.getElementById("dayModalBody");
+
+  title.textContent = `Leaves on ${dateStr}`;
+
+  // Filter leaves for that date (timezone-safe)
+  const leaves = cachedRequests.filter(l => {
+    const leaveDateStr = getLocalDateString(l.date);
+    return leaveDateStr === dateStr && l.status !== "Cancelled";
+  });
+
+  if (leaves.length === 0) {
+    body.innerHTML = "<p>No leave requests on this day.</p>";
+  } else {
+    body.innerHTML = leaves.map(l => `
+      <div style="border-bottom:1px solid #eee; padding:6px; margin-bottom:6px;">
+        <div><strong>${l.employeeName}</strong> (${l.type})</div>
+        <div>Status: <span class="${l.status}">${l.status}</span></div>
+        ${l.reason ? `<div>Reason: ${l.reason}</div>` : ""}
+        <div style="margin-top:4px;">
+          <button class="approve" onclick="updateStatus('${l.id}','Approved'); render(); openDayModal('${dateStr}')">Approve</button>
+          <button class="pend" onclick="updateStatus('${l.id}','Pending'); render(); openDayModal('${dateStr}')">Pend</button>
+          <button class="reject" onclick="updateStatus('${l.id}','Rejected'); render(); openDayModal('${dateStr}')">Reject</button>
+          <button class="cancel" onclick="cancelTargetId='${l.id}'; confirmCancel(); render(); openDayModal('${dateStr}')">Cancel</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  modal.style.display = "flex";
+}
+
+function closeDayModal() {
+  document.getElementById("dayModal").style.display = "none";
 }
 
 
@@ -987,6 +1073,7 @@ function confirmCancel(){
 }
 
 
+
 async function updateStatus(id, status){
   await db.collection("single_day_leave").doc(id).update({
     status: status,
@@ -1001,6 +1088,15 @@ function changeCalendarMonth(diff){ calendarMonth+=diff; if(calendarMonth<0){cal
 toggleCalendarControls(); render(); loadRequests();
 </script>
 
+<div class="modal" id="dayModal">
+  <div class="modal-content">
+    <h3 id="dayModalTitle">Leaves on DATE</h3>
+    <div id="dayModalBody" style="max-height:300px; overflow-y:auto;"></div>
+    <div style="text-align:center; margin-top:10px;">
+      <button onclick="closeDayModal()" class="modal-cancel">Close</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal" id="cancelModal">
   <div class="modal-content">
@@ -1018,4 +1114,3 @@ toggleCalendarControls(); render(); loadRequests();
 <div id="toastContainer"></div>
 </body>
 </html>
-
