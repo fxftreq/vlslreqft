@@ -710,10 +710,10 @@ function sortList(field) {
   renderList(data);
 }
 
-//new export to ph time
+// Export CSV including Notes with dynamic filename
 function exportCSV(){
   const data = cachedRequests;
-  let csv = "Employee,Type,Date,Submitted Date,Reason,Status\n";
+  let csv = "Employee,Type,Date,Submitted Date,Reason,Status,Notes\n"; // Added Notes
 
   data.forEach(l => {
     const s = l.submittedAt?.toDate?.() || new Date(l.submittedAt);
@@ -722,20 +722,28 @@ function exportCSV(){
       timeZone: "Asia/Manila",
       year: "numeric",
       month: "short",
-      day: "numeric",
+      day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit"
     });
 
-    csv += `${l.employeeName},${l.type},${l.date},${phTime},${l.reason},${l.status}\n`;
+    // Sanitize notes
+    const notes = l.notes ? l.notes.replace(/(\r\n|\n|\r)/gm, " ") : "";
+
+    csv += `${l.employeeName},${l.type},${l.date},${phTime},${l.reason},${l.status},${notes}\n`;
   });
+
+  // Get current PH time for filename
+  const now = new Date();
+  const phNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+  const dateStr = phNow.toISOString().split("T")[0]; // YYYY-MM-DD
 
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "leave_requests.csv";
+  a.download = `FREE_TIME_REQUEST_${dateStr}.csv`; // Dynamic filename
   a.click();
   URL.revokeObjectURL(url);
 }
