@@ -630,7 +630,7 @@ function renderList(data){
       <td>
         <button class="approve" onclick="updateStatus('${l.id}','Approved')">Approve</button>
         <button class="pend" onclick="updateStatus('${l.id}','Pending')">Pend</button>
-        <button class="reject" onclick="updateStatus('${l.id}','Rejected')">Reject</button>
+        <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
         <button class="cancel" onclick="openCancelModal('${l.id}')">Cancel</button>
       </td>
     </tr>`;
@@ -1072,7 +1072,34 @@ function confirmCancel(){
   }
 }
 
+let rejectTargetId = null;
 
+function openRejectModal(id){
+  rejectTargetId = id;
+  document.getElementById("rejectNote").value = ""; // clear previous
+  document.getElementById("rejectModal").style.display = "flex";
+}
+
+function closeRejectModal(){
+  rejectTargetId = null;
+  document.getElementById("rejectModal").style.display = "none";
+}
+
+async function confirmReject(){
+  if(!rejectTargetId) return;
+
+  const note = document.getElementById("rejectNote").value || "No note provided";
+
+  await db.collection("single_day_leave").doc(rejectTargetId).update({
+    status: "Rejected",
+    notes: note,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  closeRejectModal();
+  render(); // refresh table/list
+}
 
 async function updateStatus(id, status){
   await db.collection("single_day_leave").doc(id).update({
@@ -1087,6 +1114,18 @@ function changeCalendarMonth(diff){ calendarMonth+=diff; if(calendarMonth<0){cal
 
 toggleCalendarControls(); render(); loadRequests();
 </script>
+
+<div class="modal" id="rejectModal">
+  <div class="modal-content">
+    <h3>Reject Leave Request</h3>
+    <p>Please provide a note for rejecting this leave:</p>
+    <textarea id="rejectNote" rows="4" style="width:100%; padding:6px; border-radius:6px; border:1px solid #ccc;"></textarea>
+    <div style="text-align:center; margin-top:10px;">
+      <button class="modal-confirm" onclick="confirmReject()">Reject</button>
+      <button class="modal-cancel" onclick="closeRejectModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal" id="dayModal">
   <div class="modal-content">
