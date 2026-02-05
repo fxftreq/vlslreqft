@@ -7,14 +7,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-:root{
-  --fedex-purple:#4D148C;
-  --fedex-orange:#FF6600;
-  --border:#d1d5db;
-  --bg:#f3f4f6;
-}
-*{ box-sizing:border-box; }
-
 body{
   margin:0;
   font-family: Arial, sans-serif;
@@ -26,13 +18,11 @@ body{
   justify-content:center;
   align-items:center;
 }
-
 @keyframes gradientAnimation {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
-
 .login-card{
   background: rgba(255,255,255,0.95);
   width:100%;
@@ -42,33 +32,28 @@ body{
   box-shadow:0 10px 25px rgba(0,0,0,.15);
   backdrop-filter: blur(10px);
 }
-
 .logo{text-align:center; margin-bottom:18px;}
 .logo img{height:38px;}
-
 .purple-id{text-align:center; font-weight:bold; color:#666; margin-bottom:20px;}
-
 label{ font-size:.85em; font-weight:bold; color:#333; }
 input, select{
   width:100%;
   padding:12px;
   margin-top:6px;
   margin-bottom:14px;
-  border:1px solid var(--border);
+  border:1px solid #d1d5db;
   border-radius:4px;
   font-size:.95em;
 }
-
 input:focus, select:focus{
   outline:none;
-  border-color:var(--fedex-purple);
+  border-color:#4D148C;
   box-shadow:0 0 0 2px rgba(77,20,140,.15);
 }
-
 button{
   width:100%;
   padding:12px;
-  background:var(--fedex-purple);
+  background:#4D148C;
   border:none;
   color:#fff;
   font-weight:bold;
@@ -77,13 +62,7 @@ button{
   margin-top:8px;
 }
 button:hover{ background:#3e0f72; }
-
-.links{ margin-top:16px; font-size:.85em; }
-.links a{ display:block; color:#5b21b6; text-decoration:none; margin-top:6px; }
-.links a:hover{ text-decoration:underline; }
-
 #error{ margin-top:10px; color:#dc2626; font-size:.85em; text-align:center; }
-
 .password-wrapper{ position:relative; }
 .password-wrapper i{
   position:absolute;
@@ -94,14 +73,13 @@ button:hover{ background:#3e0f72; }
   color:#6b7280;
   font-size:.95em;
 }
-.password-wrapper i:hover{ color:var(--fedex-purple); }
+.password-wrapper i:hover{ color:#4D148C; }
 </style>
 </head>
 
 <body>
 
 <div class="login-card">
-
   <div class="logo">
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/FedEx_Express.svg/256px-FedEx_Express.svg.png">
   </div>
@@ -125,10 +103,6 @@ button:hover{ background:#3e0f72; }
 
   <button id="loginBtn">Next</button>
   <div id="error"></div>
-
-  <div class="links">
-    <a href="#" id="forgotPasswordLink">Forgot Password?</a>
-  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -170,42 +144,31 @@ loginBtn.addEventListener("click", async ()=>{
   }
 
   try{
-    let collectionName = role === "manager" ? "manager_leave_user" : "leave_users";
+    // Pick collection based on role
+    const collectionName = role === "manager" ? "manager_leave_user" : "leave_users";
     const docRef = db.collection(collectionName).doc(username);
     const docSnap = await docRef.get();
 
     if(!docSnap.exists){
-      console.log("DEBUG: Document does not exist in collection", collectionName);
       error.textContent = "User not found.";
       return;
     }
 
     const userData = docSnap.data();
 
-    // DEBUG LOGS
-    console.log("DEBUG: Input username:", username);
-    console.log("DEBUG: Input password:", password);
-    console.log("DEBUG: Firestore data:", userData);
+    if(!userData.password){
+      error.textContent = "User has no password set.";
+      return;
+    }
 
-    // Trim Firestore password for testing
-    if(password !== userData.password.trim()){
-      console.log("DEBUG: Password mismatch");
+    if(password !== userData.password){
       error.textContent = "Incorrect password.";
-      return;
-    }
-
-    if(role === "team_leader" && userData.userType !== "team_leader"){
-      error.textContent = "Incorrect role selected.";
-      return;
-    }
-    if(role === "manager" && userData.userType !== "manager"){
-      error.textContent = "Incorrect role selected.";
       return;
     }
 
     localStorage.setItem("currentUser", JSON.stringify({...userData,id:docSnap.id}));
 
-    // Routing
+    // Route based on role
     if(role === "team_leader"){
       location.href = userData.isAdmin ? "admin.html" : "employee.html";
     } else if(role === "manager"){
@@ -213,7 +176,6 @@ loginBtn.addEventListener("click", async ()=>{
     }
 
   } catch(err){
-    console.error("DEBUG: Login error", err);
     error.textContent = err.message;
   }
 });
