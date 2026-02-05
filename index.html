@@ -172,18 +172,14 @@ loginBtn.addEventListener("click", async ()=>{
 
   try{
     let collectionName = role === "team_leader" ? "leave_users" : "manager_leave_user";
+    const docRef = db.collection(collectionName).doc(username);
+    const docSnap = await docRef.get();
 
-    // Query by username field instead of doc ID
-    const querySnap = await db.collection(collectionName)
-      .where("username", "==", username)
-      .get();
-
-    if(querySnap.empty){
+    if(!docSnap.exists){
       error.textContent = role === "team_leader" ? "User not found." : "Manager not found.";
       return;
     }
 
-    const docSnap = querySnap.docs[0];
     const userData = docSnap.data();
 
     if(password !== userData.password){
@@ -191,19 +187,14 @@ loginBtn.addEventListener("click", async ()=>{
       return;
     }
 
-    // Check role
-    if(role === "team_leader" && userData.userType !== "team_leader"){
-      error.textContent = "Incorrect role selected.";
-      return;
-    }
-    if(role === "manager" && userData.userType !== "manager"){
+    if(userData.userType !== role){
       error.textContent = "Incorrect role selected.";
       return;
     }
 
-    localStorage.setItem("currentUser", JSON.stringify({...userData,id:docSnap.id}));
+    localStorage.setItem("currentUser", JSON.stringify({...userData, id: docSnap.id}));
 
-    // Routing
+    // ROUTING
     if(role === "team_leader"){
       location.href = userData.isAdmin ? "admin.html" : "employee.html";
     } else if(role === "manager"){
