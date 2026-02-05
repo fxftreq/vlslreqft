@@ -33,6 +33,7 @@ body{
   100% { background-position: 0% 50%; }
 }
 
+/* LOGIN CARD */
 .login-card{
   background: rgba(255,255,255,0.95);
   width:100%;
@@ -103,17 +104,17 @@ button:hover{ background:#3e0f72; }
 <div class="login-card">
 
   <div class="logo">
-    <img src="fedex.png" alt="FedEx Logo" style="height:150px;">
+   <img src="fedex.png" alt="FedEx Logo" style="height:150px;">
   </div>
 
   <div class="purple-id">Login</div>
 
   <label>Username</label>
-  <input type="text" id="username" placeholder="Enter your name">
+  <input type="text" id="username" placeholder="Enter your username">
 
   <label>Password</label>
   <div class="password-wrapper">
-    <input type="password" id="password">
+    <input type="password" id="password" placeholder="Enter your password">
     <i class="fa-solid fa-eye" id="togglePassword"></i>
   </div>
 
@@ -151,6 +152,7 @@ const togglePassword = document.getElementById("togglePassword");
 const passwordInput = document.getElementById("password");
 const error = document.getElementById("error");
 
+// Show/hide password
 togglePassword.addEventListener("click", ()=>{
   const hidden = passwordInput.type === "password";
   passwordInput.type = hidden ? "text" : "password";
@@ -158,11 +160,11 @@ togglePassword.addEventListener("click", ()=>{
   togglePassword.classList.toggle("fa-eye-slash");
 });
 
+// Login button
 loginBtn.addEventListener("click", async ()=>{
   error.textContent = "";
-
-  const username = document.getElementById("username").value?.trim();
-  const password = document.getElementById("password").value?.trim();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
   const role = document.getElementById("loginType").value;
 
   if(!username || !password || !role){
@@ -171,69 +173,45 @@ loginBtn.addEventListener("click", async ()=>{
   }
 
   try{
+    let collectionName = role === "team_leader" ? "leave_users" : "manager_leave_user";
+    const docRef = db.collection(collectionName).doc(username);
+    const docSnap = await docRef.get();
+
+    if(!docSnap.exists){
+      error.textContent = `${role === "team_leader" ? "User" : "Manager"} not found.`;
+      return;
+    }
+
+    const userData = docSnap.data();
+
+    // Use tempPassword for both collections
+    const storedPassword = userData.tempPassword;
+    if(!storedPassword){
+      error.textContent = "User has no password set.";
+      return;
+    }
+
+    if(password !== storedPassword){
+      error.textContent = "Incorrect password.";
+      return;
+    }
+
+    // Save user to localStorage
+    localStorage.setItem("currentUser", JSON.stringify({...userData,id:docSnap.id}));
+
+    // ROUTING
     if(role === "team_leader"){
-      // Team Leader: query leave_users by name
-      const snapshot = await db.collection("leave_users")
-        .where("name", "==", username)
-        .get();
-
-      if(snapshot.empty){
-        error.textContent = "Team Leader not found.";
-        return;
-      }
-
-      const docSnap = snapshot.docs[0];
-      const userData = docSnap.data();
-
-      if(password !== (userData.tempPassword || userData.password)){
-        error.textContent = "Incorrect password.";
-        return;
-      }
-
-      if(userData.role !== "admin" && userData.userType !== "team_leader"){
-        error.textContent = "Incorrect role selected.";
-        return;
-      }
-
-      localStorage.setItem("currentUser", JSON.stringify({...userData,id:docSnap.id}));
-      location.href = userData.isAdmin ? "admin.html" : "employee.html";
-
-    } else if(role === "manager"){
-      // Manager: query manager_leave_user by name
-      const snapshot = await db.collection("manager_leave_user")
-        .where("name", "==", username)
-        .get();
-
-      if(snapshot.empty){
-        error.textContent = "Manager not found.";
-        return;
-      }
-
-      const docSnap = snapshot.docs[0];
-      const userData = docSnap.data();
-
-      if(password !== (userData.tempPassword || userData.password)){
-        error.textContent = "Incorrect password.";
-        return;
-      }
-
-      if(userData.role !== "admin" && userData.userType !== "manager"){
-        error.textContent = "Incorrect role selected.";
-        return;
-      }
-
-      localStorage.setItem("currentUser", JSON.stringify({...userData,id:docSnap.id}));
-      // route senior -> manager-admin, others -> manager-employee
+      location.href = userData.role === "admin" ? "admin.html" : "employee.html";
+    } else {
+      // Manager
       location.href = userData.managerLevel === "senior" ? "manager-admin.html" : "manager-employee.html";
     }
 
   } catch(err){
-    console.error(err);
-    error.textContent = "Login failed: "+err.message;
+    error.textContent = err.message;
   }
 });
 </script>
 
 </body>
 </html>
-
