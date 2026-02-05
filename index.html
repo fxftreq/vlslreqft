@@ -2,224 +2,140 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>FedEx Leave System - Login</title>
+<title>FedEx Leave System | Login</title>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
-:root {
-  --fedex-purple: #4D148C;
-  --fedex-orange: #FF6600;
-  --bg-gray: #f5f5f7;
-  --input-border: #ccc;
-  --input-focus: #4D148C;
-  --error-color: #dc2626;
+:root{
+  --fedex-purple:#4D148C;
+  --fedex-orange:#FF6600;
+  --border:#d1d5db;
+  --bg:#f3f4f6;
 }
+*{ box-sizing:border-box; }
 
-* { box-sizing: border-box; }
-
-body {
+body{
   margin:0;
   font-family: Arial, sans-serif;
-  background: var(--bg-gray);
-  display:flex;
-  flex-direction:column;
+  background: linear-gradient(-45deg, #4D148C, #FF6600, #4D148C, #FF6600);
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
   min-height:100vh;
-}
-
-header, footer {
-  background: var(--fedex-purple);
-  color:white;
-  text-align:center;
-  padding:15px 0;
-  font-size:1.2em;
-  font-weight:bold;
-}
-
-main {
-  flex:1;
   display:flex;
   justify-content:center;
   align-items:center;
-  padding:20px;
 }
 
-.card {
-  background:white;
-  padding:30px 25px;
+@keyframes gradientAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* LOGIN CARD */
+.login-card{
+  background: rgba(255,255,255,0.95);
   width:100%;
-  max-width:400px;
-  border-radius:12px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.15);
-  position:relative;
-}
-
-.card h3 {
-  text-align:center;
-  margin-bottom:25px;
-  color:var(--fedex-purple);
-  font-size:1.5em;
-}
-
-input[type="text"], input[type="password"] {
-  width:100%;
-  padding:12px 40px 12px 12px;
-  margin:10px 0;
-  border:1px solid var(--input-border);
+  max-width:420px;
+  padding:32px 28px;
   border-radius:6px;
-  transition:0.2s;
+  box-shadow:0 10px 25px rgba(0,0,0,.15);
+  backdrop-filter: blur(10px);
 }
 
-input[type="text"]:focus, input[type="password"]:focus {
-  border-color: var(--input-focus);
+.logo{text-align:center; margin-bottom:18px;}
+.logo img{height:38px;}
+
+.purple-id{text-align:center; font-weight:bold; color:#666; margin-bottom:20px;}
+
+label{ font-size:.85em; font-weight:bold; color:#333; }
+input, select{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  margin-bottom:14px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  font-size:.95em;
+}
+
+input:focus, select:focus{
   outline:none;
-  box-shadow:0 0 5px rgba(77,20,140,0.3);
+  border-color:var(--fedex-purple);
+  box-shadow:0 0 0 2px rgba(77,20,140,.15);
 }
 
-.password-wrapper {
-  position:relative;
+button{
+  width:100%;
+  padding:12px;
+  background:var(--fedex-purple);
+  border:none;
+  color:#fff;
+  font-weight:bold;
+  border-radius:4px;
+  cursor:pointer;
+  margin-top:8px;
 }
+button:hover{ background:#3e0f72; }
 
-.password-wrapper i {
+.links{ margin-top:16px; font-size:.85em; }
+.links a{ display:block; color:#5b21b6; text-decoration:none; margin-top:6px; }
+.links a:hover{ text-decoration:underline; }
+
+#error{ margin-top:10px; color:#dc2626; font-size:.85em; text-align:center; }
+
+.password-wrapper{ position:relative; }
+.password-wrapper i{
   position:absolute;
   right:12px;
   top:50%;
   transform:translateY(-50%);
   cursor:pointer;
-  color:#888;
+  color:#6b7280;
+  font-size:.95em;
 }
-
-button {
-  width:100%;
-  padding:12px;
-  margin-top:20px;
-  background:var(--fedex-orange);
-  color:white;
-  border:none;
-  border-radius:6px;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.3s;
-}
-
-button:hover {
-  background:#e65a00;
-}
-
-.forgot-link {
-  display:block;
-  text-align:right;
-  margin-top:10px;
-  font-size:0.9em;
-  color:var(--fedex-purple);
-  cursor:pointer;
-  text-decoration:underline;
-}
-
-#errorMsg {
-  color: var(--error-color);
-  font-size:0.9em;
-  margin-top:8px;
-  text-align:center;
-}
-
-/* Modal styles */
-.modal {
-  display:none;
-  position:fixed;
-  z-index:1000;
-  left:0;
-  top:0;
-  width:100%;
-  height:100%;
-  overflow:auto;
-  background:rgba(0,0,0,0.5);
-}
-
-.modal-content {
-  background:white;
-  margin:10% auto;
-  padding:25px;
-  border-radius:10px;
-  width:90%;
-  max-width:350px;
-  position:relative;
-  box-shadow:0 8px 25px rgba(0,0,0,0.3);
-}
-
-.modal-content h3 {
-  color:var(--fedex-purple);
-  margin-bottom:20px;
-  text-align:center;
-}
-
-.modal-content input {
-  padding:12px;
-  width:100%;
-  margin:6px 0;
-  border-radius:6px;
-  border:1px solid var(--input-border);
-  box-sizing:border-box;
-}
-
-.modal-content button {
-  margin-top:12px;
-  background:var(--fedex-orange);
-  color:white;
-  font-weight:bold;
-  width:100%;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-.modal-content button:hover {
-  background:#e65a00;
-}
-
-.close {
-  position:absolute;
-  right:15px;
-  top:10px;
-  font-size:22px;
-  font-weight:bold;
-  cursor:pointer;
-}
+.password-wrapper i:hover{ color:var(--fedex-purple); }
 </style>
 </head>
+
 <body>
 
-<header>FedEx Leave Request System</header>
+<div class="login-card">
 
-<main>
-  <div class="card">
-    <h3>Login</h3>
-    <input type="text" id="username" placeholder="Username">
-    <div class="password-wrapper">
-      <input type="password" id="password" placeholder="Password">
-      <i class="fa-solid fa-eye" id="togglePassword"></i>
-    </div>
-    <button id="loginBtn">Login</button>
-    <p id="errorMsg"></p>
-    <span class="forgot-link" id="forgotPasswordLink">Forgot Password?</span>
+  <div class="logo">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/FedEx_Express.svg/256px-FedEx_Express.svg.png">
   </div>
-</main>
 
-<!-- Change Password Modal -->
-<div id="changePasswordModal" class="modal">
-  <div class="modal-content">
-    <span class="close" id="closeModal">&times;</span>
-    <h3>Change Temporary Password</h3>
-    <input type="password" id="newPassword" placeholder="New password">
-    <input type="password" id="confirmPassword" placeholder="Confirm password">
-    <button id="changeBtn">Change Password</button>
-    <p id="modalErrorMsg"></p>
+  <div class="purple-id">Login</div>
+
+  <label>Username</label>
+  <input type="text" id="username" placeholder="">
+
+  <label>Password</label>
+  <div class="password-wrapper">
+    <input type="password" id="password">
+    <i class="fa-solid fa-eye" id="togglePassword"></i>
+  </div>
+
+  <label>Login As</label>
+  <select id="loginType">
+    <option value="team_leader">Team Leader</option>
+    <option value="manager">Manager</option>
+  </select>
+
+  <button id="loginBtn">Next</button>
+  <div id="error"></div>
+
+  <div class="links">
+    <a href="#" id="forgotPasswordLink">Forgot Password?</a>
   </div>
 </div>
 
-<footer>© FedEx 2026</footer>
-
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain: "fedex-attendance-system.firebaseapp.com",
@@ -231,99 +147,83 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Elements
 const loginBtn = document.getElementById("loginBtn");
-const errorMsg = document.getElementById("errorMsg");
 const togglePassword = document.getElementById("togglePassword");
 const passwordInput = document.getElementById("password");
+const error = document.getElementById("error");
 
-// Modal
-const modal = document.getElementById("changePasswordModal");
-const closeModal = document.getElementById("closeModal");
-const newPassword = document.getElementById("newPassword");
-const confirmPassword = document.getElementById("confirmPassword");
-const changeBtn = document.getElementById("changeBtn");
-const modalErrorMsg = document.getElementById("modalErrorMsg");
-
-// Toggle password visibility
 togglePassword.addEventListener("click", ()=>{
-  if(passwordInput.type==="password"){ passwordInput.type="text"; togglePassword.classList.replace("fa-eye","fa-eye-slash"); }
-  else { passwordInput.type="password"; togglePassword.classList.replace("fa-eye-slash","fa-eye"); }
+  const hidden = passwordInput.type === "password";
+  passwordInput.type = hidden ? "text" : "password";
+  togglePassword.classList.toggle("fa-eye");
+  togglePassword.classList.toggle("fa-eye-slash");
 });
 
-// Login
 loginBtn.addEventListener("click", async ()=>{
+  error.textContent = "";
   const username = document.getElementById("username").value.trim();
-  const password = passwordInput.value.trim();
-  errorMsg.textContent="";
+  const password = document.getElementById("password").value.trim();
+  const role = document.getElementById("loginType").value;
 
-  if(!username || !password){ errorMsg.textContent="Enter username & password."; return; }
-
-  try{
-    const docRef = db.collection("leave_users").doc(username);
-    const doc = await docRef.get();
-    if(!doc.exists){ errorMsg.textContent="User not found."; return; }
-    const data = doc.data();
-
-    if(password !== data.tempPassword){ errorMsg.textContent="Incorrect password."; return; }
-
-    localStorage.setItem("currentUser", JSON.stringify({...data,id:doc.id}));
-
-    if(data.isTempPassword){ modal.style.display="block"; return; }
-
-    if(data.role==="admin") location.href="admin.html"; else location.href="employee.html";
-
-  } catch(err){ errorMsg.textContent="Error: "+err.message; }
-});
-
-// Forgot Password
-document.getElementById("forgotPasswordLink").addEventListener("click", async ()=>{
-  const username = document.getElementById("username").value.trim();
-  if(!username){ alert("Enter username first."); return; }
+  if(!username || !password || !role){
+    error.textContent = "Please complete all fields.";
+    return;
+  }
 
   try{
-    const docRef = db.collection("leave_users").doc(username);
-    const doc = await docRef.get();
-    if(!doc.exists){ alert("User not found."); return; }
+    if(role === "team_leader"){
+      // Team leader login: check leave_users collection
+      const docRef = db.collection("leave_users").doc(username);
+      const docSnap = await docRef.get();
 
-    const email = doc.data().email;
-    if(!email){ alert("No email registered."); return; }
+      if(!docSnap.exists){
+        error.textContent = "User not found.";
+        return;
+      }
 
-    const inputEmail = prompt(`Enter registered email:`);
-    if(!inputEmail || inputEmail!==email){ alert("Email does not match."); return; }
+      const userData = docSnap.data();
+      if(password !== userData.password){
+        error.textContent = "Incorrect password.";
+        return;
+      }
+      if(userData.userType !== "team_leader"){
+        error.textContent = "Incorrect role selected.";
+        return;
+      }
 
-    const tempPassword = Math.random().toString(36).slice(-8);
-    await docRef.update({ tempPassword, isTempPassword:true });
+      localStorage.setItem("currentUser", JSON.stringify({...userData,id:docSnap.id}));
+      location.href = userData.isAdmin ? "admin.html" : "employee.html";
 
-    alert(`Temporary password: ${tempPassword}\nUse this to log in and change password.`);
+    } else if(role === "manager"){
+      // Manager login: check manager_leave_user collection
+      const docRef = db.collection("manager_leave_user").doc(username);
+      const docSnap = await docRef.get();
 
-  } catch(err){ alert("Error: "+err.message); }
-});
+      if(!docSnap.exists){
+        error.textContent = "Manager not found in manager_leave_user.";
+        return;
+      }
 
-// Modal controls
-closeModal.onclick = ()=>{ modal.style.display="none"; }
-window.onclick = (event)=>{ if(event.target == modal) modal.style.display="none"; }
+      const userData = docSnap.data();
+      if(password !== userData.password){
+        error.textContent = "Incorrect password.";
+        return;
+      }
+      if(userData.userType !== "manager"){
+        error.textContent = "Incorrect role selected.";
+        return;
+      }
 
-// Change password in modal
-changeBtn.addEventListener("click", async ()=>{
-  modalErrorMsg.textContent="";
-  if(!newPassword.value || !confirmPassword.value){ modalErrorMsg.textContent="Fill all fields"; return; }
-  if(newPassword.value!==confirmPassword.value){ modalErrorMsg.textContent="Passwords do not match"; return; }
+      localStorage.setItem("currentUser", JSON.stringify({...userData,id:docSnap.id}));
+      // route senior -> manager-admin, others -> manager-employee
+      location.href = userData.managerLevel === "senior" ? "manager-admin.html" : "manager-employee.html";
+    }
 
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-  if(!currentUser){ alert("No user logged in."); location.href="index.html"; }
-
-  try{
-    await db.collection("leave_users").doc(currentUser.id).update({
-      tempPassword: newPassword.value,
-      isTempPassword:false
-    });
-    alert("Password changed successfully! Please login again.");
-    localStorage.removeItem("currentUser");
-    modal.style.display="none";
-    location.reload();
-  } catch(err){ modalErrorMsg.textContent="Error: "+err.message; }
+  } catch(err){
+    error.textContent = err.message;
+  }
 });
 </script>
+
 </body>
 </html>
