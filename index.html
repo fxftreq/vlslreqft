@@ -204,7 +204,7 @@ loginBtn.addEventListener("click", async ()=>{
       location.href = userData.role === "admin" ? "admin.html" : "employee.html";
     } else {
       // Manager
-      location.href = userData.managerLevel === "senior" ? "manager-admin.html" : "manager-employee.html";
+      location.href = userData.managerLevel === "admin" ? "manager-admin.html" : "manager-employee.html";
     }
 
   } catch(err){
