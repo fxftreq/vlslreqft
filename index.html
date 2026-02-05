@@ -7,6 +7,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+:root{
+  --fedex-purple:#4D148C;
+  --fedex-orange:#FF6600;
+  --border:#d1d5db;
+  --bg:#f3f4f6;
+}
+*{ box-sizing:border-box; }
+
 body{
   margin:0;
   font-family: Arial, sans-serif;
@@ -18,11 +26,13 @@ body{
   justify-content:center;
   align-items:center;
 }
+
 @keyframes gradientAnimation {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
 .login-card{
   background: rgba(255,255,255,0.95);
   width:100%;
@@ -32,28 +42,33 @@ body{
   box-shadow:0 10px 25px rgba(0,0,0,.15);
   backdrop-filter: blur(10px);
 }
+
 .logo{text-align:center; margin-bottom:18px;}
 .logo img{height:38px;}
+
 .purple-id{text-align:center; font-weight:bold; color:#666; margin-bottom:20px;}
+
 label{ font-size:.85em; font-weight:bold; color:#333; }
 input, select{
   width:100%;
   padding:12px;
   margin-top:6px;
   margin-bottom:14px;
-  border:1px solid #d1d5db;
+  border:1px solid var(--border);
   border-radius:4px;
   font-size:.95em;
 }
+
 input:focus, select:focus{
   outline:none;
-  border-color:#4D148C;
+  border-color:var(--fedex-purple);
   box-shadow:0 0 0 2px rgba(77,20,140,.15);
 }
+
 button{
   width:100%;
   padding:12px;
-  background:#4D148C;
+  background:var(--fedex-purple);
   border:none;
   color:#fff;
   font-weight:bold;
@@ -62,7 +77,13 @@ button{
   margin-top:8px;
 }
 button:hover{ background:#3e0f72; }
+
+.links{ margin-top:16px; font-size:.85em; }
+.links a{ display:block; color:#5b21b6; text-decoration:none; margin-top:6px; }
+.links a:hover{ text-decoration:underline; }
+
 #error{ margin-top:10px; color:#dc2626; font-size:.85em; text-align:center; }
+
 .password-wrapper{ position:relative; }
 .password-wrapper i{
   position:absolute;
@@ -73,13 +94,14 @@ button:hover{ background:#3e0f72; }
   color:#6b7280;
   font-size:.95em;
 }
-.password-wrapper i:hover{ color:#4D148C; }
+.password-wrapper i:hover{ color:var(--fedex-purple); }
 </style>
 </head>
 
 <body>
 
 <div class="login-card">
+
   <div class="logo">
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/FedEx_Express.svg/256px-FedEx_Express.svg.png">
   </div>
@@ -87,7 +109,7 @@ button:hover{ background:#3e0f72; }
   <div class="purple-id">Login</div>
 
   <label>Username</label>
-  <input type="text" id="username" placeholder="">
+  <input type="text" id="username" placeholder="Enter your username">
 
   <label>Password</label>
   <div class="password-wrapper">
@@ -103,12 +125,18 @@ button:hover{ background:#3e0f72; }
 
   <button id="loginBtn">Next</button>
   <div id="error"></div>
+
+  <div class="links">
+    <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+  </div>
 </div>
 
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain: "fedex-attendance-system.firebaseapp.com",
@@ -120,11 +148,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// Elements
 const loginBtn = document.getElementById("loginBtn");
 const togglePassword = document.getElementById("togglePassword");
 const passwordInput = document.getElementById("password");
 const error = document.getElementById("error");
 
+// Toggle password visibility
 togglePassword.addEventListener("click", ()=>{
   const hidden = passwordInput.type === "password";
   passwordInput.type = hidden ? "text" : "password";
@@ -132,10 +162,11 @@ togglePassword.addEventListener("click", ()=>{
   togglePassword.classList.toggle("fa-eye-slash");
 });
 
+// Login function
 loginBtn.addEventListener("click", async ()=>{
   error.textContent = "";
   const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const password = passwordInput.value.trim();
   const role = document.getElementById("loginType").value;
 
   if(!username || !password || !role){
@@ -143,9 +174,8 @@ loginBtn.addEventListener("click", async ()=>{
     return;
   }
 
-  try{
-    // Pick collection based on role
-    const collectionName = role === "manager" ? "manager_leave_user" : "leave_users";
+  try {
+    let collectionName = role === "manager" ? "manager_leave_user" : "leave_users";
     const docRef = db.collection(collectionName).doc(username);
     const docSnap = await docRef.get();
 
@@ -156,21 +186,25 @@ loginBtn.addEventListener("click", async ()=>{
 
     const userData = docSnap.data();
 
-    if(!userData.password){
+    // Pick correct password field
+    let storedPassword = role === "manager" ? userData.password : userData.tempPassword;
+
+    if(!storedPassword){
       error.textContent = "User has no password set.";
       return;
     }
 
-    if(password !== userData.password){
+    if(password !== storedPassword){
       error.textContent = "Incorrect password.";
       return;
     }
 
+    // Save current user
     localStorage.setItem("currentUser", JSON.stringify({...userData,id:docSnap.id}));
 
-    // Route based on role
+    // Routing
     if(role === "team_leader"){
-      location.href = userData.isAdmin ? "admin.html" : "employee.html";
+      location.href = userData.role === "admin" ? "admin.html" : "employee.html";
     } else if(role === "manager"){
       location.href = userData.managerLevel === "senior" ? "manager-admin.html" : "manager-employee.html";
     }
