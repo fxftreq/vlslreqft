@@ -215,6 +215,8 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   pointer-events: none;
 }
 
+
+
 .leave-tooltip h4 {
   margin: 0 0 6px;
   font-size: 13px;
@@ -566,6 +568,7 @@ function setView(v){
     document.getElementById("monthSelectWrapper").style.display = (currentView==='table')?'flex':'none';
   }
 
+
   render();
 }
 
@@ -888,7 +891,7 @@ function renderCalendar(data) {
                 l.status === "Rejected" ? "R" : "P";
       const span = document.createElement("span");
       span.className = "indicator " + c;
-      span.textContent = l.tlName || l.employeeName;
+      span.textContent = l.tlName || l.managerName;
       cell.appendChild(span);
     });
 
@@ -923,7 +926,7 @@ function openDayModal(dateStr) {
   } else {
     body.innerHTML = leaves.map(l => `
       <div style="border-bottom:1px solid #eee; padding:6px; margin-bottom:6px;">
-        <div><strong>${l.employeeName}</strong> (${l.type})</div>
+        <div><strong>${l.managerName}</strong> (${l.type})</div>
         <div>Status: <span class="${l.status}">${l.status}</span></div>
         ${l.reason ? `<div>Reason: ${l.reason}</div>` : ""}
         <div style="margin-top:4px;">
@@ -1197,6 +1200,8 @@ function changeCalendarMonth(diff){ calendarMonth+=diff; if(calendarMonth<0){cal
 
 toggleCalendarControls(); render(); loadRequests();
 </script>
+
+sda
 
 <div class="modal" id="rejectModal">
   <div class="modal-content">
