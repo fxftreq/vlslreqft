@@ -744,7 +744,7 @@ function exportCSV(){
     // Sanitize notes
     const notes = l.notes ? l.notes.replace(/(\r\n|\n|\r)/gm, " ") : "";
 
-    csv += `${l.employeeName},${l.type},${l.date},${phTime},${l.reason},${l.status},${notes}\n`;
+    csv += `${l.managerName},${l.type},${l.date},${phTime},${l.reason},${l.status},${notes}\n`;
   });
 
   // Get current PH time for filename
@@ -770,7 +770,7 @@ function renderTableView(data){
   const y = new Date().getFullYear();
 
   // Get unique TL names
-  const tlnames = [...new Set(data.map(l => l.tlName || l.employeeName))];
+  const tlnames = [...new Set(data.map(l => l.tlName || l.managerName))];
   const daysInMonth = new Date(y, month + 1, 0).getDate();
 
   // Table header
@@ -787,7 +787,7 @@ function renderTableView(data){
       // Filter leaves for this TL & day, ignoring Cancelled
       const leavesForCell = data.filter(l => {
         const ld = new Date(l.date);
-        return (l.tlName || l.employeeName) === tl &&
+        return (l.tlName || l.managerName) === tl &&
                ld.getFullYear() === y &&
                ld.getMonth() === month &&
                ld.getDate() === d &&
