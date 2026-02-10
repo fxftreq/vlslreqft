@@ -457,7 +457,7 @@ if(!currentUser || !currentUser.name){
   alert("Please login first"); 
   location.href="index.html"; 
 } else {
-  document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Admin Page`;
+  document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Manager Admin Page`;
 }
 
 
@@ -512,7 +512,7 @@ function showToast(leave){
   toast.className = "toast";
 
   toast.innerHTML = `
-    <strong>${leave.employeeName}</strong><br>
+    <strong>${leave.managerName}</strong><br>
     Filed leave for <b>${leave.date}</b><br>
     <small>${formatDateTime(leave.submittedAt)}</small>
   `;
@@ -527,7 +527,7 @@ function addNotification(leave){
   div.className = "notif-item";
 
   div.innerHTML = `
-    <strong>${leave.employeeName}</strong><br>
+    <strong>${leave.managerName}</strong><br>
     Leave date: <b>${leave.date}</b><br>
     <small>${formatDateTime(leave.submittedAt)}</small>
   `;
@@ -619,7 +619,7 @@ function renderList(data){
   t.style.display = "table";
 
   t.innerHTML = `<tr>
-    <th onclick="sortList('employeeName')">Employee &#8597;</th>
+    <th onclick="sortList('managerName)">Employee &#8597;</th>
     <th onclick="sortList('type')">Leave Type &#8597;</th>
     <th onclick="sortList('date')">Date &#8597;</th>
     <th onclick="sortList('submittedAt')">Submitted Date &#8597;</th>
@@ -635,7 +635,7 @@ function renderList(data){
     let str = s.toLocaleString("en-PH", {timeZone:"Asia/Manila", year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit"});
 
     t.innerHTML += `<tr>
-      <td>${l.employeeName}</td>
+      <td>${l.managerName}</td>
       <td>${l.type}</td>
       <td>${l.date}</td>
       <td>${str}</td>
@@ -1057,7 +1057,7 @@ function renderYearView(data){
             l.status==="Approved" ? "approved" :
             l.status==="Rejected" ? "rejected" : "pending"
           );
-          dot.title = `${l.employeeName} (${l.status})`;
+          dot.title = `${l.managerName} (${l.status})`;
           dotC.appendChild(dot);
         });
 
@@ -1091,7 +1091,7 @@ function showLeaveTooltip(leaves, e){
     <h4>Leave Details</h4>
     ${leaves.map(l => `
       <div class="leave-item">
-        <div><strong>${l.employeeName}</strong></div>
+        <div><strong>${l.managerName}</strong></div>
         <div>${l.type}</div>
         <div class="${l.status}">${l.status}</div>
         <div>Date: ${l.date}</div>
