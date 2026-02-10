@@ -622,7 +622,7 @@ function renderList(data){
   t.style.display = "table";
 
   t.innerHTML = `<tr>
-    <th onclick="sortList('managerName)">Employee &#8597;</th>
+    <th onclick="sortList('managerName')">Employee &#8597;</th>
     <th onclick="sortList('type')">Leave Type &#8597;</th>
     <th onclick="sortList('date')">Date &#8597;</th>
     <th onclick="sortList('submittedAt')">Submitted Date &#8597;</th>
@@ -949,7 +949,7 @@ function closeDayModal() {
 
 //to propery handle close modal
 async function handleStatus(id, status, dateStr){
-  await db.collection("single_day_leave").doc(id).update({
+  await db.collection("manager_single_day_leave").doc(id).update({
     status: status,
     actionBy: currentUser.name,
     actionAt: firebase.firestore.FieldValue.serverTimestamp()
