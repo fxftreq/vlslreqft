@@ -445,9 +445,7 @@ const db=firebase.firestore();
 
 //this is for login.remembner
 
-const currentUser=JSON.parse(localStorage.getItem("currentUser"));
-if(!currentUser){ alert("Please login first"); location.href="index.html"; }
-document.getElementById("welcomeMsg").textContent=`Welcome ${currentUser.name} to Admin Page`;
+
 
 //time for notif
 function formatDateTime(ts){
