@@ -617,7 +617,7 @@ function applyFilters() {
   renderList(data);
 }
 //show list 
-function renderList(data){
+function renderList(data) {
   const t = document.getElementById("table");
   t.style.display = "table";
 
@@ -634,10 +634,20 @@ function renderList(data){
   </tr>`;
 
   data.forEach(l => {
-    let s = l.submittedAt && l.submittedAt.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt);
-    let str = s.toLocaleString("en-PH", {timeZone:"Asia/Manila", year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit"});
+    const tr = document.createElement("tr");
 
-    t.innerHTML += `<tr>
+    const s = l.submittedAt && l.submittedAt.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt);
+    const str = s.toLocaleString("en-PH", {
+      timeZone:"Asia/Manila",
+      year:"numeric",
+      month:"short",
+      day:"numeric",
+      hour:"2-digit",
+      minute:"2-digit",
+      second:"2-digit"
+    });
+
+    tr.innerHTML = `
       <td>${l.managerName}</td>
       <td>${l.type}</td>
       <td>${l.date}</td>
@@ -646,13 +656,38 @@ function renderList(data){
       <td class="status-${l.status}">${l.status}</td>
       <td>${l.actionBy || "-"}</td>
       <td>${l.status === "Rejected" ? (l.notes || "-") : ""}</td>
-      <td>
-        <button class="approve" onclick="updateStatus('${l.id}','Approved')">Approve</button>
-        <button class="pend" onclick="updateStatus('${l.id}','Pending')">Pend</button>
-        <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
-        <button class="cancel" onclick="openCancelModal('${l.id}')">Cancel</button>
-      </td>
-    </tr>`;
+      <td></td>
+    `;
+
+    // Action buttons
+    const tdAction = tr.querySelector("td:last-child");
+
+    const btnApprove = document.createElement("button");
+    btnApprove.className = "approve";
+    btnApprove.textContent = "Approve";
+    btnApprove.addEventListener("click", () => updateStatus(l.id, "Approved"));
+
+    const btnPend = document.createElement("button");
+    btnPend.className = "pend";
+    btnPend.textContent = "Pend";
+    btnPend.addEventListener("click", () => updateStatus(l.id, "Pending"));
+
+    const btnReject = document.createElement("button");
+    btnReject.className = "reject";
+    btnReject.textContent = "Reject";
+    btnReject.addEventListener("click", () => openRejectModal(l.id));
+
+    const btnCancel = document.createElement("button");
+    btnCancel.className = "cancel";
+    btnCancel.textContent = "Cancel";
+    btnCancel.addEventListener("click", () => openCancelModal(l.id));
+
+    tdAction.appendChild(btnApprove);
+    tdAction.appendChild(btnPend);
+    tdAction.appendChild(btnReject);
+    tdAction.appendChild(btnCancel);
+
+    t.appendChild(tr);
   });
 }
 
