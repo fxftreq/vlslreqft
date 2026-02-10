@@ -173,36 +173,16 @@ loginBtn.addEventListener("click", async ()=>{
   }
 
   try{
-    let userData = null;
-let userId = null;
+    let collectionName = role === "team_leader" ? "leave_users" : "manager_leave_user";
+    const docRef = db.collection(collectionName).doc(username);
+    const docSnap = await docRef.get();
 
-if(role === "team_leader"){
-  // Team Leader → doc ID = username
-  const docSnap = await db.collection("leave_users").doc(username).get();
-  if(!docSnap.exists){
-    error.textContent = "User not found.";
-    return;
-  }
-  userData = docSnap.data();
-  userId = docSnap.id;
+    if(!docSnap.exists){
+      error.textContent = `${role === "team_leader" ? "User" : "Manager"} not found.`;
+      return;
+    }
 
-} else {
-  // Manager → lookup by NAME
-  const qSnap = await db
-    .collection("manager_leave_user")
-    .where("name", "==", username)
-    .limit(1)
-    .get();
-
-  if(qSnap.empty){
-    error.textContent = "Manager not found.";
-    return;
-  }
-
-  const doc = qSnap.docs[0];
-  userData = doc.data();
-  userId = doc.id;
-}
+    const userData = docSnap.data();
 
     // Use tempPassword for both collections
     const storedPassword = userData.tempPassword;
@@ -220,16 +200,12 @@ if(role === "team_leader"){
     localStorage.setItem("currentUser", JSON.stringify({...userData,id:docSnap.id}));
 
     // ROUTING
-   if(role === "team_leader"){
-  location.href = userData.role === "admin"
-    ? "admin.html"
-    : "employee.html";
-} else {
-  // Manager routing
-  location.href = userData.role === "admin"
-    ? "manager-admin.html"
-    : "manager-employee.html";
-}
+    if(role === "team_leader"){
+      location.href = userData.role === "admin" ? "admin.html" : "employee.html";
+    } else {
+      // Manager
+      location.href = userData.role === "manager-admin" ? "manager-admin.html" : "manager-employee.html";
+    }
 
   } catch(err){
     error.textContent = err.message;
