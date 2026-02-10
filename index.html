@@ -33,7 +33,6 @@ body{
   100% { background-position: 0% 50%; }
 }
 
-/* LOGIN CARD */
 .login-card{
   background: rgba(255,255,255,0.95);
   width:100%;
@@ -41,15 +40,13 @@ body{
   padding:32px 28px;
   border-radius:6px;
   box-shadow:0 10px 25px rgba(0,0,0,.15);
-  backdrop-filter: blur(10px);
 }
 
 .logo{text-align:center; margin-bottom:18px;}
-.logo img{height:38px;}
-
 .purple-id{text-align:center; font-weight:bold; color:#666; margin-bottom:20px;}
 
 label{ font-size:.85em; font-weight:bold; color:#333; }
+
 input, select{
   width:100%;
   padding:12px;
@@ -58,12 +55,6 @@ input, select{
   border:1px solid var(--border);
   border-radius:4px;
   font-size:.95em;
-}
-
-input:focus, select:focus{
-  outline:none;
-  border-color:var(--fedex-purple);
-  box-shadow:0 0 0 2px rgba(77,20,140,.15);
 }
 
 button{
@@ -75,17 +66,18 @@ button{
   font-weight:bold;
   border-radius:4px;
   cursor:pointer;
-  margin-top:8px;
 }
-button:hover{ background:#3e0f72; }
 
-.links{ margin-top:16px; font-size:.85em; }
-.links a{ display:block; color:#5b21b6; text-decoration:none; margin-top:6px; }
-.links a:hover{ text-decoration:underline; }
+#error{
+  margin-top:10px;
+  color:#dc2626;
+  font-size:.85em;
+  text-align:center;
+}
 
-#error{ margin-top:10px; color:#dc2626; font-size:.85em; text-align:center; }
-
-.password-wrapper{ position:relative; }
+.password-wrapper{
+  position:relative;
+}
 .password-wrapper i{
   position:absolute;
   right:12px;
@@ -93,9 +85,10 @@ button:hover{ background:#3e0f72; }
   transform:translateY(-50%);
   cursor:pointer;
   color:#6b7280;
-  font-size:.95em;
 }
-.password-wrapper i:hover{ color:var(--fedex-purple); }
+.password-wrapper i:hover{
+  color:var(--fedex-purple);
+}
 </style>
 </head>
 
@@ -104,17 +97,17 @@ button:hover{ background:#3e0f72; }
 <div class="login-card">
 
   <div class="logo">
-   <img src="fedex.png" alt="FedEx Logo" style="height:130px;">
+    <img src="fedex.png" style="height:130px;">
   </div>
 
   <div class="purple-id">Login</div>
 
   <label>Username</label>
-  <input type="text" id="username" placeholder="Enter your username">
+  <input type="text" id="username">
 
   <label>Password</label>
   <div class="password-wrapper">
-    <input type="password" id="password" placeholder="Enter your password">
+    <input type="password" id="password">
     <i class="fa-solid fa-eye" id="togglePassword"></i>
   </div>
 
@@ -126,32 +119,51 @@ button:hover{ background:#3e0f72; }
 
   <button id="loginBtn">Next</button>
   <div id="error"></div>
-
-  <div class="links">
-    <a href="#" id="forgotPasswordLink">Forgot Password?</a>
-  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-const firebaseConfig = {
+/* ======================
+   FIREBASE INIT
+====================== */
+firebase.initializeApp({
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain: "fedex-attendance-system.firebaseapp.com",
-  projectId: "fedex-attendance-system",
-  storageBucket: "fedex-attendance-system.firebasestorage.app",
-  messagingSenderId: "1049424874301",
-  appId: "1:1049424874301:web:f94559159b19ee39c19354"
-};
-firebase.initializeApp(firebaseConfig);
+  projectId: "fedex-attendance-system"
+});
 const db = firebase.firestore();
 
+/* ======================
+   ELEMENTS
+====================== */
+const loginBtn = document.getElementById("loginBtn");
+const error = document.getElementById("error");
+const passwordInput = document.getElementById("password");
+const togglePassword = document.getElementById("togglePassword");
+
+/* ======================
+   SHOW / HIDE PASSWORD ✅
+====================== */
+togglePassword.addEventListener("click", () => {
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
+    togglePassword.classList.replace("fa-eye", "fa-eye-slash");
+  } else {
+    passwordInput.type = "password";
+    togglePassword.classList.replace("fa-eye-slash", "fa-eye");
+  }
+});
+
+/* ======================
+   LOGIN LOGIC
+====================== */
 loginBtn.addEventListener("click", async () => {
   error.textContent = "";
 
   const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const password = passwordInput.value.trim();
   const role = document.getElementById("loginType").value;
 
   if(!username || !password){
@@ -160,82 +172,47 @@ loginBtn.addEventListener("click", async () => {
   }
 
   try {
-    let userData = null;
-    let userId = null;
+    let userData, userId;
 
-    /* =========================
-       TEAM LEADER LOGIN
-    ========================= */
     if(role === "team_leader"){
-      const docSnap = await db
-        .collection("leave_users")
-        .doc(username)
-        .get();
+      const snap = await db.collection("leave_users").doc(username).get();
+      if(!snap.exists){ error.textContent="User not found."; return; }
+      userData = snap.data();
+      userId = snap.id;
 
-      if(!docSnap.exists){
-        error.textContent = "User not found.";
-        return;
-      }
-
-      userData = docSnap.data();
-      userId = docSnap.id;
-
-    /* =========================
-       MANAGER LOGIN
-    ========================= */
     } else {
-      const qSnap = await db
-        .collection("manager_leave_user")
-        .where("name", "==", username)
+      const q = await db.collection("manager_leave_user")
+        .where("name","==",username)
         .limit(1)
         .get();
 
-      if(qSnap.empty){
-        error.textContent = "Manager not found.";
-        return;
-      }
-
-      const doc = qSnap.docs[0];
-      userData = doc.data();
-      userId = doc.id;
-    }
-
-    // PASSWORD CHECK
-    if(!userData.tempPassword){
-      error.textContent = "No password set.";
-      return;
+      if(q.empty){ error.textContent="Manager not found."; return; }
+      userData = q.docs[0].data();
+      userId = q.docs[0].id;
     }
 
     if(password !== userData.tempPassword){
-      error.textContent = "Incorrect password.";
+      error.textContent="Incorrect password.";
       return;
     }
 
-    // SAVE SESSION
-    localStorage.setItem(
-      "currentUser",
-      JSON.stringify({ ...userData, id: userId })
+    localStorage.setItem("currentUser",
+      JSON.stringify({ ...userData, id:userId })
     );
 
-    /* =========================
-       ROUTING
-    ========================= */
     if(role === "team_leader"){
-      location.href =
-        userData.role === "admin"
-          ? "admin.html"
-          : "employee.html";
+      location.href = userData.role === "admin"
+        ? "admin.html"
+        : "employee.html";
     } else {
-      // MANAGER ROUTING
-      location.href =
-        userData.role === "manager-admin"
-          ? "manager-admin.html"
-          : "manager-employee.html";
+      location.href = userData.role === "manager-admin"
+        ? "manager-admin.html"
+        : "manager-employee.html";
     }
 
-  } catch (err) {
-    console.error(err);
-    error.textContent = "Login failed. Check console.";
+  } catch(e){
+    console.error(e);
+    error.textContent="Login failed.";
   }
 });
 </script>
