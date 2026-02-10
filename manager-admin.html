@@ -11,7 +11,6 @@
   --bg-gray: #f4f4f6;
 }
 
-/* Body & Layout */
 body { 
   margin:0; font-family:Arial,sans-serif; background:var(--bg-gray); display:flex; flex-direction:column; min-height:100vh; 
 }
@@ -25,7 +24,6 @@ main { flex:1; padding:20px; }
 h2 { color:var(--fedex-purple); text-align:center; }
 .card { background:white; padding:25px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); overflow-x:auto; }
 
-/* Buttons */
 button.approve { background:green;color:white;padding:5px 8px;border-radius:4px;border:none;margin:2px;cursor:pointer; }
 button.pend { background:orange;color:white;padding:5px 8px;border-radius:4px;border:none;margin:2px; cursor:pointer; }
 button.reject { background:red;color:white;padding:5px 8px;border-radius:4px;border:none;margin:2px; }
@@ -79,30 +77,33 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 .modal-confirm{background:red;color:white}
 .modal-cancel{background:#ccc}
 
-/* Top Controls */
+/* Top Controls - Modern Professional Style */
 .top-controls {
   display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
   background:#fff; padding:12px 20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.08);
   margin-bottom:20px;
 }
+
+/* View Selector */
 .view-select-wrapper { display:flex; align-items:center; gap:8px; margin-right:20px; }
 .view-select-wrapper label { font-weight:bold; color:var(--fedex-purple); }
 .view-select-wrapper select { padding:6px 10px; border-radius:6px; border:1px solid #ccc; cursor:pointer; font-weight:500; min-width:120px; }
 
+/* Filters + Export - inline */
 #listControls { display:flex; flex-wrap:wrap; align-items:center; gap:12px; flex:1; }
 .filter-item { display:flex; flex-direction:column; font-size:0.85em; }
 .filter-item label { font-weight:bold; color:#333; margin-bottom:4px; }
 .filter-item select, .filter-item input { padding:6px 10px; border-radius:6px; border:1px solid #ccc; cursor:pointer; min-width:120px; }
 
-#exportBtn, #saveManagerBtn { background:var(--fedex-purple); color:#fff; border:none; padding:10px 12px; border-radius:6px; cursor:pointer; font-size:1.2em; display:flex; align-items:center; justify-content:center; transition:background 0.2s; margin-left:5px; }
-#exportBtn:hover, #saveManagerBtn:hover { background:var(--fedex-orange); }
+#exportBtn { background:var(--fedex-purple); color:#fff; border:none; padding:10px 12px; border-radius:6px; cursor:pointer; font-size:1.2em; display:flex; align-items:center; justify-content:center; transition:background 0.2s; }
+#exportBtn:hover { background:var(--fedex-orange); }
 
-/* Month selector */
 #monthSelectWrapper {
   display: flex;
-  justify-content: center;
+  justify-content: center; /* center horizontally */
   margin: 15px 0;
 }
+
 #monthSelect {
   padding: 8px 14px;
   border-radius: 8px;
@@ -116,104 +117,219 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   transition: all 0.2s ease;
 }
-#monthSelect:hover { border-color: var(--fedex-purple); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
-#monthSelect:focus { outline: none; border-color: var(--fedex-orange); box-shadow: 0 0 0 3px rgba(255,102,0,0.2); }
 
-/* Tooltip */
-.leave-tooltip {
-  position: absolute; background: #fff; border-radius: 8px; padding: 10px; min-width: 240px; max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); font-size: 12px; z-index: 9999; display: none; pointer-events: none;
+#monthSelect:hover {
+  border-color: var(--fedex-purple);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
 }
-.leave-tooltip h4 { margin:0 0 6px; font-size:13px; color:var(--fedex-purple); }
-.leave-tooltip .leave-item { border-top:1px solid #eee; padding-top:6px; margin-top:6px; }
-.leave-tooltip .Approved{ color:green; font-weight:bold; }
-.leave-tooltip .Rejected{ color:red; font-weight:bold; }
-.leave-tooltip .Pending{ color:orange; font-weight:bold; }
-.leave-tooltip .Cancelled{ color:#555; font-weight:bold; }
 
-<style>
-/* ===== Toast Notifications ===== */
+#monthSelect:focus {
+  outline: none;
+  border-color: var(--fedex-orange);
+  box-shadow: 0 0 0 3px rgba(255,102,0,0.2);
+}
+
+.year-month .mini-grid:first-of-type .day-cell {
+  font-size: 9px;
+  color: #555;
+  background: none;
+  height: auto;
+}
+/* ===== Improved Year View ===== */
+.year-month {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 10px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.year-month:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.year-month-label {
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--fedex-purple);
+  margin-bottom: 6px;
+}
+
+.year-month .mini-grid {
+  gap: 3px;
+}
+
+.year-month .day-cell {
+  background: #fafafa;
+}
+
+.year-month .day-cell:hover {
+  background: #f0f0f0;
+}
+
+.year-month .mini-grid:first-of-type .day-cell {
+  background: none;
+  font-size: 9px;
+  color: #666;
+  cursor: default;
+}
+
+/* Year navigation */
+.year-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.year-nav button {
+  background: var(--fedex-purple);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.year-nav span {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #333;
+}
+
+/* ===== Month View Leave Tooltip ===== */
+.leave-tooltip {
+  position: absolute;
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 240px;
+  max-width: 320px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  font-size: 12px;
+  z-index: 9999;
+  display: none;
+  pointer-events: none;
+}
+
+.leave-tooltip h4 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--fedex-purple);
+}
+
+.leave-tooltip .leave-item {
+  border-top: 1px solid #eee;
+  padding-top: 6px;
+  margin-top: 6px;
+}
+
+.leave-tooltip .Approved { color: green; font-weight: bold; }
+.leave-tooltip .Rejected { color: red; font-weight: bold; }
+.leave-tooltip .Pending  { color: orange; font-weight: bold; }
+.leave-tooltip .Cancelled{ color: #555; font-weight: bold; }
+.leave-tooltip {
+  pointer-events: none;
+}
+
+/*table*/
+.table-indicator {
+  position: relative;
+  display: inline-block;
+}
+
+
+/*notification*/
+#notifBtn {
+  position: relative;
+  background: var(--fedex-purple);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2em;
+}
+
+#notifBtn:hover {
+  background: var(--fedex-orange);
+}
+
+#notifBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7em;
+  font-weight: bold;
+  display: none;
+}
+
+/*notification dropdown*/
+.notif-dropdown {
+  position: absolute;
+  top: 85px;
+  right: 40px;
+  width: 300px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  padding: 10px;
+  z-index: 1000;
+}
+
+.notif-item {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9em;
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-item strong {
+  color: var(--fedex-purple);
+}
+
+.notif-item small {
+  color: #666;
+  font-size: 0.8em;
+}
+/*notification dropdown*/
 #toastContainer {
   position: fixed;
-  top: 20px;
+  bottom: 20px;
   right: 20px;
-  z-index: 9999;
+  z-index: 2000;
 }
+
+
 .toast {
-  background: #4D148C;
-  color: #fff;
+  background: #fff;
+  border-left: 6px solid var(--fedex-purple);
   padding: 12px 16px;
-  margin-bottom: 10px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  font-size: 14px;
-  animation: slideIn 0.5s ease forwards;
+  margin-top: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  animation: slideIn 0.4s ease;
+  min-width: 260px;
 }
+
 @keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
+  from { transform: translateX(120%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 
-/* ===== Notification Dropdown ===== */
-#notifDropdown {
-  position: absolute;
-  top: 30px;
-  right: 0;
-  background: #fff;
-  min-width: 250px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  display: none;
-  z-index: 999;
-  max-height: 400px;
-  overflow-y: auto;
+#rejectModal {
+  z-index: 2000; /* higher than dayModal */
 }
-.notif-item {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  font-size: 13px;
-  cursor: pointer;
-}
-.notif-item:hover { background: #f4f4f6; }
-#notifBadge {
-  background: #FF6600;
-  color: #fff;
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 50%;
-  position: absolute;
-  top: -5px;
-  right: -5px;
-}
-
-/* ===== Leave Tooltip ===== */
-#leaveTooltip {
-  position: absolute;
-  display: none;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 13px;
-  color: #333;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-  z-index: 9999;
-  max-width: 250px;
-}
-#leaveTooltip h4 { margin: 0 0 6px 0; font-size: 14px; color: #4D148C; }
-.leave-item { border-bottom: 1px solid #eee; margin-bottom: 6px; padding-bottom: 4px; }
-.leave-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-.leave-item .Approved { color: green; font-weight: bold; }
-.leave-item .Rejected { color: red; font-weight: bold; }
-.leave-item .Pending { color: orange; font-weight: bold; }
-
-/* ===== Table Indicators ===== */
-.table-indicator { cursor: pointer; padding: 4px 6px; border-radius: 4px; color: #fff; font-weight: bold; font-size:12px; display:inline-block; }
-.table-indicator.A { background: green; }
-.table-indicator.P { background: orange; }
-.table-indicator.R { background: red; }
-</style>
-
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -229,6 +345,7 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 <main>
   <!-- Top Controls -->
   <div class="top-controls">
+    <!-- View Selector -->
     <div class="view-select-wrapper">
       <label for="viewSelect">View:</label>
       <select id="viewSelect" onchange="setView(this.value)">
@@ -238,6 +355,7 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
       </select>
     </div>
 
+    <!-- Filters + Export (Only List View) -->
     <div id="listControls">
       <div class="filter-item">
         <label for="filterStatus">Status</label>
@@ -266,27 +384,33 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
         <label for="filterSubmitted">Submitted Date</label>
         <input type="date" id="filterSubmitted" onchange="applyFilters()">
       </div>
-      <button id="exportBtn" title="Export" onclick="exportCSV()"><i class="fas fa-file-export"></i></button>
-      <button id="saveManagerBtn" title="Save All Manager Leaves" onclick="saveManagerLeaves()"><i class="fas fa-save"></i></button>
+      <button id="exportBtn" title="Export" onclick="exportCSV()">
+        <i class="fas fa-file-export"></i>
+      </button>
+      <button id="notifBtn" title="Notifications" onclick="toggleNotifDropdown()">
+    <i class="fas fa-bell"></i>
+    <span id="notifBadge">0</span>
+  </button>
     </div>
   </div>
 
-  <div id="monthSelectWrapper" style="display:none;">
-    <select id="monthSelect" onchange="render()">
-      <option value="0">January</option>
-      <option value="1">February</option>
-      <option value="2">March</option>
-      <option value="3">April</option>
-      <option value="4">May</option>
-      <option value="5">June</option>
-      <option value="6">July</option>
-      <option value="7">August</option>
-      <option value="8">September</option>
-      <option value="9">October</option>
-      <option value="10">November</option>
-      <option value="11">December</option>
-    </select>
-  </div>
+<!-- Month selector for Table view -->
+<div id="monthSelectWrapper" style="display:none;">
+  <select id="monthSelect" onchange="render()">
+    <option value="0">January</option>
+    <option value="1">February</option>
+    <option value="2">March</option>
+    <option value="3">April</option>
+    <option value="4">May</option>
+    <option value="5">June</option>
+    <option value="6">July</option>
+    <option value="7">August</option>
+    <option value="8">September</option>
+    <option value="9">October</option>
+    <option value="10">November</option>
+    <option value="11">December</option>
+  </select>
+</div>
 
   <div class="calendar-wrapper" id="calendarControls">
     <button onclick="changeCalendarMonth(-1)">◀</button>
@@ -297,11 +421,12 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   </div>
 
   <div class="card">
+   
     <div id="calendarContainer"><div class="calendar" id="calendarGrid"></div></div>
     <table id="table"></table>
   </div>
-</main>
 
+</main>
 <footer>© FedEx 2026</footer>
 <div id="leaveTooltip" class="leave-tooltip"></div>
 
@@ -309,27 +434,22 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 let currentSort = { field: null, ascending: true };
 let lastSeenTimestamp = localStorage.getItem("lastSeenLeave") || 0;
 let unreadCount = 0;
-let cachedRequests = [];
-let currentFilter = "All";
-let currentView = "list";
-let calendarMonth = new Date().getMonth();
-let calendarYear = new Date().getFullYear();
-let calendarMode = "month";
-let cancelTargetId = null;
-let rejectTargetId = null;
 
-// Initialize Firebase
 firebase.initializeApp({
   apiKey:"AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain:"fedex-attendance-system.firebaseapp.com",
   projectId:"fedex-attendance-system"
 });
-const db = firebase.firestore();
-
-// Check login
+const db=firebase.firestore();
 
 
-// ===== Notification Helpers =====
+//this is for login.remembner
+
+const currentUser=JSON.parse(localStorage.getItem("currentUser"));
+if(!currentUser){ alert("Please login first"); location.href="index.html"; }
+document.getElementById("welcomeMsg").textContent=`Welcome ${currentUser.name} to Admin Page`;
+
+//time for notif
 function formatDateTime(ts){
   if(!ts) return "-";
   const d = ts.toDate ? ts.toDate() : new Date(ts);
@@ -343,37 +463,12 @@ function formatDateTime(ts){
   });
 }
 
-function showToast(leave){
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.innerHTML = `<strong>${leave.employeeName}</strong><br>
-                     Filed leave for <b>${leave.date}</b><br>
-                     <small>${formatDateTime(leave.submittedAt)}</small>`;
-  document.getElementById("toastContainer").appendChild(toast);
-  setTimeout(() => toast.remove(), 5000);
-}
+let cachedRequests=[], currentFilter="All", currentView="list", calendarMonth=new Date().getMonth(), calendarYear=new Date().getFullYear(), calendarMode="month";
 
-function addNotification(leave){
-  const drop = document.getElementById("notifDropdown");
-  const div = document.createElement("div");
-  div.className = "notif-item";
-  div.innerHTML = `<strong>${leave.employeeName}</strong><br>
-                   Leave date: <b>${leave.date}</b><br>
-                   <small>${formatDateTime(leave.submittedAt)}</small>`;
-  drop.prepend(div);
-}
+//this is for notif new added
 
-function toggleNotifDropdown(){
-  const d = document.getElementById("notifDropdown");
-  d.style.display = d.style.display === "block" ? "none" : "block";
-  unreadCount = 0;
-  document.getElementById("notifBadge").style.display = "none";
-  localStorage.setItem("lastSeenLeave", Date.now());
-}
-
-// ===== Load Leave Requests =====
 function loadRequests(){
-  db.collection("single_day_leave")
+  db.collection("manager_single_day_leave")
     .orderBy("submittedAt", "asc")
     .onSnapshot(snapshot => {
 
@@ -381,7 +476,8 @@ function loadRequests(){
         if (change.type === "added") {
           const data = change.doc.data();
           const submittedTime = data.submittedAt?.toMillis?.() || 0;
-          if(submittedTime > lastSeenTimestamp){
+
+          if (submittedTime > lastSeenTimestamp) {
             showToast(data);
             addNotification(data);
             unreadCount++;
@@ -399,11 +495,57 @@ function loadRequests(){
     });
 }
 
-// ===== View Controls =====
+function showToast(leave){
+  const toast = document.createElement("div");
+  toast.className = "toast";
+
+  toast.innerHTML = `
+    <strong>${leave.employeeName}</strong><br>
+    Filed leave for <b>${leave.date}</b><br>
+    <small>${formatDateTime(leave.submittedAt)}</small>
+  `;
+
+  document.getElementById("toastContainer").appendChild(toast);
+
+  setTimeout(() => toast.remove(), 5000);
+}
+function addNotification(leave){
+  const drop = document.getElementById("notifDropdown");
+  const div = document.createElement("div");
+  div.className = "notif-item";
+
+  div.innerHTML = `
+    <strong>${leave.employeeName}</strong><br>
+    Leave date: <b>${leave.date}</b><br>
+    <small>${formatDateTime(leave.submittedAt)}</small>
+  `;
+
+  drop.prepend(div);
+}
+
+function toggleNotifDropdown(){
+  const d = document.getElementById("notifDropdown");
+  d.style.display = d.style.display === "block" ? "none" : "block";
+
+  // Mark as read
+  unreadCount = 0;
+  document.getElementById("notifBadge").style.display = "none";
+  localStorage.setItem("lastSeenLeave", Date.now());
+}
+
+//this is for notif new added
+//until here
+
+
 function setView(v){
   currentView = v;
+
+  // Show/hide list controls
   document.getElementById("listControls").style.display = (v==='list')?'flex':'none';
+
   toggleCalendarControls();
+
+  // Reset filters for non-list views
   if(v!=='list'){
     document.getElementById("filterStatus").value = "All";
     document.getElementById("filterType").value = "All";
@@ -411,6 +553,7 @@ function setView(v){
     document.getElementById("filterSubmitted").value = "";
     document.getElementById("monthSelectWrapper").style.display = (currentView==='table')?'flex':'none';
   }
+
   render();
 }
 
@@ -421,47 +564,48 @@ function toggleCalendarControls(){
   document.getElementById("monthSelect").style.display=(currentView==='table')?'inline-block':'none';
 }
 
-function logout(){
-  if(confirm("Are you sure?")){
-    localStorage.removeItem("currentUser");
-    location.href="index.html";
-  }
-}
+function logout(){ if(confirm("Are you sure?")){ localStorage.removeItem("currentUser"); location.href="index.html"; } }
 
-// ===== Rendering Functions =====
 function render(){
   const data = currentFilter==="All"?cachedRequests:cachedRequests.filter(r=>r.status===currentFilter);
-  if(currentView==='list') applyFilters();
+  if(currentView==='list') applyFilters(); // List view uses filters
   else if(currentView==='table') renderTableView(data);
   else if(currentView==='calendar') calendarMode==='month'?renderCalendar(data):renderYearView(data);
 }
 
-// Apply filters for list view
 function applyFilters() {
-  let data = cachedRequests;
   const status = document.getElementById("filterStatus").value;
   const type = document.getElementById("filterType").value;
   const date = document.getElementById("filterDate").value;
   const submitted = document.getElementById("filterSubmitted").value;
 
+  let data = cachedRequests;
+
   if(status !== "All") data = data.filter(r => r.status === status);
-  if(type !== "All"){
-    if(type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
-    else data = data.filter(r => r.type === type);
+
+  if(type !== "All") {
+    if(type === "Others") {
+      // Match anything that is not Vacation or Sick
+      data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+    } else {
+      data = data.filter(r => r.type === type);
+    }
   }
+
   if(date) data = data.filter(r => r.date === date);
+
   if(submitted) data = data.filter(r => {
-    const subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
+    let subDate = r.submittedAt && r.submittedAt.toDate ? r.submittedAt.toDate() : new Date(r.submittedAt);
     return subDate.toISOString().split("T")[0] === submitted;
   });
 
   renderList(data);
 }
-
-// List view
+//show list 
 function renderList(data){
   const t = document.getElementById("table");
   t.style.display = "table";
+
   t.innerHTML = `<tr>
     <th onclick="sortList('employeeName')">Employee &#8597;</th>
     <th onclick="sortList('type')">Leave Type &#8597;</th>
@@ -474,17 +618,19 @@ function renderList(data){
     <th>Action</th>
   </tr>`;
 
-  data.forEach(l=>{
-    const str = formatDateTime(l.submittedAt);
+  data.forEach(l => {
+    let s = l.submittedAt && l.submittedAt.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt);
+    let str = s.toLocaleString("en-PH", {timeZone:"Asia/Manila", year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit"});
+
     t.innerHTML += `<tr>
       <td>${l.employeeName}</td>
       <td>${l.type}</td>
       <td>${l.date}</td>
       <td>${str}</td>
-      <td>${l.reason || ""}</td>
+      <td>${l.reason}</td>
       <td class="status-${l.status}">${l.status}</td>
       <td>${l.actionBy || "-"}</td>
-      <td>${l.status==="Rejected"? (l.notes||"-") : ""}</td>
+      <td>${l.status === "Rejected" ? (l.notes || "-") : ""}</td>
       <td>
         <button class="approve" onclick="updateStatus('${l.id}','Approved')">Approve</button>
         <button class="pend" onclick="updateStatus('${l.id}','Pending')">Pend</button>
@@ -495,268 +641,586 @@ function renderList(data){
   });
 }
 
-// Table view
-function renderTableView(data){
-  const t = document.getElementById("table");
-  t.style.display = "table";
-
-  const month = parseInt(document.getElementById("monthSelect").value);
-  const y = new Date().getFullYear();
-  const tlnames = [...new Set(data.map(l => l.tlName || l.employeeName))];
-  const daysInMonth = new Date(y, month + 1, 0).getDate();
-
-  let html = `<tr><th>TL Name</th>`;
-  for(let d=1; d<=daysInMonth; d++) html += `<th>${d}</th>`;
-  html += `</tr>`;
-
-  tlnames.forEach(tl=>{
-    html += `<tr><td>${tl}</td>`;
-    for(let d=1; d<=daysInMonth; d++){
-      const cellDate = new Date(y, month, d);
-      const dayLeaves = data.filter(l=>{
-        const ld = new Date(l.date);
-        return (l.tlName||l.employeeName)===tl && ld.getFullYear()===y && ld.getMonth()===month && ld.getDate()===d && l.status!=="Cancelled";
-      });
-
-      if(dayLeaves.length){
-        let letter = "";
-        if(dayLeaves.some(l=>l.status==="Approved")) letter="A";
-        else if(dayLeaves.some(l=>l.status==="Pending")) letter="P";
-        else if(dayLeaves.some(l=>l.status==="Rejected")) letter="R";
-        html += `<td><span class="table-indicator ${letter}" data-leaves='${JSON.stringify(dayLeaves)}'>${letter}</span></td>`;
-      } else html += "<td></td>";
-    }
-    html += "</tr>";
-  });
-
-  t.innerHTML = html;
-
-  // Tooltip listeners
-  document.querySelectorAll(".table-indicator").forEach(span=>{
-    const leaves = JSON.parse(span.dataset.leaves);
-    span.addEventListener("mouseenter", e=>showLeaveTooltip(leaves,e));
-    span.addEventListener("mousemove", moveLeaveTooltip);
-    span.addEventListener("mouseleave", hideLeaveTooltip);
-  });
-}
-
-// Calendar
-function getLocalDateString(dateInput){
-  const d = new Date(dateInput);
-  const offset = d.getTimezoneOffset();
-  d.setMinutes(d.getMinutes() - offset);
-  return d.toISOString().split("T")[0];
-}
-
-function renderCalendar(data){
-  const grid = document.getElementById("calendarGrid");
-  grid.innerHTML="";
-  grid.style.gridTemplateColumns="repeat(7,1fr)";
-  grid.className="calendar";
-
-  const y = calendarYear, m = calendarMonth;
-  const days = new Date(y,m+1,0).getDate();
-  const start = new Date(y,m,1).getDay();
-
-  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{
-    const h = document.createElement("div");
-    h.className="cal-header"; h.textContent=d; grid.appendChild(h);
-  });
-
-  for(let i=0;i<start;i++){ const empty=document.createElement("div"); empty.className="cal-cell"; grid.appendChild(empty); }
-
-  for(let d=1; d<=days; d++){
-    const cell=document.createElement("div"); cell.className="cal-cell";
-    const dayDiv=document.createElement("div"); dayDiv.className="cal-day"; dayDiv.textContent=d; cell.appendChild(dayDiv);
-    const cd = new Date(y,m,d);
-    const dateStr = getLocalDateString(cd);
-
-    const dayLeaves = data.filter(l=>getLocalDateString(l.date)===dateStr && l.status!=="Cancelled");
-    dayLeaves.forEach(l=>{
-      const c = l.status==="Approved"?"A":l.status==="Rejected"?"R":"P";
-      const span=document.createElement("span"); span.className="indicator "+c; span.textContent=l.tlName||l.employeeName; cell.appendChild(span);
-    });
-
-    cell.addEventListener("click",()=>openDayModal(dateStr));
-    grid.appendChild(cell);
-  }
-
-  document.getElementById("calendarMonthLabel").textContent=`${new Date(y,m).toLocaleString('default',{month:'long'})} ${y}`;
-}
-
-// Year view
-function renderYearView(data){
-  const grid = document.getElementById("calendarGrid");
-  grid.innerHTML="";
-  grid.className="year-view";
-  grid.style.gridTemplateColumns="repeat(3,1fr)";
-  const y = new Date().getFullYear();
-  const weekdays=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-
-  for(let m=0;m<12;m++){
-    const monthDiv=document.createElement("div"); monthDiv.className="year-month";
-    const label=document.createElement("div"); label.className="year-month-label"; label.textContent=new Date(y,m).toLocaleString('default',{month:'short'}); monthDiv.appendChild(label);
-
-    const headerGrid=document.createElement("div"); headerGrid.className="mini-grid";
-    weekdays.forEach(d=>{ const w=document.createElement("div"); w.className="day-cell"; w.style.fontWeight="bold"; w.style.border="none"; w.textContent=d; headerGrid.appendChild(w); });
-    monthDiv.appendChild(headerGrid);
-
-    const miniGrid=document.createElement("div"); miniGrid.className="mini-grid";
-    const start=new Date(y,m,1).getDay(); for(let i=0;i<start;i++){ miniGrid.appendChild(document.createElement("div")); }
-    const days=new Date(y,m+1,0).getDate();
-    for(let d=1;d<=days;d++){
-      const cell=document.createElement("div"); cell.className="day-cell"; cell.textContent=d;
-      const cd=new Date(y,m,d);
-      const leaves=data.filter(l=>{ const ld=new Date(l.date); return ld.getFullYear()===cd.getFullYear() && ld.getMonth()===cd.getMonth() && ld.getDate()===cd.getDate(); });
-      if(leaves.length){
-        const dotC=document.createElement("div"); dotC.className="day-dots";
-        leaves.forEach(l=>{ const dot=document.createElement("div"); dot.className="dot "+(l.status==="Approved"?"approved":l.status==="Rejected"?"rejected":"pending"); dot.title=`${l.employeeName} (${l.status})`; dotC.appendChild(dot); });
-        cell.appendChild(dotC);
-      }
-      miniGrid.appendChild(cell);
-    }
-    monthDiv.appendChild(miniGrid);
-    monthDiv.onclick=()=>{ calendarMonth=m; setCalendarMode('month'); };
-    grid.appendChild(monthDiv);
-  }
-}
-
-function setCalendarMode(mode){ calendarMode=mode; render(); }
-
-// ===== Tooltips =====
-const leaveTooltip=document.getElementById("leaveTooltip");
-function showLeaveTooltip(leaves,e){
-  leaveTooltip.innerHTML=`<h4>Leave Details</h4>${leaves.map(l=>`<div class="leave-item"><div><strong>${l.employeeName}</strong></div><div>${l.type}</div><div class="${l.status}">${l.status}</div><div>Date: ${l.date}</div>${l.reason?`<div><em>${l.reason}</em></div>`:""}${l.actionBy?`<div><strong>By:</strong> ${l.actionBy}</div>`:""}</div>`).join("")}`;
-  leaveTooltip.style.display="block"; moveLeaveTooltip(e);
-}
-
-function moveLeaveTooltip(e){
-  const w=leaveTooltip.offsetWidth,h=leaveTooltip.offsetHeight;
-  let x=e.pageX+12,y=e.pageY+12;
-  if(x+w>window.innerWidth) x=e.pageX-w-12;
-  if(y+h>window.innerHeight) y=e.pageY-h-12;
-  leaveTooltip.style.left=x+"px"; leaveTooltip.style.top=y+"px";
-}
-
-function hideLeaveTooltip(){ leaveTooltip.style.display="none"; }
-
-// ===== Update Status / Cancel / Reject =====
-async function updateStatus(id,status){
-  await db.collection("single_day_leave").doc(id).update({
-    status: status,
-    actionBy: currentUser.name,
+async function updateStatus(id, status){
+  let updates = { 
+    status: status, 
+    actionBy: currentUser.name, 
     actionAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  render();
-}
+  };
 
-function openCancelModal(id){ cancelTargetId=id; document.getElementById("cancelModal").style.display="flex"; }
-function closeCancelModal(){ cancelTargetId=null; document.getElementById("cancelModal").style.display="none"; }
-function confirmCancel(){ if(cancelTargetId){ updateStatus(cancelTargetId,"Cancelled"); closeCancelModal(); } }
-
-function openRejectModal(id){ rejectTargetId=id; document.getElementById("rejectNote").value=""; document.getElementById("rejectModal").style.display="flex"; }
-function closeRejectModal(){ rejectTargetId=null; document.getElementById("rejectModal").style.display="none"; }
-async function confirmReject(){
-  if(!rejectTargetId) return;
-  const note=document.getElementById("rejectNote").value||"No note provided";
-  await db.collection("single_day_leave").doc(rejectTargetId).update({
-    status:"Rejected", notes:note, actionBy:currentUser.name, actionAt:firebase.firestore.FieldValue.serverTimestamp()
-  });
-  closeRejectModal(); render(); const dayModal=document.getElementById("dayModal"); if(dayModal.style.display==="flex") closeDayModal();
-}
-
-// ===== Day Modal =====
-function openDayModal(dateStr){
-  const modal=document.getElementById("dayModal");
-  const title=document.getElementById("dayModalTitle");
-  const body=document.getElementById("dayModalBody");
-  title.textContent=`Leaves on ${dateStr}`;
-  const leaves=cachedRequests.filter(l=>getLocalDateString(l.date)===dateStr && l.status!=="Cancelled");
-  if(leaves.length===0){ body.innerHTML="<p>No leave requests on this day.</p>"; }
-  else{
-    body.innerHTML=leaves.map(l=>`<div style="border-bottom:1px solid #eee; padding:6px; margin-bottom:6px;">
-      <div><strong>${l.employeeName}</strong> (${l.type})</div>
-      <div>Status: <span class="${l.status}">${l.status}</span></div>
-      ${l.reason?`<div>Reason: ${l.reason}</div>`:""}
-      <div style="margin-top:4px;">
-        <button class="approve" onclick="handleStatus('${l.id}','Approved','${dateStr}')">Approve</button>
-        <button class="pend" onclick="handleStatus('${l.id}','Pending','${dateStr}')">Pend</button>
-        <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
-        <button class="cancel" onclick="handleCancel('${l.id}','${dateStr}')">Cancel</button>
-      </div>
-    </div>`).join("");
+  // If rejecting, ask for a note
+  if(status === "Rejected"){
+    const note = prompt("Enter reason/note for rejection:");
+    updates.notes = note || "No note provided";
   }
-  modal.style.display="flex";
+
+  await db.collection("single_day_leave").doc(id).update(updates);
 }
 
-function closeDayModal(){ document.getElementById("dayModal").style.display="none"; }
+//for sorting
+function sortList(field) {
+  // Toggle ascending if same field clicked
+  if(currentSort.field === field){
+    currentSort.ascending = !currentSort.ascending;
+  } else {
+    currentSort.field = field;
+    currentSort.ascending = true;
+  }
 
-async function handleStatus(id,status,dateStr){
-  await updateStatus(id,status); openDayModal(dateStr);
-}
-function handleCancel(id,dateStr){ cancelTargetId=id; confirmCancel(); openDayModal(dateStr); }
+  // Copy cachedRequests and apply filters first
+  let data = currentFilter==="All"?cachedRequests:cachedRequests.filter(r=>r.status===currentFilter);
 
-// ===== Sorting =====
-function sortList(field){
-  if(currentSort.field===field) currentSort.ascending=!currentSort.ascending;
-  else { currentSort.field=field; currentSort.ascending=true; }
+  // Apply filters from dropdowns
+  const status = document.getElementById("filterStatus").value;
+  const type = document.getElementById("filterType").value;
+  const date = document.getElementById("filterDate").value;
+  const submitted = document.getElementById("filterSubmitted").value;
 
-  let data=cachedRequests;
-  const status=document.getElementById("filterStatus").value;
-  const type=document.getElementById("filterType").value;
-  const date=document.getElementById("filterDate").value;
-  const submitted=document.getElementById("filterSubmitted").value;
-  if(status!=="All") data=data.filter(r=>r.status===status);
-  if(type!=="All") data=type==="Others"?data.filter(r=>r.type!=="Vacation"&&r.type!=="Sick"):data.filter(r=>r.type===type);
-  if(date) data=data.filter(r=>r.date===date);
-  if(submitted) data=data.filter(r=>getLocalDateString(r.submittedAt)===submitted);
+  if(status !== "All") data = data.filter(r => r.status === status);
+  if(type !== "All") {
+    if(type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+    else data = data.filter(r => r.type === type);
+  }
+  if(date) data = data.filter(r => r.date === date);
+  if(submitted) data = data.filter(r => {
+    let subDate = r.submittedAt && r.submittedAt.toDate ? r.submittedAt.toDate() : new Date(r.submittedAt);
+    return subDate.toISOString().split("T")[0] === submitted;
+  });
 
+  // Sort
   data.sort((a,b)=>{
-    let valA=a[field], valB=b[field];
-    if(field==='submittedAt') valA=a.submittedAt?.toDate?.().getTime()||new Date(a.submittedAt).getTime(), valB=b.submittedAt?.toDate?.().getTime()||new Date(b.submittedAt).getTime();
-    else if(field==='date') valA=new Date(a.date).getTime(), valB=new Date(b.date).getTime();
-    else valA=valA?valA.toString().toLowerCase():'', valB=valB?valB.toString().toLowerCase():'';
-    if(valA<valB) return currentSort.ascending?-1:1;
-    if(valA>valB) return currentSort.ascending?1:-1;
+    let valA = a[field], valB = b[field];
+
+    // handle dates
+    if(field==='submittedAt') {
+      valA = a.submittedAt && a.submittedAt.toDate ? a.submittedAt.toDate().getTime() : new Date(a.submittedAt).getTime();
+      valB = b.submittedAt && b.submittedAt.toDate ? b.submittedAt.toDate().getTime() : new Date(b.submittedAt).getTime();
+    } else if(field==='date'){
+      valA = new Date(a.date).getTime();
+      valB = new Date(b.date).getTime();
+    } else {
+      valA = valA ? valA.toString().toLowerCase() : '';
+      valB = valB ? valB.toString().toLowerCase() : '';
+    }
+
+    if(valA < valB) return currentSort.ascending ? -1 : 1;
+    if(valA > valB) return currentSort.ascending ? 1 : -1;
     return 0;
   });
 
   renderList(data);
 }
 
-// ===== Export CSV =====
+// Export CSV including Notes with dynamic filename
 function exportCSV(){
   const data = cachedRequests;
-  let csv="Employee,Type,Date,Submitted Date,Reason,Status,Notes\n";
-  data.forEach(l=>{
-    const s=l.submittedAt?.toDate?.()||new Date(l.submittedAt);
-    const phTime=s.toLocaleString("en-PH",{timeZone:"Asia/Manila",year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});
-    const notes=l.notes?l.notes.replace(/(\r\n|\n|\r)/gm," "):"";
-    csv+=`${l.employeeName},${l.type},${l.date},${phTime},${l.reason||""},${l.status},${notes}\n`;
+  let csv = "Employee,Type,Date,Submitted Date,Reason,Status,Notes\n"; // Added Notes
+
+  data.forEach(l => {
+    const s = l.submittedAt?.toDate?.() || new Date(l.submittedAt);
+
+    const phTime = s.toLocaleString("en-PH", {
+      timeZone: "Asia/Manila",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    });
+
+    // Sanitize notes
+    const notes = l.notes ? l.notes.replace(/(\r\n|\n|\r)/gm, " ") : "";
+
+    csv += `${l.employeeName},${l.type},${l.date},${phTime},${l.reason},${l.status},${notes}\n`;
   });
 
-  const now=new Date();
-  const phNow=new Date(now.toLocaleString("en-US",{timeZone:"Asia/Manila"}));
-  const dateStr=phNow.toISOString().split("T")[0];
+  // Get current PH time for filename
+  const now = new Date();
+  const phNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+  const dateStr = phNow.toISOString().split("T")[0]; // YYYY-MM-DD
 
-  const blob=new Blob([csv],{type:"text/csv"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;
-  a.download=`FREE_TIME_REQUEST_${dateStr}.csv`;
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `FREE_TIME_REQUEST_${dateStr}.csv`; // Dynamic filename
   a.click();
   URL.revokeObjectURL(url);
 }
 
-// ===== Calendar Navigation =====
+// Table view
+function renderTableView(data){
+  const t = document.getElementById("table");
+  t.style.display = "table";
+
+  const month = parseInt(document.getElementById("monthSelect").value); // selected month
+  const y = new Date().getFullYear();
+
+  // Get unique TL names
+  const tlnames = [...new Set(data.map(l => l.tlName || l.employeeName))];
+  const daysInMonth = new Date(y, month + 1, 0).getDate();
+
+  // Table header
+  let html = `<tr><th>TL Name</th>`;
+  for(let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
+  html += `</tr>`;
+
+  tlnames.forEach(tl => {
+    html += `<tr><td>${tl}</td>`;
+
+    for(let d = 1; d <= daysInMonth; d++){
+      const cellDate = new Date(y, month, d);
+
+      // Filter leaves for this TL & day, ignoring Cancelled
+      const leavesForCell = data.filter(l => {
+        const ld = new Date(l.date);
+        return (l.tlName || l.employeeName) === tl &&
+               ld.getFullYear() === y &&
+               ld.getMonth() === month &&
+               ld.getDate() === d &&
+               l.status !== "Cancelled"; // ignore Cancelled
+      });
+
+      if(leavesForCell.length){
+        // Determine the letter by priority: Approved > Pending > Rejected
+        let letter = "";
+        if(leavesForCell.some(l => l.status === "Approved")) letter = "A";
+        else if(leavesForCell.some(l => l.status === "Pending")) letter = "P";
+        else if(leavesForCell.some(l => l.status === "Rejected")) letter = "R";
+
+        html += `<td>
+          <span class="table-indicator ${letter}" 
+                data-leaves='${JSON.stringify(leavesForCell)}'>
+            ${letter}
+          </span>
+        </td>`;
+      } else {
+        html += "<td></td>";
+      }
+    }
+
+    html += "</tr>";
+  });
+
+  t.innerHTML = html;
+
+  // Re-add hover tooltip listeners after table is rendered
+  document.querySelectorAll(".table-indicator").forEach(span => {
+    const leaves = JSON.parse(span.dataset.leaves);
+    span.addEventListener("mouseenter", e => showLeaveTooltip(leaves, e));
+    span.addEventListener("mousemove", moveLeaveTooltip);
+    span.addEventListener("mouseleave", hideLeaveTooltip);
+  });
+}
+
+
+
+// Utility: Convert any date input to local YYYY-MM-DD string
+function getLocalDateString(dateInput) {
+  const d = new Date(dateInput);
+  // adjust to local midnight
+  const offset = d.getTimezoneOffset();
+  d.setMinutes(d.getMinutes() - offset);
+  return d.toISOString().split("T")[0];
+}
+
+// Render month calendar
+function renderCalendar(data) {
+  const grid = document.getElementById("calendarGrid");
+  grid.innerHTML = "";
+  grid.style.gridTemplateColumns = "repeat(7,1fr)";
+  grid.className = "calendar";
+
+  const y = calendarYear, m = calendarMonth;
+  const days = new Date(y, m + 1, 0).getDate();
+  const start = new Date(y, m, 1).getDay();
+
+  // Weekday headers
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d => {
+    const h = document.createElement("div");
+    h.className = "cal-header";
+    h.textContent = d;
+    grid.appendChild(h);
+  });
+
+  // Empty cells before first day
+  for (let i = 0; i < start; i++) {
+    const empty = document.createElement("div");
+    empty.className = "cal-cell";
+    grid.appendChild(empty);
+  }
+
+  // Day cells
+  for (let d = 1; d <= days; d++) {
+    const cell = document.createElement("div");
+    cell.className = "cal-cell";
+
+    const dayDiv = document.createElement("div");
+    dayDiv.className = "cal-day";
+    dayDiv.textContent = d;
+    cell.appendChild(dayDiv);
+
+    const cd = new Date(y, m, d);
+    const dateStr = getLocalDateString(cd); // YYYY-MM-DD local
+
+    // Filter leaves for this date (ignore Cancelled)
+    const dayLeaves = data.filter(l => {
+      const leaveDateStr = getLocalDateString(l.date);
+      return leaveDateStr === dateStr && l.status !== "Cancelled";
+    });
+
+    // Add indicators for leaves
+    dayLeaves.forEach(l => {
+      const c = l.status === "Approved" ? "A" :
+                l.status === "Rejected" ? "R" : "P";
+      const span = document.createElement("span");
+      span.className = "indicator " + c;
+      span.textContent = l.tlName || l.employeeName;
+      cell.appendChild(span);
+    });
+
+    // Click to open modal with all leaves for that day
+    cell.addEventListener("click", () => {
+      openDayModal(dateStr);
+    });
+
+    grid.appendChild(cell);
+  }
+
+  document.getElementById("calendarMonthLabel").textContent =
+    `${new Date(y, m).toLocaleString('default',{month:'long'})} ${y}`;
+}
+
+// Open modal showing all leaves for a specific day
+function openDayModal(dateStr) {
+  const modal = document.getElementById("dayModal");
+  const title = document.getElementById("dayModalTitle");
+  const body = document.getElementById("dayModalBody");
+
+  title.textContent = `Leaves on ${dateStr}`;
+
+  // Filter leaves for that date (timezone-safe)
+  const leaves = cachedRequests.filter(l => {
+    const leaveDateStr = getLocalDateString(l.date);
+    return leaveDateStr === dateStr && l.status !== "Cancelled";
+  });
+
+  if (leaves.length === 0) {
+    body.innerHTML = "<p>No leave requests on this day.</p>";
+  } else {
+    body.innerHTML = leaves.map(l => `
+      <div style="border-bottom:1px solid #eee; padding:6px; margin-bottom:6px;">
+        <div><strong>${l.employeeName}</strong> (${l.type})</div>
+        <div>Status: <span class="${l.status}">${l.status}</span></div>
+        ${l.reason ? `<div>Reason: ${l.reason}</div>` : ""}
+        <div style="margin-top:4px;">
+          <button class="approve" onclick="handleStatus('${l.id}','Approved','${dateStr}')">Approve</button>
+          <button class="pend" onclick="handleStatus('${l.id}','Pending','${dateStr}')">Pend</button>
+          <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
+          <button class="cancel" onclick="handleCancel('${l.id}','${dateStr}')">Cancel</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  modal.style.display = "flex";
+}
+
+
+function closeDayModal() {
+  document.getElementById("dayModal").style.display = "none";
+}
+
+//to propery handle close modal
+async function handleStatus(id, status, dateStr){
+  await db.collection("single_day_leave").doc(id).update({
+    status: status,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  render();
+  openDayModal(dateStr); // Only reopen day modal for non-reject actions
+}
+
+function handleCancel(id, dateStr){
+  cancelTargetId = id;
+  confirmCancel();
+  openDayModal(dateStr);
+}
+
+// Reject modal stays as before
+function openRejectModal(id){
+  rejectTargetId = id;
+  document.getElementById("rejectNote").value = "";
+  document.getElementById("rejectModal").style.display = "flex";
+}
+
+async function confirmReject(){
+  if(!rejectTargetId) return;
+
+  const note = document.getElementById("rejectNote").value || "No note provided";
+
+  await db.collection("single_day_leave").doc(rejectTargetId).update({
+    status: "Rejected",
+    notes: note,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  closeRejectModal(); // Close reject modal
+
+  render(); // Refresh table/list/calendar
+
+  // Optional: close day modal after rejection
+  const dayModal = document.getElementById("dayModal");
+  if(dayModal.style.display === "flex"){
+    closeDayModal();
+  }
+}
+
+// Year View
+function renderYearView(data){
+  const grid = document.getElementById("calendarGrid");
+  grid.innerHTML = "";
+  grid.className = "year-view";
+  grid.style.gridTemplateColumns = "repeat(3,1fr)";
+
+  const y = new Date().getFullYear();
+  const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  for(let m=0; m<12; m++){
+    const monthDiv = document.createElement("div");
+    monthDiv.className = "year-month";
+
+    // Month label
+    const label = document.createElement("div");
+    label.className = "year-month-label";
+    label.textContent = new Date(y,m).toLocaleString('default',{month:'short'});
+    monthDiv.appendChild(label);
+
+    // Weekday header row
+    const headerGrid = document.createElement("div");
+    headerGrid.className = "mini-grid";
+    weekdays.forEach(d=>{
+      const w = document.createElement("div");
+      w.className = "day-cell";
+      w.style.fontWeight = "bold";
+      w.style.border = "none";
+      w.textContent = d;
+      headerGrid.appendChild(w);
+    });
+    monthDiv.appendChild(headerGrid);
+
+    // Actual days grid
+    const miniGrid = document.createElement("div");
+    miniGrid.className = "mini-grid";
+
+    const start = new Date(y,m,1).getDay();
+    for(let i=0;i<start;i++){
+      miniGrid.appendChild(document.createElement("div"));
+    }
+
+    const days = new Date(y,m+1,0).getDate();
+    for(let d=1; d<=days; d++){
+      const cell = document.createElement("div");
+      cell.className = "day-cell";
+      cell.textContent = d;
+
+      const cd = new Date(y,m,d);
+      const leaves = data.filter(l=>{
+        const ld = new Date(l.date);
+        return ld.getFullYear()===cd.getFullYear()
+          && ld.getMonth()===cd.getMonth()
+          && ld.getDate()===cd.getDate();
+      });
+
+      if(leaves.length){
+        const dotC = document.createElement("div");
+        dotC.className = "day-dots";
+
+        leaves.forEach(l=>{
+          const dot = document.createElement("div");
+          dot.className = "dot " + (
+            l.status==="Approved" ? "approved" :
+            l.status==="Rejected" ? "rejected" : "pending"
+          );
+          dot.title = `${l.employeeName} (${l.status})`;
+          dotC.appendChild(dot);
+        });
+
+        cell.appendChild(dotC);
+      }
+
+      miniGrid.appendChild(cell);
+    }
+
+    monthDiv.appendChild(miniGrid);
+
+    monthDiv.onclick = ()=>{
+      calendarMonth = m;
+      setCalendarMode('month');
+    };
+
+    grid.appendChild(monthDiv);
+  }
+}
+
+
+function setCalendarMode(mode){
+  calendarMode = mode;
+  render();
+}
+
+const leaveTooltip = document.getElementById("leaveTooltip");
+
+function showLeaveTooltip(leaves, e){
+  leaveTooltip.innerHTML = `
+    <h4>Leave Details</h4>
+    ${leaves.map(l => `
+      <div class="leave-item">
+        <div><strong>${l.employeeName}</strong></div>
+        <div>${l.type}</div>
+        <div class="${l.status}">${l.status}</div>
+        <div>Date: ${l.date}</div>
+        ${l.reason ? `<div><em>${l.reason}</em></div>` : ``}
+      </div>
+      ${l.actionBy ? `<div><strong>By:</strong> ${l.actionBy}</div>` : ``}
+    `).join("")}
+  `;
+
+  leaveTooltip.style.display = "block";
+  leaveTooltip.style.left = e.pageX + 12 + "px";
+  leaveTooltip.style.top  = e.pageY + 12 + "px";
+}
+
+
+function moveLeaveTooltip(e){
+  leaveTooltip.style.left = e.pageX + 12 + "px";
+  leaveTooltip.style.top  = e.pageY + 12 + "px";
+}
+
+function hideLeaveTooltip(){
+  leaveTooltip.style.display = "none";
+}
+
+//avoid overlapped
+function moveLeaveTooltip(e){
+  const w = leaveTooltip.offsetWidth;
+  const h = leaveTooltip.offsetHeight;
+  let x = e.pageX + 12;
+  let y = e.pageY + 12;
+  if(x + w > window.innerWidth) x = e.pageX - w - 12;
+  if(y + h > window.innerHeight) y = e.pageY - h - 12;
+  leaveTooltip.style.left = x + "px";
+  leaveTooltip.style.top = y + "px";
+}
+
+let cancelTargetId = null;
+function openCancelModal(id){ cancelTargetId = id; document.getElementById("cancelModal").style.display = "flex"; }
+function closeCancelModal(){ cancelTargetId = null; document.getElementById("cancelModal").style.display = "none"; }
+
+function confirmCancel(){
+  if(cancelTargetId){
+    db.collection("single_day_leave").doc(cancelTargetId).update({
+      status: "Cancelled",
+      actionBy: currentUser.name,
+      actionAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeCancelModal();
+  }
+}
+
+let rejectTargetId = null;
+
+function openRejectModal(id){
+  rejectTargetId = id;
+  document.getElementById("rejectNote").value = ""; // clear previous
+  document.getElementById("rejectModal").style.display = "flex";
+}
+
+function closeRejectModal(){
+  rejectTargetId = null;
+  document.getElementById("rejectModal").style.display = "none";
+}
+
+async function confirmReject(){
+  if(!rejectTargetId) return;
+
+  const note = document.getElementById("rejectNote").value || "No note provided";
+
+  await db.collection("single_day_leave").doc(rejectTargetId).update({
+    status: "Rejected",
+    notes: note,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  closeRejectModal(); // close reject modal
+
+  render(); // refresh table/list/calendar
+
+  // Close day modal if it's open
+  const dayModal = document.getElementById("dayModal");
+  if(dayModal.style.display === "flex"){
+    closeDayModal();
+  }
+
+  // reset target
+  rejectTargetId = null;
+  currentDayModalDate = null;
+}
+
+
+async function updateStatus(id, status){
+  await db.collection("single_day_leave").doc(id).update({
+    status: status,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
 function changeCalendarMonth(diff){ calendarMonth+=diff; if(calendarMonth<0){calendarMonth=11; calendarYear--;} if(calendarMonth>11){calendarMonth=0; calendarYear++;} render(); }
 
-// ===== Init =====
-toggleCalendarControls();
-render();
-loadRequests();
+
+toggleCalendarControls(); render(); loadRequests();
 </script>
 
+<div class="modal" id="rejectModal">
+  <div class="modal-content">
+    <h3>Reject Leave Request</h3>
+    <p>Please provide a note for rejecting this leave:</p>
+    <textarea id="rejectNote" rows="4" style="width:100%; padding:6px; border-radius:6px; border:1px solid #ccc;"></textarea>
+    <div style="text-align:center; margin-top:10px;">
+      <button class="modal-confirm" onclick="confirmReject()">Reject</button>
+      <button class="modal-cancel" onclick="closeRejectModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
+<div class="modal" id="dayModal">
+  <div class="modal-content">
+    <h3 id="dayModalTitle">Leaves on DATE</h3>
+    <div id="dayModalBody" style="max-height:300px; overflow-y:auto;"></div>
+    <div style="text-align:center; margin-top:10px;">
+      <button onclick="closeDayModal()" class="modal-cancel">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="cancelModal">
+  <div class="modal-content">
+    <h3>Cancel Leave Request?</h3>
+    <p>Are you sure you want to cancel this leave?</p>
+    <div class="modal-actions">
+      <button class="modal-confirm" onclick="confirmCancel()">Yes, Cancel</button>
+      <button class="modal-cancel" onclick="closeCancelModal()">No</button>
+    </div>
+  </div>
+</div>
+
+<div id="notifDropdown" style="display:none;" class="notif-dropdown"></div>
+
+<div id="toastContainer"></div>
 </body>
 </html>
