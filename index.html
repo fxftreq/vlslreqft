@@ -147,68 +147,95 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const loginBtn = document.getElementById("loginBtn");
-const togglePassword = document.getElementById("togglePassword");
-const passwordInput = document.getElementById("password");
-const error = document.getElementById("error");
-
-// Show/hide password
-togglePassword.addEventListener("click", ()=>{
-  const hidden = passwordInput.type === "password";
-  passwordInput.type = hidden ? "text" : "password";
-  togglePassword.classList.toggle("fa-eye");
-  togglePassword.classList.toggle("fa-eye-slash");
-});
-
-// Login button
-loginBtn.addEventListener("click", async ()=>{
+loginBtn.addEventListener("click", async () => {
   error.textContent = "";
+
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
   const role = document.getElementById("loginType").value;
 
-  if(!username || !password || !role){
+  if(!username || !password){
     error.textContent = "Please complete all fields.";
     return;
   }
 
-  try{
-    let collectionName = role === "team_leader" ? "leave_users" : "manager_leave_user";
-    const docRef = db.collection(collectionName).doc(username);
-    const docSnap = await docRef.get();
+  try {
+    let userData = null;
+    let userId = null;
 
-    if(!docSnap.exists){
-      error.textContent = `${role === "team_leader" ? "User" : "Manager"} not found.`;
+    /* =========================
+       TEAM LEADER LOGIN
+    ========================= */
+    if(role === "team_leader"){
+      const docSnap = await db
+        .collection("leave_users")
+        .doc(username)
+        .get();
+
+      if(!docSnap.exists){
+        error.textContent = "User not found.";
+        return;
+      }
+
+      userData = docSnap.data();
+      userId = docSnap.id;
+
+    /* =========================
+       MANAGER LOGIN
+    ========================= */
+    } else {
+      const qSnap = await db
+        .collection("manager_leave_user")
+        .where("name", "==", username)
+        .limit(1)
+        .get();
+
+      if(qSnap.empty){
+        error.textContent = "Manager not found.";
+        return;
+      }
+
+      const doc = qSnap.docs[0];
+      userData = doc.data();
+      userId = doc.id;
+    }
+
+    // PASSWORD CHECK
+    if(!userData.tempPassword){
+      error.textContent = "No password set.";
       return;
     }
 
-    const userData = docSnap.data();
-
-    // Use tempPassword for both collections
-    const storedPassword = userData.tempPassword;
-    if(!storedPassword){
-      error.textContent = "User has no password set.";
-      return;
-    }
-
-    if(password !== storedPassword){
+    if(password !== userData.tempPassword){
       error.textContent = "Incorrect password.";
       return;
     }
 
-    // Save user to localStorage
-    localStorage.setItem("currentUser", JSON.stringify({...userData,id:docSnap.id}));
+    // SAVE SESSION
+    localStorage.setItem(
+      "currentUser",
+      JSON.stringify({ ...userData, id: userId })
+    );
 
-    // ROUTING
+    /* =========================
+       ROUTING
+    ========================= */
     if(role === "team_leader"){
-      location.href = userData.role === "admin" ? "admin.html" : "employee.html";
+      location.href =
+        userData.role === "admin"
+          ? "admin.html"
+          : "employee.html";
     } else {
-      // Manager
-      location.href = userData.role === "manager-admin" ? "manager-admin.html" : "manager-employee.html";
+      // MANAGER ROUTING
+      location.href =
+        userData.role === "manager-admin"
+          ? "manager-admin.html"
+          : "manager-employee.html";
     }
 
-  } catch(err){
-    error.textContent = err.message;
+  } catch (err) {
+    console.error(err);
+    error.textContent = "Login failed. Check console.";
   }
 });
 </script>
