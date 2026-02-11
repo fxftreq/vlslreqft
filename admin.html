@@ -575,9 +575,8 @@ function render(){
 
 function applyFilters() {
   const status = document.getElementById("filterStatus").value;
-  const type = document.getElementById("filterType").value;
-  const date = document.getElementById("filterDate").value;
   const submitted = document.getElementById("filterSubmitted").value;
+  
   // Get PH Date for the filter default
 const phFilterNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
 const phFilterString = phFilterNow.toISOString().split("T")[0];
@@ -601,10 +600,16 @@ document.getElementById("filterSubmitted").value = phFilterString; // Uncomment 
 
   if(date) data = data.filter(r => r.date === date);
 
- if(submitted) data = data.filter(r => {
+ if (submitted) {
+  data = data.filter(r => {
     let subDate = r.submittedAt && r.submittedAt.toDate ? r.submittedAt.toDate() : new Date(r.submittedAt);
-    return subDate.toISOString().split("T")[0] === submitted;
+    
+    // Convert the database timestamp to a PH date string (YYYY-MM-DD)
+    const phSubDate = subDate.toLocaleDateString("sv-SE", { timeZone: "Asia/Manila" }); 
+    
+    return phSubDate === submitted;
   });
+}
 
   renderList(data);
 }
@@ -1257,6 +1262,7 @@ toggleCalendarControls(); render(); loadRequests();
 <div id="toastContainer"></div>
 </body>
 </html>
+
 
 
 
