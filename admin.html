@@ -448,6 +448,19 @@ const currentUser=JSON.parse(localStorage.getItem("currentUser"));
 if(!currentUser){ alert("Please login first"); location.href="index.html"; }
 document.getElementById("welcomeMsg").textContent=`Welcome ${currentUser.name} to Admin Page`;
 
+//for setting the date time to ph	
+
+function getPHDateString(dateObj = new Date()) {
+  const phDate = new Date(
+    dateObj.toLocaleString("en-US", { timeZone: "Asia/Manila" })
+  );
+
+  const year = phDate.getFullYear();
+  const month = String(phDate.getMonth() + 1).padStart(2, "0");
+  const day = String(phDate.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 
 //time for notif
 function formatDateTime(ts){
@@ -595,9 +608,13 @@ function applyFilters() {
   if(date) data = data.filter(r => r.date === date);
 
   if(submitted) data = data.filter(r => {
-    let subDate = r.submittedAt && r.submittedAt.toDate ? r.submittedAt.toDate() : new Date(r.submittedAt);
-    return subDate.toISOString().split("T")[0] === submitted;
-  });
+  let subDate = r.submittedAt && r.submittedAt.toDate 
+    ? r.submittedAt.toDate() 
+    : new Date(r.submittedAt);
+
+  const phSubmitted = getPHDateString(subDate);
+  return phSubmitted === submitted;
+});
 
   renderList(data);
 }
@@ -685,9 +702,12 @@ function sortList(field) {
   }
   if(date) data = data.filter(r => r.date === date);
   if(submitted) data = data.filter(r => {
-    let subDate = r.submittedAt && r.submittedAt.toDate ? r.submittedAt.toDate() : new Date(r.submittedAt);
-    return subDate.toISOString().split("T")[0] === submitted;
-  });
+  let subDate = r.submittedAt && r.submittedAt.toDate 
+    ? r.submittedAt.toDate() 
+    : new Date(r.submittedAt);
+
+  return getPHDateString(subDate) === submitted;
+});
 
   // Sort
   data.sort((a,b)=>{
@@ -1198,14 +1218,6 @@ async function confirmReject(){
 }
 
 
-async function updateStatus(id, status){
-  await db.collection("single_day_leave").doc(id).update({
-    status: status,
-    actionBy: currentUser.name,
-    actionAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-}
-
 function changeCalendarMonth(diff){ calendarMonth+=diff; if(calendarMonth<0){calendarMonth=11; calendarYear--;} if(calendarMonth>11){calendarMonth=0; calendarYear++;} render(); }
 
 
@@ -1250,7 +1262,6 @@ toggleCalendarControls(); render(); loadRequests();
 <div id="toastContainer"></div>
 </body>
 </html>
-
 
 
 
