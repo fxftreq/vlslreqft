@@ -251,6 +251,30 @@ function logout() {
 // Elements
 const typeEl = document.getElementById("type");
 const dateEl = document.getElementById("date");
+
+function updatePhilippinesTime() {
+    const now = new Date();
+    
+    // Format the date/time specifically for Manila
+    const phTime = new Intl.DateTimeFormat('en-PH', {
+        timeZone: 'Asia/Manila',
+        dateStyle: 'medium', // e.g., Feb 11, 2026
+        timeStyle: 'medium', // e.g., 2:30:00 PM
+        hour12: true
+    }).format(now);
+
+    // Update the HTML element
+    if (dateEl) {
+        dateEl.innerHTML = phTime;
+    }
+}
+
+// Call once immediately to prevent 1-second delay
+updatePhilippinesTime();
+
+// Update every second (1000 milliseconds)
+setInterval(updatePhilippinesTime, 1000);
+
 const reasonEl = document.getElementById("reason");
 const submitBtn = document.getElementById("submitBtn");
 
@@ -324,4 +348,5 @@ loadLeaves();
 
 </body>
 </html>
+
 
