@@ -464,6 +464,18 @@ if(!currentUser || !currentUser.name){
 
 
 
+function getPHDateString(dateObj = new Date()) {
+  const phDate = new Date(
+    dateObj.toLocaleString("en-US", { timeZone: "Asia/Manila" })
+  );
+
+  const year = phDate.getFullYear();
+  const month = String(phDate.getMonth() + 1).padStart(2, "0");
+  const day = String(phDate.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 //time for notif
 function formatDateTime(ts){
   if(!ts) return "-";
@@ -611,9 +623,13 @@ function applyFilters() {
   if(date) data = data.filter(r => r.date === date);
 
   if(submitted) data = data.filter(r => {
-    let subDate = r.submittedAt && r.submittedAt.toDate ? r.submittedAt.toDate() : new Date(r.submittedAt);
-    return subDate.toISOString().split("T")[0] === submitted;
-  });
+  let subDate = r.submittedAt && r.submittedAt.toDate 
+    ? r.submittedAt.toDate() 
+    : new Date(r.submittedAt);
+
+  const phSubmitted = getPHDateString(subDate);
+  return phSubmitted === submitted;
+});
 
   renderList(data);
 }
@@ -726,9 +742,12 @@ function sortList(field) {
   }
   if(date) data = data.filter(r => r.date === date);
   if(submitted) data = data.filter(r => {
-    let subDate = r.submittedAt && r.submittedAt.toDate ? r.submittedAt.toDate() : new Date(r.submittedAt);
-    return subDate.toISOString().split("T")[0] === submitted;
-  });
+  let subDate = r.submittedAt && r.submittedAt.toDate 
+    ? r.submittedAt.toDate() 
+    : new Date(r.submittedAt);
+
+  return getPHDateString(subDate) === submitted;
+});
 
   // Sort
   data.sort((a,b)=>{
