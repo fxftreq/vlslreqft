@@ -463,6 +463,7 @@ if(!currentUser || !currentUser.name){
 }
 
 
+
 //time for notif
 function formatDateTime(ts){
   if(!ts) return "-";
@@ -692,19 +693,11 @@ function renderList(data) {
 }
 
 async function updateStatus(id, status){
-  let updates = { 
-    status: status, 
-    actionBy: currentUser.name, 
+  await db.collection("manager_single_day_leave").doc(id).update({
+    status: status,
+    actionBy: currentUser.name,
     actionAt: firebase.firestore.FieldValue.serverTimestamp()
-  };
-
-  // If rejecting, ask for a note
-  if(status === "Rejected"){
-    const note = prompt("Enter reason/note for rejection:");
-    updates.notes = note || "No note provided";
-  }
-
-  await db.collection("manager_single_day_leave").doc(id).update(updates);
+  });
 }
 
 //for sorting
@@ -1006,28 +999,6 @@ function openRejectModal(id){
   document.getElementById("rejectModal").style.display = "flex";
 }
 
-async function confirmReject(){
-  if(!rejectTargetId) return;
-
-  const note = document.getElementById("rejectNote").value || "No note provided";
-
-  await db.collection("single_day_leave").doc(rejectTargetId).update({
-    status: "Rejected",
-    notes: note,
-    actionBy: currentUser.name,
-    actionAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  closeRejectModal(); // Close reject modal
-
-  render(); // Refresh table/list/calendar
-
-  // Optional: close day modal after rejection
-  const dayModal = document.getElementById("dayModal");
-  if(dayModal.style.display === "flex"){
-    closeDayModal();
-  }
-}
 
 // Year View
 function renderYearView(data){
@@ -1127,16 +1098,16 @@ const leaveTooltip = document.getElementById("leaveTooltip");
 function showLeaveTooltip(leaves, e){
   leaveTooltip.innerHTML = `
     <h4>Leave Details</h4>
-    ${leaves.map(l => `
-      <div class="leave-item">
-        <div><strong>${l.managerName}</strong></div>
-        <div>${l.type}</div>
-        <div class="${l.status}">${l.status}</div>
-        <div>Date: ${l.date}</div>
-        ${l.reason ? `<div><em>${l.reason}</em></div>` : ``}
-      </div>
-      ${l.actionBy ? `<div><strong>By:</strong> ${l.actionBy}</div>` : ``}
-    `).join("")}
+   ${leaves.map(l => `
+  <div class="leave-item">
+    <div><strong>${l.managerName}</strong></div>
+    <div>${l.type}</div>
+    <div class="${l.status}">${l.status}</div>
+    <div>Date: ${l.date}</div>
+    ${l.reason ? `<div><em>${l.reason}</em></div>` : ``}
+    ${l.actionBy ? `<div><strong>By:</strong> ${l.actionBy}</div>` : ``}
+  </div>
+`).join("")}
   `;
 
   leaveTooltip.style.display = "block";
@@ -1144,11 +1115,6 @@ function showLeaveTooltip(leaves, e){
   leaveTooltip.style.top  = e.pageY + 12 + "px";
 }
 
-
-function moveLeaveTooltip(e){
-  leaveTooltip.style.left = e.pageX + 12 + "px";
-  leaveTooltip.style.top  = e.pageY + 12 + "px";
-}
 
 function hideLeaveTooltip(){
   leaveTooltip.style.display = "none";
@@ -1172,7 +1138,7 @@ function closeCancelModal(){ cancelTargetId = null; document.getElementById("can
 
 function confirmCancel(){
   if(cancelTargetId){
-    db.collection("single_day_leave").doc(cancelTargetId).update({
+    db.collection("manager_single_day_leave").doc(cancelTargetId).update({
       status: "Cancelled",
       actionBy: currentUser.name,
       actionAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1180,6 +1146,7 @@ function confirmCancel(){
     closeCancelModal();
   }
 }
+
 
 let rejectTargetId = null;
 
@@ -1199,44 +1166,32 @@ async function confirmReject(){
 
   const note = document.getElementById("rejectNote").value || "No note provided";
 
-  await db.collection("single_day_leave").doc(rejectTargetId).update({
+  await db.collection("manager_single_day_leave").doc(rejectTargetId).update({
     status: "Rejected",
     notes: note,
     actionBy: currentUser.name,
     actionAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
-  closeRejectModal(); // close reject modal
+  closeRejectModal();
+  render();
 
-  render(); // refresh table/list/calendar
-
-  // Close day modal if it's open
   const dayModal = document.getElementById("dayModal");
   if(dayModal.style.display === "flex"){
     closeDayModal();
   }
 
-  // reset target
   rejectTargetId = null;
-  currentDayModalDate = null;
 }
 
-
-async function updateStatus(id, status){
-  await db.collection("single_day_leave").doc(id).update({
-    status: status,
-    actionBy: currentUser.name,
-    actionAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-}
 
 function changeCalendarMonth(diff){ calendarMonth+=diff; if(calendarMonth<0){calendarMonth=11; calendarYear--;} if(calendarMonth>11){calendarMonth=0; calendarYear++;} render(); }
 
 
 toggleCalendarControls(); render(); loadRequests();
+
 </script>
 
-sda
 
 <div class="modal" id="rejectModal">
   <div class="modal-content">
