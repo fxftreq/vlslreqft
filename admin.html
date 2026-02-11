@@ -448,6 +448,7 @@ const currentUser=JSON.parse(localStorage.getItem("currentUser"));
 if(!currentUser){ alert("Please login first"); location.href="index.html"; }
 document.getElementById("welcomeMsg").textContent=`Welcome ${currentUser.name} to Admin Page`;
 
+
 //time for notif
 function formatDateTime(ts){
   if(!ts) return "-";
@@ -713,7 +714,27 @@ function sortList(field) {
 // Export CSV including Notes with dynamic filename
 function exportCSV(){
   const data = cachedRequests;
-  let csv = "Employee,Type,Date,Submitted Date,Reason,Status,Notes\n"; // Added Notes
+
+  // CSV escape function
+  function escapeCSV(value){
+    if(value === null || value === undefined) return "";
+    value = value.toString();
+
+    // Replace line breaks with space (prevents row break)
+    value = value.replace(/(\r\n|\n|\r)/gm, " ");
+
+    // Escape double quotes
+    value = value.replace(/"/g, '""');
+
+    // Wrap in quotes if contains comma
+    if(value.includes(",") || value.includes('"')){
+      value = `"${value}"`;
+    }
+
+    return value;
+  }
+
+  let csv = "Employee,Type,Date,Submitted Date,Reason,Status,Notes\n";
 
   data.forEach(l => {
     const s = l.submittedAt?.toDate?.() || new Date(l.submittedAt);
@@ -728,22 +749,26 @@ function exportCSV(){
       second: "2-digit"
     });
 
-    // Sanitize notes
-    const notes = l.notes ? l.notes.replace(/(\r\n|\n|\r)/gm, " ") : "";
-
-    csv += `${l.employeeName},${l.type},${l.date},${phTime},${l.reason},${l.status},${notes}\n`;
+    csv += [
+      escapeCSV(l.employeeName),
+      escapeCSV(l.type),
+      escapeCSV(l.date),
+      escapeCSV(phTime),
+      escapeCSV(l.reason),
+      escapeCSV(l.status),
+      escapeCSV(l.notes || "")
+    ].join(",") + "\n";
   });
 
-  // Get current PH time for filename
   const now = new Date();
   const phNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
-  const dateStr = phNow.toISOString().split("T")[0]; // YYYY-MM-DD
+  const dateStr = phNow.toISOString().split("T")[0];
 
-  const blob = new Blob([csv], { type: "text/csv" });
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `FREE_TIME_REQUEST_${dateStr}.csv`; // Dynamic filename
+  a.download = `FREE_TIME_REQUEST_${dateStr}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
