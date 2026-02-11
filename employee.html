@@ -270,6 +270,17 @@ function logout() {
 // Elements
 const typeEl = document.getElementById("type");
 const dateEl = document.getElementById("date");
+	
+// Set default date to PH Time (Asia/Manila)
+const nowPH = new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" });
+const phDate = new Date(nowPH);
+const year = phDate.getFullYear();
+const month = String(phDate.getMonth() + 1).padStart(2, '0');
+const day = String(phDate.getDate()).padStart(2, '0');
+
+// This sets the input value to YYYY-MM-DD
+dateEl.value = `${year}-${month}-${day}`;
+	
 const reasonEl = document.getElementById("reason");
 const submitBtn = document.getElementById("submitBtn");
 
@@ -351,4 +362,5 @@ loadLeaves();
 
 </body>
 </html>
+
 
