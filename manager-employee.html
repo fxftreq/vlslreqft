@@ -209,6 +209,7 @@ td.reason-col { max-width: 250px; }
         <th>Date</th>
         <th>Reason</th>
         <th>Status</th>
+        <th>Admin Notes</th>
         <th>Submitted Date</th>
       </tr>
     </table>
@@ -286,8 +287,13 @@ function loadLeaves() {
     .where("managerId","==",currentUser.id)
     .onSnapshot(snapshot => {
       tableEl.innerHTML = `<tr>
-        <th>Type</th><th>Date</th><th>Reason</th><th>Status</th><th>Submitted Date</th>
-      </tr>`;
+  <th>Type</th>
+  <th>Date</th>
+  <th>Reason</th>
+  <th>Status</th>
+  <th>Admin Notes</th>
+  <th>Submitted Date</th>
+</tr>`;
       
       snapshot.forEach(doc => {
         const l = doc.data();
@@ -300,12 +306,15 @@ function loadLeaves() {
         });
 
         tableEl.innerHTML += `<tr>
-          <td>${l.type}</td>
-          <td>${l.date}</td>
-          <td class="reason-col">${l.reason}</td>
-          <td class="status-${l.status}">${l.status}</td>
-          <td>${dateStr}</td>
-        </tr>`;
+  <td>${l.type}</td>
+  <td>${l.date}</td>
+  <td class="reason-col">${l.reason}</td>
+  <td class="status-${l.status}">${l.status}</td>
+  <td class="reason-col">
+    ${l.notes ? l.notes : (l.status === "Rejected" ? "No note provided" : "-")}
+  </td>
+  <td>${dateStr}</td>
+</tr>`;
       });
     }, err => { alert("Error loading leaves: "+err.message); });
 }
