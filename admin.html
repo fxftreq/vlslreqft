@@ -600,16 +600,10 @@ document.getElementById("filterSubmitted").value = phFilterString; // Uncomment 
 
   if(date) data = data.filter(r => r.date === date);
 
- if (submitted) {
-  data = data.filter(r => {
+ if(submitted) data = data.filter(r => {
     let subDate = r.submittedAt && r.submittedAt.toDate ? r.submittedAt.toDate() : new Date(r.submittedAt);
-    
-    // Convert the database timestamp to a PH date string (YYYY-MM-DD)
-    const phSubDate = subDate.toLocaleDateString("sv-SE", { timeZone: "Asia/Manila" }); 
-    
-    return phSubDate === submitted;
+    return subDate.toISOString().split("T")[0] === submitted;
   });
-}
 
   renderList(data);
 }
@@ -1262,6 +1256,7 @@ toggleCalendarControls(); render(); loadRequests();
 <div id="toastContainer"></div>
 </body>
 </html>
+
 
 
 
