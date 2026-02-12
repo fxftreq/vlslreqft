@@ -463,6 +463,16 @@ if(!currentUser || !currentUser.name){
 }
 
 
+function getPHDate(year, month = 0, day = 1) {
+  const phDateStr = new Date(Date.UTC(year, month, day)).toLocaleString("en-US", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric"
+  });
+  const [m, d, y] = phDateStr.split("/"); // US format MM/DD/YYYY
+  return new Date(`${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`);
+}
 
 function getPHDateString(dateObj = new Date()) {
   const phDate = new Date(
@@ -887,7 +897,8 @@ function getLocalDateString(dateInput) {
   return d.toISOString().split("T")[0];
 }
 
-// Render month calendar
+
+// Render month calendar in PH timezone
 function renderCalendar(data) {
   const grid = document.getElementById("calendarGrid");
   grid.innerHTML = "";
@@ -895,8 +906,9 @@ function renderCalendar(data) {
   grid.className = "calendar";
 
   const y = calendarYear, m = calendarMonth;
-  const days = new Date(y, m + 1, 0).getDate();
-  const start = new Date(y, m, 1).getDay();
+  const phFirstDay = getPHDate(y, m, 1); // PH-adjusted first day
+  const days = new Date(phFirstDay.getFullYear(), phFirstDay.getMonth() + 1, 0).getDate();
+  const start = phFirstDay.getDay();
 
   // Weekday headers
   ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d => {
@@ -923,13 +935,15 @@ function renderCalendar(data) {
     dayDiv.textContent = d;
     cell.appendChild(dayDiv);
 
-    const cd = new Date(y, m, d);
-    const dateStr = getLocalDateString(cd); // YYYY-MM-DD local
+    const cd = getPHDate(y, m, d);
+    const dateStr = getPHDateString(cd); // PH-time YYYY-MM-DD
 
     // Filter leaves for this date (ignore Cancelled)
     const dayLeaves = data.filter(l => {
-      const leaveDateStr = getLocalDateString(l.date);
-      return leaveDateStr === dateStr && l.status !== "Cancelled";
+      const phLeaveDate = getPHDateString(new Date(
+        new Date(l.date).toLocaleString("en-US", { timeZone: "Asia/Manila" })
+      ));
+      return phLeaveDate === dateStr && l.status !== "Cancelled";
     });
 
     // Add indicators for leaves
@@ -943,16 +957,17 @@ function renderCalendar(data) {
     });
 
     // Click to open modal with all leaves for that day
-    cell.addEventListener("click", () => {
-      openDayModal(dateStr);
-    });
+    cell.addEventListener("click", () => openDayModal(dateStr));
 
     grid.appendChild(cell);
   }
 
+  const phLabelDate = getPHDate(y, m, 1);
   document.getElementById("calendarMonthLabel").textContent =
-    `${new Date(y, m).toLocaleString('default',{month:'long'})} ${y}`;
+    `${phLabelDate.toLocaleString("en-US", { month: "long", timeZone: "Asia/Manila" })} ${phLabelDate.getFullYear()}`;
 }
+
+
 
 // Open modal showing all leaves for a specific day
 function openDayModal(dateStr) {
@@ -1020,29 +1035,32 @@ function openRejectModal(id){
 
 
 // Year View
+// Render year view calendar in PH timezone
 function renderYearView(data){
   const grid = document.getElementById("calendarGrid");
   grid.innerHTML = "";
   grid.className = "year-view";
   grid.style.gridTemplateColumns = "repeat(3,1fr)";
 
-  const y = new Date().getFullYear();
+  const y = calendarYear; // PH year
   const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
-  for(let m=0; m<12; m++){
+  for(let m = 0; m < 12; m++){
     const monthDiv = document.createElement("div");
     monthDiv.className = "year-month";
+
+    const phMonthDate = getPHDate(y, m, 1);
 
     // Month label
     const label = document.createElement("div");
     label.className = "year-month-label";
-    label.textContent = new Date(y,m).toLocaleString('default',{month:'short'});
+    label.textContent = phMonthDate.toLocaleString("en-US", { month: "short", timeZone: "Asia/Manila" });
     monthDiv.appendChild(label);
 
     // Weekday header row
     const headerGrid = document.createElement("div");
     headerGrid.className = "mini-grid";
-    weekdays.forEach(d=>{
+    weekdays.forEach(d => {
       const w = document.createElement("div");
       w.className = "day-cell";
       w.style.fontWeight = "bold";
@@ -1056,34 +1074,32 @@ function renderYearView(data){
     const miniGrid = document.createElement("div");
     miniGrid.className = "mini-grid";
 
-    const start = new Date(y,m,1).getDay();
-    for(let i=0;i<start;i++){
-      miniGrid.appendChild(document.createElement("div"));
-    }
+    const start = phMonthDate.getDay(); // first day of month
+    for(let i = 0; i < start; i++) miniGrid.appendChild(document.createElement("div"));
 
-    const days = new Date(y,m+1,0).getDate();
-    for(let d=1; d<=days; d++){
+    const days = new Date(phMonthDate.getFullYear(), phMonthDate.getMonth() + 1, 0).getDate();
+    for(let d = 1; d <= days; d++){
       const cell = document.createElement("div");
       cell.className = "day-cell";
       cell.textContent = d;
 
-      const cd = new Date(y,m,d);
-      const leaves = data.filter(l=>{
-        const ld = new Date(l.date);
-        return ld.getFullYear()===cd.getFullYear()
-          && ld.getMonth()===cd.getMonth()
-          && ld.getDate()===cd.getDate();
+      const cd = getPHDate(y, m, d); // PH date for this cell
+      const leaves = data.filter(l => {
+        const phLeaveDate = getPHDateString(new Date(
+          new Date(l.date).toLocaleString("en-US", { timeZone: "Asia/Manila" })
+        ));
+        return phLeaveDate === getPHDateString(cd);
       });
 
       if(leaves.length){
         const dotC = document.createElement("div");
         dotC.className = "day-dots";
 
-        leaves.forEach(l=>{
+        leaves.forEach(l => {
           const dot = document.createElement("div");
           dot.className = "dot " + (
-            l.status==="Approved" ? "approved" :
-            l.status==="Rejected" ? "rejected" : "pending"
+            l.status === "Approved" ? "approved" :
+            l.status === "Rejected" ? "rejected" : "pending"
           );
           dot.title = `${l.managerName} (${l.status})`;
           dotC.appendChild(dot);
@@ -1097,7 +1113,7 @@ function renderYearView(data){
 
     monthDiv.appendChild(miniGrid);
 
-    monthDiv.onclick = ()=>{
+    monthDiv.onclick = () => {
       calendarMonth = m;
       setCalendarMode('month');
     };
@@ -1105,6 +1121,7 @@ function renderYearView(data){
     grid.appendChild(monthDiv);
   }
 }
+
 
 
 function setCalendarMode(mode){
