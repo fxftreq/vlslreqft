@@ -448,7 +448,13 @@ const currentUser=JSON.parse(localStorage.getItem("currentUser"));
 if(!currentUser){ alert("Please login first"); location.href="index.html"; }
 document.getElementById("welcomeMsg").textContent=`Welcome ${currentUser.name} to Admin Page`;
 
+
 //for setting the date time to ph	
+function getPHDateObject(dateObj = new Date()) {
+  return new Date(
+    dateObj.toLocaleString("en-US", { timeZone: "Asia/Manila" })
+  );
+}
 
 function getPHDateString(dateObj = new Date()) {
   const phDate = new Date(
@@ -461,6 +467,7 @@ function getPHDateString(dateObj = new Date()) {
 
   return `${year}-${month}-${day}`;
 }
+
 
 //time for notif
 function formatDateTime(ts){
@@ -476,7 +483,14 @@ function formatDateTime(ts){
   });
 }
 
-let cachedRequests=[], currentFilter="All", currentView="list", calendarMonth=new Date().getMonth(), calendarYear=new Date().getFullYear(), calendarMode="month";
+const phNow = getPHDateObject();
+
+let cachedRequests=[],
+    currentFilter="All",
+    currentView="list",
+    calendarMonth=phNow.getMonth(),
+    calendarYear=phNow.getFullYear(),
+    calendarMode="month";
 
 //this is for notif new added
 
@@ -801,7 +815,8 @@ function renderTableView(data){
   t.style.display = "table";
 
   const month = parseInt(document.getElementById("monthSelect").value); // selected month
-  const y = new Date().getFullYear();
+const phNow = getPHDateObject();
+const y = phNow.getFullYear();
 
   // Get unique TL names
   const tlnames = [...new Set(data.map(l => l.tlName || l.employeeName))];
@@ -861,17 +876,8 @@ function renderTableView(data){
 }
 
 
-
-// Utility: Convert any date input to local YYYY-MM-DD string
-function getLocalDateString(dateInput) {
-  const d = new Date(dateInput);
-  // adjust to local midnight
-  const offset = d.getTimezoneOffset();
-  d.setMinutes(d.getMinutes() - offset);
-  return d.toISOString().split("T")[0];
-}
-
 // Render month calendar
+// Month Calendar (PH Time)
 function renderCalendar(data) {
   const grid = document.getElementById("calendarGrid");
   grid.innerHTML = "";
@@ -879,26 +885,27 @@ function renderCalendar(data) {
   grid.className = "calendar";
 
   const y = calendarYear, m = calendarMonth;
-  const days = new Date(y, m + 1, 0).getDate();
-  const start = new Date(y, m, 1).getDay();
+  const phFirstDay = getPHDateObject(new Date(y, m, 1));
+  const phDaysInMonth = new Date(phFirstDay.getFullYear(), phFirstDay.getMonth() + 1, 0).getDate();
+  const startDay = phFirstDay.getDay();
 
   // Weekday headers
-  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d => {
-    const h = document.createElement("div");
-    h.className = "cal-header";
-    h.textContent = d;
-    grid.appendChild(h);
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(day => {
+    const header = document.createElement("div");
+    header.className = "cal-header";
+    header.textContent = day;
+    grid.appendChild(header);
   });
 
   // Empty cells before first day
-  for (let i = 0; i < start; i++) {
+  for(let i=0;i<startDay;i++){
     const empty = document.createElement("div");
     empty.className = "cal-cell";
     grid.appendChild(empty);
   }
 
   // Day cells
-  for (let d = 1; d <= days; d++) {
+  for(let d=1; d<=phDaysInMonth; d++){
     const cell = document.createElement("div");
     cell.className = "cal-cell";
 
@@ -907,35 +914,26 @@ function renderCalendar(data) {
     dayDiv.textContent = d;
     cell.appendChild(dayDiv);
 
-    const cd = new Date(y, m, d);
-    const dateStr = getLocalDateString(cd); // YYYY-MM-DD local
+    const cellDate = getPHDateString(new Date(y, m, d));
 
-    // Filter leaves for this date (ignore Cancelled)
-    const dayLeaves = data.filter(l => {
-      const leaveDateStr = getLocalDateString(l.date);
-      return leaveDateStr === dateStr && l.status !== "Cancelled";
+    // Add leave indicators (ignoring Cancelled)
+    const leavesToday = data.filter(l => getPHDateString(new Date(l.date)) === cellDate && l.status !== "Cancelled");
+    leavesToday.forEach(l => {
+      const indicator = document.createElement("span");
+      indicator.className = "indicator " + (l.status==="Approved"?"A":l.status==="Rejected"?"R":"P");
+      indicator.textContent = l.tlName || l.employeeName;
+      cell.appendChild(indicator);
     });
 
-    // Add indicators for leaves
-    dayLeaves.forEach(l => {
-      const c = l.status === "Approved" ? "A" :
-                l.status === "Rejected" ? "R" : "P";
-      const span = document.createElement("span");
-      span.className = "indicator " + c;
-      span.textContent = l.tlName || l.employeeName;
-      cell.appendChild(span);
-    });
-
-    // Click to open modal with all leaves for that day
-    cell.addEventListener("click", () => {
-      openDayModal(dateStr);
-    });
+    // Click to open day modal
+    cell.addEventListener("click", () => openDayModal(cellDate));
 
     grid.appendChild(cell);
   }
 
+  // Update month label
   document.getElementById("calendarMonthLabel").textContent =
-    `${new Date(y, m).toLocaleString('default',{month:'long'})} ${y}`;
+    `${phFirstDay.toLocaleString('default',{month:'long'})} ${y}`;
 }
 
 // Open modal showing all leaves for a specific day
@@ -948,7 +946,7 @@ function openDayModal(dateStr) {
 
   // Filter leaves for that date (timezone-safe)
   const leaves = cachedRequests.filter(l => {
-    const leaveDateStr = getLocalDateString(l.date);
+    const leaveDateStr = getPHDateString(new Date(l.date));
     return leaveDateStr === dateStr && l.status !== "Cancelled";
   });
 
@@ -1032,7 +1030,7 @@ function renderYearView(data){
   grid.className = "year-view";
   grid.style.gridTemplateColumns = "repeat(3,1fr)";
 
-  const y = new Date().getFullYear();
+  const year = calendarYear; // use calendarYear for consistency
   const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
   for(let m=0; m<12; m++){
@@ -1042,60 +1040,53 @@ function renderYearView(data){
     // Month label
     const label = document.createElement("div");
     label.className = "year-month-label";
-    label.textContent = new Date(y,m).toLocaleString('default',{month:'short'});
+    label.textContent = new Date(year, m).toLocaleString('default',{month:'short'});
     monthDiv.appendChild(label);
 
-    // Weekday header row
+    // Weekday headers
     const headerGrid = document.createElement("div");
     headerGrid.className = "mini-grid";
-    weekdays.forEach(d=>{
+    weekdays.forEach(wd => {
       const w = document.createElement("div");
       w.className = "day-cell";
       w.style.fontWeight = "bold";
       w.style.border = "none";
-      w.textContent = d;
+      w.textContent = wd;
       headerGrid.appendChild(w);
     });
     monthDiv.appendChild(headerGrid);
 
-    // Actual days grid
+    // Days grid
     const miniGrid = document.createElement("div");
     miniGrid.className = "mini-grid";
 
-    const start = new Date(y,m,1).getDay();
-    for(let i=0;i<start;i++){
-      miniGrid.appendChild(document.createElement("div"));
-    }
+    const phFirstDay = getPHDateObject(new Date(year, m, 1));
+    const start = phFirstDay.getDay();
+    for(let i=0;i<start;i++) miniGrid.appendChild(document.createElement("div"));
 
-    const days = new Date(y,m+1,0).getDate();
-    for(let d=1; d<=days; d++){
+    const daysInMonth = new Date(phFirstDay.getFullYear(), phFirstDay.getMonth()+1, 0).getDate();
+
+    for(let d=1; d<=daysInMonth; d++){
       const cell = document.createElement("div");
       cell.className = "day-cell";
       cell.textContent = d;
 
-      const cd = new Date(y,m,d);
-      const leaves = data.filter(l=>{
-        const ld = new Date(l.date);
-        return ld.getFullYear()===cd.getFullYear()
-          && ld.getMonth()===cd.getMonth()
-          && ld.getDate()===cd.getDate();
+      const cd = getPHDateObject(new Date(year, m, d));
+      const leavesToday = data.filter(l=>{
+        const ld = getPHDateObject(new Date(l.date));
+        return ld.getFullYear()===cd.getFullYear() && ld.getMonth()===cd.getMonth() && ld.getDate()===cd.getDate();
       });
 
-      if(leaves.length){
-        const dotC = document.createElement("div");
-        dotC.className = "day-dots";
-
-        leaves.forEach(l=>{
+      if(leavesToday.length){
+        const dotContainer = document.createElement("div");
+        dotContainer.className = "day-dots";
+        leavesToday.forEach(l=>{
           const dot = document.createElement("div");
-          dot.className = "dot " + (
-            l.status==="Approved" ? "approved" :
-            l.status==="Rejected" ? "rejected" : "pending"
-          );
+          dot.className = "dot " + (l.status==="Approved"?"approved":l.status==="Rejected"?"rejected":"pending");
           dot.title = `${l.employeeName} (${l.status})`;
-          dotC.appendChild(dot);
+          dotContainer.appendChild(dot);
         });
-
-        cell.appendChild(dotC);
+        cell.appendChild(dotContainer);
       }
 
       miniGrid.appendChild(cell);
@@ -1103,15 +1094,15 @@ function renderYearView(data){
 
     monthDiv.appendChild(miniGrid);
 
-    monthDiv.onclick = ()=>{
-      calendarMonth = m;
-      setCalendarMode('month');
-    };
+    // Click month to switch to month view
+    monthDiv.addEventListener("click", ()=>{ 
+      calendarMonth = m; 
+      setCalendarMode("month"); 
+    });
 
     grid.appendChild(monthDiv);
   }
 }
-
 
 function setCalendarMode(mode){
   calendarMode = mode;
