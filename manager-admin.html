@@ -463,6 +463,7 @@ if(!currentUser || !currentUser.name){
 }
 
 
+
 function getPHDate(year, month = 0, day = 1) {
   const phDateStr = new Date(Date.UTC(year, month, day)).toLocaleString("en-US", {
     timeZone: "Asia/Manila",
@@ -977,9 +978,9 @@ function openDayModal(dateStr) {
 
   title.textContent = `Leaves on ${dateStr}`;
 
-  // Filter leaves for that date (timezone-safe)
+  // Filter leaves for that date
   const leaves = cachedRequests.filter(l => {
-    const leaveDateStr = getLocalDateString(l.date);
+    const leaveDateStr = getPHDateString(new Date(l.date));
     return leaveDateStr === dateStr && l.status !== "Cancelled";
   });
 
@@ -994,8 +995,8 @@ function openDayModal(dateStr) {
         <div style="margin-top:4px;">
           <button class="approve" onclick="handleStatus('${l.id}','Approved','${dateStr}')">Approve</button>
           <button class="pend" onclick="handleStatus('${l.id}','Pending','${dateStr}')">Pend</button>
-          <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
-          <button class="cancel" onclick="handleCancel('${l.id}','${dateStr}')">Cancel</button>
+          <button class="reject" onclick="openRejectModal('${l.id}','${dateStr}')">Reject</button>
+          <button class="cancel" onclick="openCancelModal('${l.id}','${dateStr}')">Cancel</button>
         </div>
       </div>
     `).join("");
@@ -1004,20 +1005,32 @@ function openDayModal(dateStr) {
   modal.style.display = "flex";
 }
 
-
 function closeDayModal() {
   document.getElementById("dayModal").style.display = "none";
 }
 
-//to propery handle close modal
+// --- Handle Approve / Pending ---
 async function handleStatus(id, status, dateStr){
-  await db.collection("manager_single_day_leave").doc(id).update({
-    status: status,
-    actionBy: currentUser.name,
-    actionAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  render();
-  openDayModal(dateStr); // Only reopen day modal for non-reject actions
+  if(!currentUser?.name){
+    alert("User not found. Please login again.");
+    return;
+  }
+
+  try {
+    await db.collection("manager_single_day_leave").doc(id).update({
+      status: status,
+      actionBy: currentUser.name,
+      actionAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Refresh data and reopen modal
+    render();
+    openDayModal(dateStr);
+
+  } catch(err){
+    console.error(err);
+    alert("Failed to update status: " + err.message);
+  }
 }
 
 function handleCancel(id, dateStr){
@@ -1025,14 +1038,6 @@ function handleCancel(id, dateStr){
   confirmCancel();
   openDayModal(dateStr);
 }
-
-// Reject modal stays as before
-function openRejectModal(id){
-  rejectTargetId = id;
-  document.getElementById("rejectNote").value = "";
-  document.getElementById("rejectModal").style.display = "flex";
-}
-
 
 // Year View
 // Render year view calendar in PH timezone
