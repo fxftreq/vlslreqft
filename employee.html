@@ -543,54 +543,57 @@ db.collection("single_day_leave")
     renderCalendar();
   });
 
-function renderCalendar(){
-  if(viewMode==="month") renderMonth();
-  else renderYear();
+function renderCalendar() {
+  if (viewMode === "month") renderMonth();
+  else if (viewMode === "year") renderYear();
 }
 
-function renderMonth(){
-  const container=document.getElementById("calendarContainer");
-  container.className="calendar";
-  container.innerHTML="";
+function renderMonth() {
+  const container = document.getElementById("calendarContainer");
+  container.className = "calendar";
+  container.innerHTML = "";
 
-  const first=new Date(calYear,calMonth,1);
-  const days=new Date(calYear,calMonth+1,0).getDate();
-  const start=first.getDay();
+  const first = new Date(calYear, calMonth, 1);
+  const days = new Date(calYear, calMonth + 1, 0).getDate();
+  const start = first.getDay();
 
+  // Update label
   document.getElementById("calendarLabel").textContent =
-    first.toLocaleString('default',{month:'long'})+" "+calYear;
+    first.toLocaleString('default', { month: 'long' }) + " " + calYear;
 
-  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{
-    const h=document.createElement("div");
-    h.className="cal-header";
-    h.textContent=d;
+  // Day headers
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d => {
+    const h = document.createElement("div");
+    h.className = "cal-header";
+    h.textContent = d;
     container.appendChild(h);
   });
 
-  for(let i=0;i<start;i++){
-    container.appendChild(document.createElement("div"));
-  }
+  // Empty cells before first day
+  for (let i = 0; i < start; i++) container.appendChild(document.createElement("div"));
 
-  for(let d=1; d<=days; d++){
-    const cell=document.createElement("div");
-    cell.className="cal-cell";
+  // Days
+  for (let d = 1; d <= days; d++) {
+    const cell = document.createElement("div");
+    cell.className = "cal-cell";
 
-    const day=document.createElement("div");
-    day.className="cal-day";
-    day.textContent=d;
+    const day = document.createElement("div");
+    day.className = "cal-day";
+    day.textContent = d;
     cell.appendChild(day);
 
-    const fullDate=new Date(calYear,calMonth,d).toISOString().split("T")[0];
+    const fullDate = new Date(calYear, calMonth, d).toISOString().split("T")[0];
 
+    // Show all employee leaves on this day
     employeeLeaves
-  .filter(l => l.date === fullDate)
-  .forEach(l => {
-    const tag = document.createElement("div");
-    tag.className = "cal-tag tag-" + l.status;
-    tag.textContent = `${l.employeeName}: ${l.type} (${l.status})`;
-    cell.appendChild(tag);
-  });
-  
+      .filter(l => l.date === fullDate)
+      .forEach(l => {
+        const tag = document.createElement("div");
+        tag.className = "cal-tag tag-" + l.status;
+        tag.textContent = `${l.employeeName}: ${l.type} (${l.status})`;
+        cell.appendChild(tag);
+      });
+
     container.appendChild(cell);
   }
 }
@@ -600,19 +603,18 @@ function renderYear() {
   container.className = "year-view";
   container.innerHTML = "";
 
-  // Get unique years from leave data
+  // Unique years from all leave records
   const years = [...new Set(employeeLeaves.map(l => parseInt(l.date.split("-")[0])))];
+  years.sort((a, b) => b - a); // latest first
 
-  // Sort descending so latest year is first
-  years.sort((a, b) => b - a);
-
+  // Create clickable boxes for each year
   years.forEach(y => {
     const box = document.createElement("div");
     box.className = "year-box";
     box.textContent = y;
     box.onclick = () => {
       calYear = y;
-      viewMode = "month";
+      viewMode = "month"; // switch to month for that year
       renderCalendar();
     };
     container.appendChild(box);
@@ -628,5 +630,6 @@ function renderYear() {
 
 </body>
 </html>
+
 
 
