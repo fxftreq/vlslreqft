@@ -389,6 +389,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+
 // Check login
 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 if(!currentUser){ 
@@ -397,6 +398,7 @@ if(!currentUser){
 } 
 document.getElementById("userName").textContent = `Welcome! ${currentUser.name} to Employee Page`;
 document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Employee Page`;
+
 
 
 // Logout
@@ -523,12 +525,21 @@ let calYear = new Date().getFullYear();
 let employeeLeaves = [];
 
 db.collection("single_day_leave")
-  .where("employeeId","==",currentUser.id)
-  .onSnapshot(snapshot=>{
-    employeeLeaves=[];
-    snapshot.forEach(doc=>{
+  .orderBy("date", "asc")
+  .onSnapshot(snapshot => {
+    employeeLeaves = [];
+    snapshot.forEach(doc => {
       employeeLeaves.push(doc.data());
     });
+
+    // Determine the min/max year from leaves
+    const years = employeeLeaves.map(l => parseInt(l.date.split("-")[0]));
+    if(years.length) {
+      calYear = Math.max(...years);
+    } else {
+      calYear = new Date().getFullYear();
+    }
+
     renderCalendar();
   });
 
@@ -572,14 +583,14 @@ function renderMonth(){
     const fullDate=new Date(calYear,calMonth,d).toISOString().split("T")[0];
 
     employeeLeaves
-      .filter(l=>l.date===fullDate)
-      .forEach(l=>{
-        const tag=document.createElement("div");
-        tag.className="cal-tag tag-"+l.status;
-        tag.textContent=l.type+" ("+l.status+")";
-        cell.appendChild(tag);
-      });
-
+  .filter(l => l.date === fullDate)
+  .forEach(l => {
+    const tag = document.createElement("div");
+    tag.className = "cal-tag tag-" + l.status;
+    tag.textContent = `${l.employeeName}: ${l.type} (${l.status})`;
+    cell.appendChild(tag);
+  });
+  
     container.appendChild(cell);
   }
 }
