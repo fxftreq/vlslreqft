@@ -529,16 +529,16 @@ db.collection("single_day_leave")
   .onSnapshot(snapshot => {
     employeeLeaves = [];
     snapshot.forEach(doc => {
-      employeeLeaves.push(doc.data());
+      const data = doc.data();
+      employeeLeaves.push({
+        ...data,
+        submittedAt: data.submittedAt?.toDate ? data.submittedAt.toDate() : new Date(data.submittedAt)
+      });
     });
 
-    // Determine the min/max year from leaves
+    // Determine calendar year (latest year)
     const years = employeeLeaves.map(l => parseInt(l.date.split("-")[0]));
-    if(years.length) {
-      calYear = Math.max(...years);
-    } else {
-      calYear = new Date().getFullYear();
-    }
+    calYear = years.length ? Math.max(...years) : new Date().getFullYear();
 
     renderCalendar();
   });
@@ -603,33 +603,83 @@ function renderYear() {
   container.className = "year-view";
   container.innerHTML = "";
 
-  // Unique years from all leave records
-  const years = [...new Set(employeeLeaves.map(l => parseInt(l.date.split("-")[0])))];
-  years.sort((a, b) => b - a); // latest first
+  // Show 12 months for calYear
+  for (let m = 0; m < 12; m++) {
+    const monthDiv = document.createElement("div");
+    monthDiv.className = "year-box";
 
-  // Create clickable boxes for each year
-  years.forEach(y => {
-    const box = document.createElement("div");
-    box.className = "year-box";
-    box.textContent = y;
-    box.onclick = () => {
-      calYear = y;
-      viewMode = "month"; // switch to month for that year
-      renderCalendar();
-    };
-    container.appendChild(box);
-  });
+    const monthName = new Date(calYear, m, 1).toLocaleString('default', { month: 'short' });
+    monthDiv.innerHTML = `<strong>${monthName} ${calYear}</strong>`;
+    
+    const monthCalendar = document.createElement("div");
+    monthCalendar.className = "calendar";
+    monthCalendar.style.marginTop = "8px";
+
+    // Add day headers
+    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d => {
+      const h = document.createElement("div");
+      h.className = "cal-header";
+      h.textContent = d;
+      monthCalendar.appendChild(h);
+    });
+
+    const first = new Date(calYear, m, 1);
+    const days = new Date(calYear, m + 1, 0).getDate();
+    const start = first.getDay();
+
+    // Empty cells before first day
+    for (let i = 0; i < start; i++) monthCalendar.appendChild(document.createElement("div"));
+
+    for (let d = 1; d <= days; d++) {
+      const cell = document.createElement("div");
+      cell.className = "cal-cell";
+
+      const dayDiv = document.createElement("div");
+      dayDiv.className = "cal-day";
+      dayDiv.textContent = d;
+      cell.appendChild(dayDiv);
+
+      const fullDate = new Date(calYear, m, d).toISOString().split("T")[0];
+
+      // Show all employees’ leaves
+      employeeLeaves
+        .filter(l => l.date === fullDate)
+        .forEach(l => {
+          const tag = document.createElement("div");
+          tag.className = "cal-tag tag-" + l.status;
+          tag.textContent = `${l.employeeName}: ${l.type} (${l.status})`;
+          cell.appendChild(tag);
+        });
+
+      monthCalendar.appendChild(cell);
+    }
+
+    monthDiv.appendChild(monthCalendar);
+    container.appendChild(monthDiv);
+  }
 
   // Update label
-  document.getElementById("calendarLabel").textContent = "Select Year";
+  document.getElementById("calendarLabel").textContent = calYear;
 }
 
+function setViewMode(mode) {
+  viewMode = mode;
+  renderCalendar();
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
 
 
 </script>
 
 </body>
 </html>
+
 
 
 
