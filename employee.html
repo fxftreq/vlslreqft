@@ -175,6 +175,121 @@ th, td {
 td.reason-col {
   max-width: 250px; /* Restrict Reason column width */
 }
+
+/* ===== ACCORDION CALENDAR ===== */
+.accordion {
+  background: var(--fedex-purple);
+  color: white;
+  cursor: pointer;
+  padding: 14px 18px;
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 0.95em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  transition: 0.3s;
+}
+
+.accordion:hover {
+  background: #3a0f6f;
+}
+
+.accordion:after {
+  content: '\f078';
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  float: right;
+}
+
+.accordion.active:after {
+  content: '\f077';
+}
+
+.panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+/* ===== CALENDAR ===== */
+.calendar-controls {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin-bottom:15px;
+  flex-wrap:wrap;
+}
+
+.calendar-controls button {
+  background: var(--fedex-orange);
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  color:white;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.calendar {
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:4px;
+}
+
+.cal-header {
+  background: var(--table-header-bg);
+  color:white;
+  padding:6px;
+  text-align:center;
+  font-weight:bold;
+  border-radius:4px;
+}
+
+.cal-cell {
+  border:1px solid #ddd;
+  min-height:80px;
+  padding:4px;
+  font-size:12px;
+  border-radius:6px;
+}
+
+.cal-day {
+  font-weight:bold;
+}
+
+.cal-tag {
+  margin-top:3px;
+  font-size:10px;
+  padding:2px 4px;
+  border-radius:4px;
+  color:white;
+}
+
+.tag-Pending { background:orange; }
+.tag-Approved { background:green; }
+.tag-Rejected { background:red; }
+.tag-Cancelled { background:#888; }
+
+/* YEAR VIEW */
+.year-view {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+}
+
+.year-box {
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:10px;
+  background:#fff;
+  cursor:pointer;
+  text-align:center;
+  font-weight:bold;
+}
+
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -219,6 +334,30 @@ td.reason-col {
     </button>
   </div>
 
+
+<!-- ===== ACCORDION: VIEW PLOTTED LEAVES ===== -->
+<button class="accordion">
+  Click to View Plotted Leave Requests
+</button>
+
+<div class="panel">
+  <div class="card" style="margin-bottom:20px;">
+    
+    <div class="calendar-controls">
+      <button onclick="changeMonth(-1)">◀</button>
+      <span id="calendarLabel"></span>
+      <button onclick="changeMonth(1)">▶</button>
+      <button onclick="setViewMode('month')">Month</button>
+      <button onclick="setViewMode('year')">Year</button>
+    </div>
+
+    <div id="calendarContainer"></div>
+
+  </div>
+</div>
+
+
+
   <div class="card">
     <h3>My Leave Tickets</h3>
     <table id="table">
@@ -258,6 +397,7 @@ if(!currentUser){
 } 
 document.getElementById("userName").textContent = `Welcome! ${currentUser.name} to Employee Page`;
 document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Employee Page`;
+
 
 // Logout
 function logout() {
@@ -358,9 +498,128 @@ function loadLeaves() {
 
 
 loadLeaves();
+
+
+/* ============================= */
+/* ACCORDION TOGGLE */
+const acc = document.querySelector(".accordion");
+const panel = document.querySelector(".panel");
+
+acc.addEventListener("click", function(){
+  this.classList.toggle("active");
+  if(panel.style.maxHeight){
+    panel.style.maxHeight = null;
+  } else {
+    panel.style.maxHeight = panel.scrollHeight + "px";
+  }
+});
+
+/* ============================= */
+/* CALENDAR LOGIC */
+
+let viewMode = "month";
+let calMonth = new Date().getMonth();
+let calYear = new Date().getFullYear();
+let employeeLeaves = [];
+
+db.collection("single_day_leave")
+  .where("employeeId","==",currentUser.id)
+  .onSnapshot(snapshot=>{
+    employeeLeaves=[];
+    snapshot.forEach(doc=>{
+      employeeLeaves.push(doc.data());
+    });
+    renderCalendar();
+  });
+
+function renderCalendar(){
+  if(viewMode==="month") renderMonth();
+  else renderYear();
+}
+
+function renderMonth(){
+  const container=document.getElementById("calendarContainer");
+  container.className="calendar";
+  container.innerHTML="";
+
+  const first=new Date(calYear,calMonth,1);
+  const days=new Date(calYear,calMonth+1,0).getDate();
+  const start=first.getDay();
+
+  document.getElementById("calendarLabel").textContent =
+    first.toLocaleString('default',{month:'long'})+" "+calYear;
+
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{
+    const h=document.createElement("div");
+    h.className="cal-header";
+    h.textContent=d;
+    container.appendChild(h);
+  });
+
+  for(let i=0;i<start;i++){
+    container.appendChild(document.createElement("div"));
+  }
+
+  for(let d=1; d<=days; d++){
+    const cell=document.createElement("div");
+    cell.className="cal-cell";
+
+    const day=document.createElement("div");
+    day.className="cal-day";
+    day.textContent=d;
+    cell.appendChild(day);
+
+    const fullDate=new Date(calYear,calMonth,d).toISOString().split("T")[0];
+
+    employeeLeaves
+      .filter(l=>l.date===fullDate)
+      .forEach(l=>{
+        const tag=document.createElement("div");
+        tag.className="cal-tag tag-"+l.status;
+        tag.textContent=l.type+" ("+l.status+")";
+        cell.appendChild(tag);
+      });
+
+    container.appendChild(cell);
+  }
+}
+
+function renderYear(){
+  const container=document.getElementById("calendarContainer");
+  container.className="year-view";
+  container.innerHTML="";
+
+  document.getElementById("calendarLabel").textContent = calYear;
+
+  for(let m=0;m<12;m++){
+    const box=document.createElement("div");
+    box.className="year-box";
+    box.textContent =
+      new Date(calYear,m).toLocaleString('default',{month:'short'});
+    box.onclick=()=>{
+      calMonth=m;
+      viewMode="month";
+      renderCalendar();
+    };
+    container.appendChild(box);
+  }
+}
+
+function changeMonth(d){
+  calMonth+=d;
+  if(calMonth<0){calMonth=11;calYear--;}
+  if(calMonth>11){calMonth=0;calYear++;}
+  renderCalendar();
+}
+
+function setViewMode(mode){
+  viewMode=mode;
+  renderCalendar();
+}
+
+
 </script>
 
 </body>
 </html>
-
 
