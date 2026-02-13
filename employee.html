@@ -595,42 +595,38 @@ function renderMonth(){
   }
 }
 
-function renderYear(){
-  const container=document.getElementById("calendarContainer");
-  container.className="year-view";
-  container.innerHTML="";
+function renderYear() {
+  const container = document.getElementById("calendarContainer");
+  container.className = "year-view";
+  container.innerHTML = "";
 
-  document.getElementById("calendarLabel").textContent = calYear;
+  // Get unique years from leave data
+  const years = [...new Set(employeeLeaves.map(l => parseInt(l.date.split("-")[0])))];
 
-  for(let m=0;m<12;m++){
-    const box=document.createElement("div");
-    box.className="year-box";
-    box.textContent =
-      new Date(calYear,m).toLocaleString('default',{month:'short'});
-    box.onclick=()=>{
-      calMonth=m;
-      viewMode="month";
+  // Sort descending so latest year is first
+  years.sort((a, b) => b - a);
+
+  years.forEach(y => {
+    const box = document.createElement("div");
+    box.className = "year-box";
+    box.textContent = y;
+    box.onclick = () => {
+      calYear = y;
+      viewMode = "month";
       renderCalendar();
     };
     container.appendChild(box);
-  }
+  });
+
+  // Update label
+  document.getElementById("calendarLabel").textContent = "Select Year";
 }
 
-function changeMonth(d){
-  calMonth+=d;
-  if(calMonth<0){calMonth=11;calYear--;}
-  if(calMonth>11){calMonth=0;calYear++;}
-  renderCalendar();
-}
-
-function setViewMode(mode){
-  viewMode=mode;
-  renderCalendar();
-}
 
 
 </script>
 
 </body>
 </html>
+
 
