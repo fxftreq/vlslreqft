@@ -275,10 +275,36 @@ td.reason-col {
 
 /* YEAR VIEW */
 .year-view {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
 }
+
+/* Compact mini calendar inside year */
+.year-view .calendar {
+  gap: 2px;
+}
+
+.year-view .cal-header {
+  padding: 4px;
+  font-size: 10px;
+}
+
+.year-view .cal-cell {
+  min-height: 26px;
+  padding: 2px;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.year-view .cal-day {
+  font-size: 9px;
+}
+
+.year-view .cal-tag {
+  display: none; /* cleaner year view */
+}
+
 
 .year-box {
   border:1px solid #ddd;
@@ -541,9 +567,11 @@ db.collection("single_day_leave")
     calYear = years.length ? Math.max(...years) : new Date().getFullYear();
 
     renderCalendar();
+	  document.getElementById("calendarContainer").scrollIntoView({ behavior: "smooth" });
   });
 
-function renderCalendar() {
+function renderCalendar()
+{
   if (viewMode === "month") renderMonth();
   else if (viewMode === "year") renderYear();
 }
@@ -631,8 +659,32 @@ function renderYear() {
     for (let i = 0; i < start; i++) monthCalendar.appendChild(document.createElement("div"));
 
     for (let d = 1; d <= days; d++) {
-      const cell = document.createElement("div");
-      cell.className = "cal-cell";
+  const cell = document.createElement("div");
+  cell.className = "cal-cell";
+
+  const dayDiv = document.createElement("div");
+  dayDiv.className = "cal-day";
+  dayDiv.textContent = d;
+  cell.appendChild(dayDiv);
+
+  const fullDate = new Date(calYear, m, d);
+
+  // Click → switch to month view
+  cell.addEventListener("click", () => {
+    calMonth = m;
+    viewMode = "month";
+    renderCalendar();
+
+    // Auto expand accordion if collapsed
+    if (!panel.style.maxHeight) {
+      acc.classList.add("active");
+      panel.style.maxHeight = panel.scrollHeight + "px";
+    }
+  });
+
+  monthCalendar.appendChild(cell);
+}
+
 
       const dayDiv = document.createElement("div");
       dayDiv.className = "cal-day";
@@ -679,6 +731,7 @@ function changeMonth(dir) {
 
 </body>
 </html>
+
 
 
 
