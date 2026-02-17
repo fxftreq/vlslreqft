@@ -208,9 +208,7 @@ td.reason-col {
 }
 
 .panel {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease;
+  display: none;
 }
 
 /* ===== CALENDAR ===== */
@@ -535,10 +533,11 @@ const panel = document.querySelector(".panel");
 
 acc.addEventListener("click", function(){
   this.classList.toggle("active");
-  if(panel.style.maxHeight){
-    panel.style.maxHeight = null;
+
+  if(panel.style.display === "block"){
+    panel.style.display = "none";
   } else {
-    panel.style.maxHeight = panel.scrollHeight + "px";
+    panel.style.display = "block";
   }
 });
 
@@ -718,6 +717,7 @@ function changeMonth(dir) {
 
 </body>
 </html>
+
 
 
 
