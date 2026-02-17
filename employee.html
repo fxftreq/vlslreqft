@@ -545,11 +545,8 @@ acc.addEventListener("click", function(){
 /* CALENDAR LOGIC */
 
 let viewMode = "year";
-const nowPH = new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" });
-const phNow = new Date(nowPH);
-
-let calMonth = phNow.getMonth();
-let calYear = phNow.getFullYear();
+let calMonth = new Date().getMonth();
+let calYear = new Date().getFullYear();
 let employeeLeaves = [];
 
 db.collection("single_day_leave")
@@ -611,11 +608,8 @@ function renderMonth() {
     day.textContent = d;
     cell.appendChild(day);
 
-    const fullDate =
-  calYear + "-" +
-  String(calMonth + 1).padStart(2, "0") + "-" +
-  String(d).padStart(2, "0");
-	  
+    const fullDate = new Date(calYear, calMonth, d).toISOString().split("T")[0];
+
     // Show all employee leaves on this day
     employeeLeaves
       .filter(l => l.date === fullDate)
@@ -678,10 +672,7 @@ function renderYear() {
       dayNumber.textContent = d;
       cell.appendChild(dayNumber);
 
-      const fullDate =
-  calYear + "-" +
-  String(m + 1).padStart(2, "0") + "-" +
-  String(d).padStart(2, "0");
+      const fullDate = new Date(calYear, m, d).toISOString().split("T")[0];
 
       // If leave exists on that date, show dot indicator
       const hasLeave = employeeLeaves.some(l => l.date === fullDate);
@@ -724,9 +715,6 @@ function changeMonth(dir) {
 
 </body>
 </html>
-
-
-
 
 
 
