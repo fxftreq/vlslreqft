@@ -544,13 +544,12 @@ acc.addEventListener("click", function(){
 /* ============================= */
 /* CALENDAR LOGIC */
 
-let viewMode = "month";
+let viewMode = "year";
 let calMonth = new Date().getMonth();
 let calYear = new Date().getFullYear();
 let employeeLeaves = [];
 
 db.collection("single_day_leave")
-  .where("employeeId","==",currentUser.id)
   .orderBy("date", "asc")
   .onSnapshot(snapshot => {
     employeeLeaves = [];
@@ -567,7 +566,6 @@ db.collection("single_day_leave")
     calYear = years.length ? Math.max(...years) : new Date().getFullYear();
 
     renderCalendar();
-	  document.getElementById("calendarContainer").scrollIntoView({ behavior: "smooth" });
   });
 
 function renderCalendar()
@@ -717,6 +715,7 @@ function changeMonth(dir) {
 
 </body>
 </html>
+
 
 
 
