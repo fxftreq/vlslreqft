@@ -144,6 +144,52 @@ button{
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ================= MOBILE RESPONSIVE ================= */
+@media screen and (max-width: 480px) {
+  body {
+    padding: 10px;
+    align-items: flex-start;
+  }
+
+  .login-card {
+    padding: 20px 16px;
+    width: 100%;
+    max-width: 360px;
+    margin-top: 30px;
+  }
+
+  .logo img {
+    height: 100px;
+  }
+
+  label {
+    font-size: 0.9em;
+  }
+
+  input, select, button {
+    font-size: 0.95em;
+    padding: 10px;
+  }
+
+  .password-wrapper i {
+    right: 10px;
+  }
+
+  .forgot-password a {
+    font-size: 0.8em;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 15px 20px;
+    margin-top: 20%;
+  }
+
+  #resetSuccess, #resetError {
+    font-size: 0.85em;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -347,6 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
