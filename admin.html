@@ -919,13 +919,11 @@ function sortList(field) {
 // Export CSV including Notes with dynamic filename
 function exportCSV(){
 
-  // Only allow export in List View
   if(currentView !== "list"){
     alert("Export is only available in List View.");
     return;
   }
 
-  // Get current filter values
   const status = document.getElementById("filterStatus").value;
   const type = document.getElementById("filterType").value;
   const date = document.getElementById("filterDate").value;
@@ -933,7 +931,7 @@ function exportCSV(){
 
   let data = [...cachedRequests];
 
-  // Apply same filters as applyFilters()
+  // Apply filters
   if(status !== "All") {
     data = data.filter(r => r.status === status);
   }
@@ -957,7 +955,7 @@ function exportCSV(){
     });
   }
 
-  // Apply current sorting (same logic as sortList)
+  // Apply sorting
   if(currentSort.field){
     data.sort((a,b)=>{
       let valA = a[currentSort.field];
@@ -982,7 +980,7 @@ function exportCSV(){
     });
   }
 
-  // CSV escape helper
+  // Escape helper
   function escapeCSV(value){
     if(value === null || value === undefined) return "";
     value = value.toString().replace(/(\r\n|\n|\r)/gm, " ");
@@ -1006,6 +1004,11 @@ function exportCSV(){
       second: "2-digit"
     });
 
+    const processedBy =
+      typeof l.actionBy === "string"
+        ? l.actionBy
+        : l.actionBy?.name || "-";
+
     csv += [
       escapeCSV(l.employeeName),
       escapeCSV(l.type),
@@ -1013,12 +1016,11 @@ function exportCSV(){
       escapeCSV(phTime),
       escapeCSV(l.reason),
       escapeCSV(l.status),
-      escapeCSV(l.actionBy || "-"),
+      escapeCSV(processedBy),
       escapeCSV(l.notes || "")
     ].join(",") + "\n";
   });
 
-  // PH Date filename
   const now = new Date();
   const phNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
   const dateStr = phNow.toISOString().split("T")[0];
@@ -1478,6 +1480,7 @@ toggleCalendarControls(); render(); loadRequests();
 <div id="toastContainer"></div>
 </body>
 </html>
+
 
 
 
