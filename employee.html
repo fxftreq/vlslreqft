@@ -314,6 +314,107 @@ td.reason-col {
   font-weight:bold;
 }
 
+/* ===== PROFESSIONAL HEADER ===== */
+
+.main-header {
+  background: linear-gradient(90deg, #4D148C, #3b0f70);
+  color: white;
+  padding: 14px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-circle {
+  background: var(--fedex-orange);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}
+
+.system-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.system-title {
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.system-subtitle {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.header-center {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-chip {
+  background: rgba(255,255,255,0.15);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.logout-btn {
+  background: var(--fedex-orange);
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.logout-btn:hover {
+  background: darkorange;
+  transform: translateY(-1px);
+}
+
+/* Mobile Responsive */
+@media(max-width:768px){
+  .main-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -322,12 +423,35 @@ td.reason-col {
 
 <body>
 
-<header>
-  <span class="welcome" id="welcomeMsg">Welcome</span>
-  <button class="logout" onclick="logout()">
-    <i class="fas fa-sign-out-alt"></i> Logout
-  </button>
+<header class="main-header">
+
+  <div class="header-left">
+    <div class="logo-circle">
+      <i class="fas fa-plane"></i>
+    </div>
+    <div class="system-info">
+      <div class="system-title">FedEx Leave Portal</div>
+      <div class="system-subtitle">Employee Self-Service System</div>
+    </div>
+  </div>
+
+  <div class="header-center">
+    <span id="welcomeMsg">Welcome</span>
+  </div>
+
+  <div class="header-right">
+    <div class="user-chip">
+      <i class="fas fa-user"></i>
+      <span id="headerUserName"></span>
+    </div>
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i>
+      Logout
+    </button>
+  </div>
+
 </header>
+
 
 <main>
   <h2 id="userName">Welcome!</h2>
@@ -420,8 +544,11 @@ if(!currentUser){
   alert("Please login first"); 
   location.href="index.html"; 
 } 
-document.getElementById("userName").textContent = `Welcome! ${currentUser.name} to Employee Page`;
-document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Employee Page`;
+document.getElementById("welcomeMsg").textContent =
+  "Employee Dashboard";
+
+document.getElementById("headerUserName").textContent =
+  currentUser.name;
 
 
 
