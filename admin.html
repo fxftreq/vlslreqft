@@ -918,30 +918,82 @@ function sortList(field) {
 
 // Export CSV including Notes with dynamic filename
 function exportCSV(){
-  const data = cachedRequests;
 
-  // CSV escape function
-  function escapeCSV(value){
-    if(value === null || value === undefined) return "";
-    value = value.toString();
-
-    // Replace line breaks with space (prevents row break)
-    value = value.replace(/(\r\n|\n|\r)/gm, " ");
-
-    // Escape double quotes
-    value = value.replace(/"/g, '""');
-
-    // Wrap in quotes if contains comma
-    if(value.includes(",") || value.includes('"')){
-      value = `"${value}"`;
-    }
-
-    return value;
+  // Only allow export in List View
+  if(currentView !== "list"){
+    alert("Export is only available in List View.");
+    return;
   }
 
-  let csv = "Employee,Type,Date,Submitted Date,Reason,Status,Notes\n";
+  // Get current filter values
+  const status = document.getElementById("filterStatus").value;
+  const type = document.getElementById("filterType").value;
+  const date = document.getElementById("filterDate").value;
+  const submitted = document.getElementById("filterSubmitted").value;
+
+  let data = [...cachedRequests];
+
+  // Apply same filters as applyFilters()
+  if(status !== "All") {
+    data = data.filter(r => r.status === status);
+  }
+
+  if(type !== "All") {
+    if(type === "Others") {
+      data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+    } else {
+      data = data.filter(r => r.type === type);
+    }
+  }
+
+  if(date) {
+    data = data.filter(r => r.date === date);
+  }
+
+  if(submitted) {
+    data = data.filter(r => {
+      let subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
+      return getPHDateString(subDate) === submitted;
+    });
+  }
+
+  // Apply current sorting (same logic as sortList)
+  if(currentSort.field){
+    data.sort((a,b)=>{
+      let valA = a[currentSort.field];
+      let valB = b[currentSort.field];
+
+      if(currentSort.field === 'submittedAt'){
+        valA = a.submittedAt?.toDate?.()?.getTime() || new Date(a.submittedAt).getTime();
+        valB = b.submittedAt?.toDate?.()?.getTime() || new Date(b.submittedAt).getTime();
+      } 
+      else if(currentSort.field === 'date'){
+        valA = new Date(a.date).getTime();
+        valB = new Date(b.date).getTime();
+      } 
+      else {
+        valA = valA ? valA.toString().toLowerCase() : '';
+        valB = valB ? valB.toString().toLowerCase() : '';
+      }
+
+      if(valA < valB) return currentSort.ascending ? -1 : 1;
+      if(valA > valB) return currentSort.ascending ? 1 : -1;
+      return 0;
+    });
+  }
+
+  // CSV escape helper
+  function escapeCSV(value){
+    if(value === null || value === undefined) return "";
+    value = value.toString().replace(/(\r\n|\n|\r)/gm, " ");
+    value = value.replace(/"/g, '""');
+    return `"${value}"`;
+  }
+
+  let csv = "Employee,Type,Date,Submitted Date,Reason,Status,Processed By,Notes\n";
 
   data.forEach(l => {
+
     const s = l.submittedAt?.toDate?.() || new Date(l.submittedAt);
 
     const phTime = s.toLocaleString("en-PH", {
@@ -961,20 +1013,24 @@ function exportCSV(){
       escapeCSV(phTime),
       escapeCSV(l.reason),
       escapeCSV(l.status),
+      escapeCSV(l.actionBy || "-"),
       escapeCSV(l.notes || "")
     ].join(",") + "\n";
   });
 
+  // PH Date filename
   const now = new Date();
   const phNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
   const dateStr = phNow.toISOString().split("T")[0];
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
+
   const a = document.createElement("a");
   a.href = url;
   a.download = `FREE_TIME_REQUEST_${dateStr}.csv`;
   a.click();
+
   URL.revokeObjectURL(url);
 }
 
@@ -1422,6 +1478,7 @@ toggleCalendarControls(); render(); loadRequests();
 <div id="toastContainer"></div>
 </body>
 </html>
+
 
 
 
