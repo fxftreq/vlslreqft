@@ -199,7 +199,7 @@ button{
   <button id="loginBtn">Next</button>
   <div id="error"></div>
   <div class="forgot-password">
-  <a href="forgot-password.html">Forgot password?</a>
+  <a href="#" id="forgotLink">Forgot password?</a>
 </div>
 </div>
 
@@ -301,7 +301,7 @@ loginBtn.addEventListener("click", async () => {
 
 /* ===== FORGOT PASSWORD MODAL ===== */
 const forgotModal = document.getElementById("forgotModal");
-const forgotLink = document.querySelector(".forgot-password a");
+const forgotLink = document.getElementById("forgotLink");
 const closeModal = document.querySelector(".close");
 const resetBtn = document.getElementById("resetBtn");
 const resetError = document.getElementById("resetError");
