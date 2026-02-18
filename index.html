@@ -89,6 +89,85 @@ button{
 .password-wrapper i:hover{
   color:var(--fedex-purple);
 }
+.forgot-password {
+  text-align: left;   /* aligns link to left */
+  margin-top: 10px;
+}
+
+.forgot-password a {
+  font-size: 0.85em;
+  color: var(--fedex-purple);
+  text-decoration: none;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
+/* Modal background */
+.modal {
+  display: none; 
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+/* Modal content */
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px 30px;
+  border-radius: 6px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  position: relative;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.modal-content button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background: var(--fedex-purple);
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-content h2 {
+  margin-bottom: 10px;
+}
+
+.modal-content p {
+  font-size: 0.9em;
+  margin-bottom: 10px;
+}
+
+/* Close button */
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+
 </style>
 </head>
 
@@ -119,6 +198,9 @@ button{
 
   <button id="loginBtn">Next</button>
   <div id="error"></div>
+  <div class="forgot-password">
+  <a href="forgot-password.html">Forgot password?</a>
+</div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -215,7 +297,140 @@ loginBtn.addEventListener("click", async () => {
     error.textContent="Login failed.";
   }
 });
+
+
+/* ===== FORGOT PASSWORD MODAL ===== */
+const forgotModal = document.getElementById("forgotModal");
+const forgotLink = document.querySelector(".forgot-password a");
+const closeModal = document.querySelector(".close");
+const resetBtn = document.getElementById("resetBtn");
+const resetError = document.getElementById("resetError");
+const resetSuccess = document.getElementById("resetSuccess");
+
+forgotLink.addEventListener("click", () => {
+  forgotModal.style.display = "block";
+  resetError.textContent = "";
+  resetSuccess.textContent = "";
+  document.getElementById("resetEmail").value = "";
+  document.getElementById("newPassword").value = "";
+  document.getElementById("confirmPassword").value = "";
+});
+
+closeModal.addEventListener("click", () => {
+  forgotModal.style.display = "none";
+});
+
+window.addEventListener("click", (e) => {
+  if(e.target === forgotModal) forgotModal.style.display = "none";
+});
+
+/* ===== RESET PASSWORD LOGIC ===== */
+resetBtn.addEventListener("click", async () => {
+  resetError.textContent = "";
+  resetSuccess.textContent = "";
+
+  const email = document.getElementById("resetEmail").value.trim();
+  const newPass = document.getElementById("newPassword").value.trim();
+  const confirmPass = document.getElementById("confirmPassword").value.trim();
+
+  if(!email || !newPass || !confirmPass){
+    resetError.textContent = "Please complete all fields.";
+    return;
+  }
+
+  if(newPass !== confirmPass){
+    resetError.textContent = "Passwords do not match.";
+    return;
+  }
+
+  try {
+    // Search both collections since user can be team leader or manager
+    let userRef, userData, docId;
+
+    // Try team_leader collection
+    const snapTL = await db.collection("leave_users").where("email", "==", email).limit(1).get();
+    if(!snapTL.empty){
+      userData = snapTL.docs[0].data();
+      docId = snapTL.docs[0].id;
+      userRef = db.collection("leave_users").doc(docId);
+    } else {
+      // Try manager collection
+      const snapM = await db.collection("manager_leave_user").where("email", "==", email).limit(1).get();
+      if(!snapM.empty){
+        userData = snapM.docs[0].data();
+        docId = snapM.docs[0].id;
+        userRef = db.collection("manager_leave_user").doc(docId);
+      }
+    }
+
+    if(!userRef){
+      resetError.textContent = "Email not found.";
+      return;
+    }
+
+    // Update tempPassword
+    await userRef.update({ tempPassword: newPass });
+    resetSuccess.textContent = "Password reset successfully! You can now login.";
+    setTimeout(() => { forgotModal.style.display = "none"; }, 2000);
+
+  } catch(e){
+    console.error(e);
+    resetError.textContent = "Failed to reset password. Try again.";
+  }
+});
+
+/* ===== SHOW / HIDE PASSWORD IN MODAL ===== */
+const toggleNewPassword = document.getElementById("toggleNewPassword");
+const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
+const newPasswordInput = document.getElementById("newPassword");
+const confirmPasswordInput = document.getElementById("confirmPassword");
+
+toggleNewPassword.addEventListener("click", () => {
+  if(newPasswordInput.type === "password"){
+    newPasswordInput.type = "text";
+    toggleNewPassword.classList.replace("fa-eye","fa-eye-slash");
+  } else {
+    newPasswordInput.type = "password";
+    toggleNewPassword.classList.replace("fa-eye-slash","fa-eye");
+  }
+});
+
+toggleConfirmPassword.addEventListener("click", () => {
+  if(confirmPasswordInput.type === "password"){
+    confirmPasswordInput.type = "text";
+    toggleConfirmPassword.classList.replace("fa-eye","fa-eye-slash");
+  } else {
+    confirmPasswordInput.type = "password";
+    toggleConfirmPassword.classList.replace("fa-eye-slash","fa-eye");
+  }
+});
+
 </script>
+
+<!-- Forgot Password Modal -->
+<div id="forgotModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Reset Password</h2>
+    <p>Enter your email to reset your password:</p>
+
+    <input type="text" id="resetEmail" placeholder="Your email">
+
+    <div class="password-wrapper">
+      <input type="password" id="newPassword" placeholder="New password">
+      <i class="fa-solid fa-eye" id="toggleNewPassword"></i>
+    </div>
+
+    <div class="password-wrapper">
+      <input type="password" id="confirmPassword" placeholder="Confirm new password">
+      <i class="fa-solid fa-eye" id="toggleConfirmPassword"></i>
+    </div>
+
+    <button id="resetBtn">Reset Password</button>
+    <div id="resetError"></div>
+    <div id="resetSuccess"></div>
+  </div>
+</div>
 
 </body>
 </html>
