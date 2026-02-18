@@ -585,7 +585,11 @@ if(!currentUser || !currentUser.name){
   alert("Please login first"); 
   location.href="index.html"; 
 } else {
-  document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name} to Manager Admin Page`;
+  document.getElementById("welcomeMsg").textContent =
+  "Admin Dashboard";
+
+document.getElementById("headerUserName").textContent =
+  currentUser.name;
 }
 
 
@@ -1398,4 +1402,5 @@ toggleCalendarControls(); render(); loadRequests();
 <div id="toastContainer"></div>
 </body>
 </html>
+
 
