@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>FedEx Leave System | Login</title>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
@@ -11,7 +10,6 @@
   --fedex-purple:#4D148C;
   --fedex-orange:#FF6600;
   --border:#d1d5db;
-  --bg:#f3f4f6;
 }
 *{ box-sizing:border-box; }
 
@@ -44,7 +42,6 @@ body{
 
 .logo{text-align:center; margin-bottom:18px;}
 .purple-id{text-align:center; font-weight:bold; color:#666; margin-bottom:20px;}
-
 label{ font-size:.85em; font-weight:bold; color:#333; }
 
 input, select{
@@ -75,9 +72,7 @@ button{
   text-align:center;
 }
 
-.password-wrapper{
-  position:relative;
-}
+.password-wrapper{ position:relative; }
 .password-wrapper i{
   position:absolute;
   right:12px;
@@ -86,28 +81,19 @@ button{
   cursor:pointer;
   color:#6b7280;
 }
-.password-wrapper i:hover{
-  color:var(--fedex-purple);
-}
+.password-wrapper i:hover{ color:var(--fedex-purple); }
 
-.forgot-password {
-  text-align: left;   /* aligns link to left */
-  margin-top: 10px;
-}
-
+.forgot-password { text-align: left; margin-top: 10px; }
 .forgot-password a {
   font-size: 0.85em;
   color: var(--fedex-purple);
   text-decoration: none;
 }
+.forgot-password a:hover { text-decoration: underline; }
 
-.forgot-password a:hover {
-  text-decoration: underline;
-}
-
-/* Modal background */
+/* Modal */
 .modal {
-  display: none; 
+  display: none;
   position: fixed;
   z-index: 999;
   left: 0;
@@ -117,8 +103,6 @@ button{
   overflow: auto;
   background-color: rgba(0,0,0,0.4);
 }
-
-/* Modal content */
 .modal-content {
   background-color: #fff;
   margin: 10% auto;
@@ -129,47 +113,14 @@ button{
   text-align: center;
   position: relative;
 }
+.modal-content input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: 1px solid var(--border);}
+.modal-content button { width: 100%; padding: 12px; margin-top: 10px; background: var(--fedex-purple); color:#fff; font-weight:bold; border:none; border-radius:4px; cursor:pointer; }
+.modal-content h2 { margin-bottom: 10px; }
+.modal-content p { font-size: 0.9em; margin-bottom: 10px; }
+.close { position: absolute; top: 10px; right: 15px; font-size: 1.5em; cursor: pointer; }
 
-.modal-content input {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-}
-
-.modal-content button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  background: var(--fedex-purple);
-  color: #fff;
-  font-weight: bold;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.modal-content h2 {
-  margin-bottom: 10px;
-}
-
-.modal-content p {
-  font-size: 0.9em;
-  margin-bottom: 10px;
-}
-
-/* Close button */
-.close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 1.5em;
-  cursor: pointer;
-}
 </style>
 </head>
-
 <body>
 
 <div class="login-card">
@@ -202,201 +153,6 @@ button{
   </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<script>
-/* ======================
-   FIREBASE INIT
-====================== */
-firebase.initializeApp({
-  apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
-  authDomain: "fedex-attendance-system.firebaseapp.com",
-  projectId: "fedex-attendance-system"
-});
-const db = firebase.firestore();
-
-/* ======================
-   ELEMENTS
-====================== */
-const loginBtn = document.getElementById("loginBtn");
-const error = document.getElementById("error");
-const passwordInput = document.getElementById("password");
-const togglePassword = document.getElementById("togglePassword");
-
-/* ======================
-   SHOW / HIDE PASSWORD
-====================== */
-togglePassword.addEventListener("click", () => {
-  if(passwordInput.type === "password"){
-    passwordInput.type = "text";
-    togglePassword.classList.replace("fa-eye","fa-eye-slash");
-  } else {
-    passwordInput.type = "password";
-    togglePassword.classList.replace("fa-eye-slash","fa-eye");
-  }
-});
-
-/* ======================
-   LOGIN LOGIC
-====================== */
-loginBtn.addEventListener("click", async () => {
-  error.textContent = "";
-
-  const username = document.getElementById("username").value.trim();
-  const password = passwordInput.value.trim();
-  const role = document.getElementById("loginType").value;
-
-  if(!username || !password){
-    error.textContent = "Please complete all fields.";
-    return;
-  }
-
-  try {
-    let userData, userId;
-
-    if(role === "team_leader"){
-      const snap = await db.collection("leave_users").doc(username).get();
-      if(!snap.exists){ error.textContent="User not found."; return; }
-      userData = snap.data();
-      userId = snap.id;
-
-    } else {
-      const q = await db.collection("manager_leave_user")
-        .where("name","==",username)
-        .limit(1)
-        .get();
-
-      if(q.empty){ error.textContent="Manager not found."; return; }
-      userData = q.docs[0].data();
-      userId = q.docs[0].id;
-    }
-
-    if(password !== userData.tempPassword){
-      error.textContent="Incorrect password.";
-      return;
-    }
-
-    localStorage.setItem("currentUser", JSON.stringify({...userData, id:userId}));
-
-    if(role === "team_leader"){
-      location.href = userData.role === "admin" ? "admin.html" : "employee.html";
-    } else {
-      location.href = userData.role === "manager-admin" ? "manager-admin.html" : "manager-employee.html";
-    }
-
-  } catch(e){
-    console.error(e);
-    error.textContent="Login failed.";
-  }
-});
-
-/* ===== FORGOT PASSWORD MODAL ===== */
-const forgotModal = document.getElementById("forgotModal");
-const forgotLink = document.getElementById("forgotLink");
-const closeModal = document.querySelector(".close");
-const resetBtn = document.getElementById("resetBtn");
-const resetError = document.getElementById("resetError");
-const resetSuccess = document.getElementById("resetSuccess");
-const newPasswordInput = document.getElementById("newPassword");
-const confirmPasswordInput = document.getElementById("confirmPassword");
-const toggleNewPassword = document.getElementById("toggleNewPassword");
-const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
-
-forgotLink.addEventListener("click", () => {
-  forgotModal.style.display = "block";
-  resetError.textContent = "";
-  resetSuccess.textContent = "";
-  document.getElementById("resetEmail").value = "";
-  newPasswordInput.value = "";
-  confirmPasswordInput.value = "";
-});
-
-closeModal.addEventListener("click", () => {
-  forgotModal.style.display = "none";
-});
-
-window.addEventListener("click", e => {
-  if(e.target === forgotModal) forgotModal.style.display = "none";
-});
-
-/* ===== RESET PASSWORD LOGIC (WORKS FOR BOTH COLLECTIONS) ===== */
-resetBtn.addEventListener("click", async () => {
-  resetError.textContent = "";
-  resetSuccess.textContent = "";
-
-  const email = document.getElementById("resetEmail").value.trim();
-  const newPass = newPasswordInput.value.trim();
-  const confirmPass = confirmPasswordInput.value.trim();
-
-  if(!email || !newPass || !confirmPass){
-    resetError.textContent = "Please complete all fields.";
-    return;
-  }
-
-  if(newPass !== confirmPass){
-    resetError.textContent = "Passwords do not match.";
-    return;
-  }
-
-  try {
-    let userRef = null;
-
-    // Check leave_users by email
-    const snapTL = await db.collection("leave_users")
-      .where("email","==",email)
-      .limit(1)
-      .get();
-    if(!snapTL.empty){
-      userRef = db.collection("leave_users").doc(snapTL.docs[0].id);
-    } else {
-      // Check manager_leave_user by email
-      const snapM = await db.collection("manager_leave_user")
-        .where("email","==",email)
-        .limit(1)
-        .get();
-      if(!snapM.empty){
-        userRef = db.collection("manager_leave_user").doc(snapM.docs[0].id);
-      }
-    }
-
-    if(!userRef){
-      resetError.textContent = "Email not found in the system.";
-      return;
-    }
-
-    await userRef.update({ tempPassword: newPass });
-    resetSuccess.textContent = "Password reset successfully! You can now login.";
-    setTimeout(() => { forgotModal.style.display = "none"; }, 2000);
-
-  } catch(e){
-    console.error(e);
-    resetError.textContent = "Failed to reset password. Try again.";
-  }
-});
-
-/* ===== SHOW / HIDE PASSWORD IN MODAL ===== */
-toggleNewPassword.addEventListener("click", () => {
-  if(newPasswordInput.type==="password"){
-    newPasswordInput.type="text";
-    toggleNewPassword.classList.replace("fa-eye","fa-eye-slash");
-  } else {
-    newPasswordInput.type="password";
-    toggleNewPassword.classList.replace("fa-eye-slash","fa-eye");
-  }
-});
-
-toggleConfirmPassword.addEventListener("click", () => {
-  if(confirmPasswordInput.type==="password"){
-    confirmPasswordInput.type="text";
-    toggleConfirmPassword.classList.replace("fa-eye","fa-eye-slash");
-  } else {
-    confirmPasswordInput.type="password";
-    toggleConfirmPassword.classList.replace("fa-eye-slash","fa-eye");
-  }
-});
-</script>
-
 <!-- Forgot Password Modal -->
 <div id="forgotModal" class="modal">
   <div class="modal-content">
@@ -421,6 +177,148 @@ toggleConfirmPassword.addEventListener("click", () => {
     <div id="resetSuccess"></div>
   </div>
 </div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  /* ====================== FIREBASE INIT ====================== */
+  firebase.initializeApp({
+    apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+    authDomain: "fedex-attendance-system.firebaseapp.com",
+    projectId: "fedex-attendance-system"
+  });
+  const db = firebase.firestore();
+
+  /* ====================== ELEMENTS ====================== */
+  const loginBtn = document.getElementById("loginBtn");
+  const error = document.getElementById("error");
+  const passwordInput = document.getElementById("password");
+  const togglePassword = document.getElementById("togglePassword");
+
+  /* SHOW/HIDE PASSWORD */
+  togglePassword.addEventListener("click", () => {
+    if(passwordInput.type === "password"){
+      passwordInput.type = "text";
+      togglePassword.classList.replace("fa-eye","fa-eye-slash");
+    } else {
+      passwordInput.type = "password";
+      togglePassword.classList.replace("fa-eye-slash","fa-eye");
+    }
+  });
+
+  /* LOGIN LOGIC */
+  loginBtn.addEventListener("click", async () => {
+    error.textContent = "";
+
+    const username = document.getElementById("username").value.trim();
+    const password = passwordInput.value.trim();
+    const role = document.getElementById("loginType").value;
+
+    if(!username || !password){ error.textContent = "Please complete all fields."; return; }
+
+    try {
+      let userData, userId;
+
+      if(role==="team_leader"){
+        const snap = await db.collection("leave_users").doc(username).get();
+        if(!snap.exists){ error.textContent="User not found."; return; }
+        userData = snap.data();
+        userId = snap.id;
+      } else {
+        const q = await db.collection("manager_leave_user")
+          .where("name","==",username)
+          .limit(1).get();
+        if(q.empty){ error.textContent="Manager not found."; return; }
+        userData = q.docs[0].data();
+        userId = q.docs[0].id;
+      }
+
+      if(password !== userData.tempPassword){ error.textContent="Incorrect password."; return; }
+
+      localStorage.setItem("currentUser", JSON.stringify({ ...userData, id:userId }));
+
+      if(role==="team_leader"){
+        location.href = userData.role==="admin" ? "admin.html" : "employee.html";
+      } else {
+        location.href = userData.role==="manager-admin" ? "manager-admin.html" : "manager-employee.html";
+      }
+
+    } catch(e){ console.error(e); error.textContent="Login failed."; }
+  });
+
+  /* ===== FORGOT PASSWORD MODAL ===== */
+  const forgotModal = document.getElementById("forgotModal");
+  const forgotLink = document.getElementById("forgotLink");
+  const closeModal = document.querySelector(".close");
+  const resetBtn = document.getElementById("resetBtn");
+  const resetError = document.getElementById("resetError");
+  const resetSuccess = document.getElementById("resetSuccess");
+
+  forgotLink.addEventListener("click", e => {
+    e.preventDefault();
+    forgotModal.style.display = "block";
+    resetError.textContent = "";
+    resetSuccess.textContent = "";
+    document.getElementById("resetEmail").value = "";
+    document.getElementById("newPassword").value = "";
+    document.getElementById("confirmPassword").value = "";
+  });
+
+  closeModal.addEventListener("click", () => forgotModal.style.display = "none");
+  window.addEventListener("click", e => { if(e.target===forgotModal) forgotModal.style.display="none"; });
+
+  /* RESET PASSWORD LOGIC (both collections) */
+  resetBtn.addEventListener("click", async () => {
+    resetError.textContent = "";
+    resetSuccess.textContent = "";
+
+    const email = document.getElementById("resetEmail").value.trim();
+    const newPass = document.getElementById("newPassword").value.trim();
+    const confirmPass = document.getElementById("confirmPassword").value.trim();
+
+    if(!email || !newPass || !confirmPass){ resetError.textContent="Please complete all fields."; return; }
+    if(newPass !== confirmPass){ resetError.textContent="Passwords do not match."; return; }
+
+    try {
+      let userRef = null;
+
+      // Check team_leader
+      const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
+      if(!snapTL.empty) userRef = db.collection("leave_users").doc(snapTL.docs[0].id);
+
+      // Check manager
+      const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
+      if(!snapM.empty) userRef = db.collection("manager_leave_user").doc(snapM.docs[0].id);
+
+      if(!userRef){ resetError.textContent="Email not found."; return; }
+
+      await userRef.update({ tempPassword:newPass });
+      resetSuccess.textContent = "Password reset successfully! You can now login.";
+      setTimeout(()=>{ forgotModal.style.display="none"; },2000);
+
+    } catch(e){ console.error(e); resetError.textContent="Failed to reset password. Try again."; }
+  });
+
+  /* SHOW/HIDE PASSWORD IN MODAL */
+  const toggleNewPassword = document.getElementById("toggleNewPassword");
+  const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
+  const newPasswordInput = document.getElementById("newPassword");
+  const confirmPasswordInput = document.getElementById("confirmPassword");
+
+  toggleNewPassword.addEventListener("click", () => {
+    if(newPasswordInput.type==="password"){ newPasswordInput.type="text"; toggleNewPassword.classList.replace("fa-eye","fa-eye-slash"); }
+    else { newPasswordInput.type="password"; toggleNewPassword.classList.replace("fa-eye-slash","fa-eye"); }
+  });
+
+  toggleConfirmPassword.addEventListener("click", () => {
+    if(confirmPasswordInput.type==="password"){ confirmPasswordInput.type="text"; toggleConfirmPassword.classList.replace("fa-eye","fa-eye-slash"); }
+    else { confirmPasswordInput.type="password"; toggleConfirmPassword.classList.replace("fa-eye-slash","fa-eye"); }
+  });
+
+});
+</script>
 
 </body>
 </html>
