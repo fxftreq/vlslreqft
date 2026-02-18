@@ -425,7 +425,6 @@ document.getElementById("welcomeMsg").textContent = `Welcome ${currentUser.name}
 
 
 
-
 // Logout
 function logout() {
   if(confirm("Are you sure you want to logout?")){
@@ -546,13 +545,8 @@ acc.addEventListener("click", function(){
 /* CALENDAR LOGIC */
 
 let viewMode = "year";
-
-// Get PH current date
-const phNowString = new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" });
-const phNow = new Date(phNowString);
-
-let calMonth = phNow.getMonth();
-let calYear = phNow.getFullYear();
+let calMonth = new Date().getMonth();
+let calYear = new Date().getFullYear();
 let employeeLeaves = [];
 
 db.collection("single_day_leave")
@@ -614,15 +608,10 @@ function renderMonth() {
     day.textContent = d;
     cell.appendChild(day);
 
-    const tempDate = new Date(
-  new Date(`${calYear}-${calMonth+1}-${d}T00:00:00`)
-    .toLocaleString("en-US", { timeZone: "Asia/Manila" })
-);
-
-const fullDate =
-  tempDate.getFullYear() + "-" +
-  String(tempDate.getMonth() + 1).padStart(2, "0") + "-" +
-  String(tempDate.getDate()).padStart(2, "0");
+    const fullDate =
+  calYear + "-" +
+  String(calMonth + 1).padStart(2, "0") + "-" +
+  String(d).padStart(2, "0");
 
     // Show all employee leaves on this day
     employeeLeaves
@@ -686,15 +675,11 @@ function renderYear() {
       dayNumber.textContent = d;
       cell.appendChild(dayNumber);
 
-const tempDate = new Date(
-  new Date(`${calYear}-${m+1}-${d}T00:00:00`)
-    .toLocaleString("en-US", { timeZone: "Asia/Manila" })
-);
+      const fullDate =
+  calYear + "-" +
+  String(m + 1).padStart(2, "0") + "-" +
+  String(d).padStart(2, "0");
 
-const fullDate =
-  tempDate.getFullYear() + "-" +
-  String(tempDate.getMonth() + 1).padStart(2, "0") + "-" +
-  String(tempDate.getDate()).padStart(2, "0");
 
       // If leave exists on that date, show dot indicator
       const hasLeave = employeeLeaves.some(l => l.date === fullDate);
