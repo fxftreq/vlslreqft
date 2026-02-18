@@ -916,10 +916,69 @@ function sortList(field) {
 
 // Export CSV including Notes with dynamic filename
 function exportCSV(){
-  const data = cachedRequests;
-  let csv = "Employee,Type,Date,Submitted Date,Reason,Status,Notes\n"; // Added Notes
+
+  // Get current filters
+  const status = document.getElementById("filterStatus").value;
+  const type = document.getElementById("filterType").value;
+  const date = document.getElementById("filterDate").value;
+  const submitted = document.getElementById("filterSubmitted").value;
+
+  let data = [...cachedRequests];
+
+  // Apply filters (same logic as applyFilters)
+  if(status !== "All") {
+    data = data.filter(r => r.status === status);
+  }
+
+  if(type !== "All") {
+    if(type === "Others") {
+      data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+    } else {
+      data = data.filter(r => r.type === type);
+    }
+  }
+
+  if(date) {
+    data = data.filter(r => r.date === date);
+  }
+
+  if(submitted) {
+    data = data.filter(r => {
+      let subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
+      return getPHDateString(subDate) === submitted;
+    });
+  }
+
+  // Apply current sorting
+  if(currentSort.field){
+    data.sort((a,b)=>{
+      let valA = a[currentSort.field];
+      let valB = b[currentSort.field];
+
+      if(currentSort.field === 'submittedAt'){
+        valA = a.submittedAt?.toDate?.()?.getTime() || new Date(a.submittedAt).getTime();
+        valB = b.submittedAt?.toDate?.()?.getTime() || new Date(b.submittedAt).getTime();
+      } 
+      else if(currentSort.field === 'date'){
+        valA = new Date(a.date).getTime();
+        valB = new Date(b.date).getTime();
+      } 
+      else {
+        valA = valA ? valA.toString().toLowerCase() : '';
+        valB = valB ? valB.toString().toLowerCase() : '';
+      }
+
+      if(valA < valB) return currentSort.ascending ? -1 : 1;
+      if(valA > valB) return currentSort.ascending ? 1 : -1;
+      return 0;
+    });
+  }
+
+  // Build CSV
+  let csv = "Employee,Type,Date,Submitted Date,Reason,Status,Processed By,Notes\n";
 
   data.forEach(l => {
+
     const s = l.submittedAt?.toDate?.() || new Date(l.submittedAt);
 
     const phTime = s.toLocaleString("en-PH", {
@@ -932,23 +991,24 @@ function exportCSV(){
       second: "2-digit"
     });
 
-    // Sanitize notes
     const notes = l.notes ? l.notes.replace(/(\r\n|\n|\r)/gm, " ") : "";
 
-    csv += `${l.managerName},${l.type},${l.date},${phTime},${l.reason},${l.status},${notes}\n`;
+    csv += `"${l.managerName}","${l.type}","${l.date}","${phTime}","${l.reason}","${l.status}","${l.actionBy || "-"}","${notes}"\n`;
   });
 
-  // Get current PH time for filename
+  // Filename (PH time)
   const now = new Date();
   const phNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
-  const dateStr = phNow.toISOString().split("T")[0]; // YYYY-MM-DD
+  const dateStr = phNow.toISOString().split("T")[0];
 
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
+
   a.href = url;
-  a.download = `FREE_TIME_REQUEST_${dateStr}.csv`; // Dynamic filename
+  a.download = `FREE_TIME_REQUEST_${dateStr}.csv`;
   a.click();
+
   URL.revokeObjectURL(url);
 }
 
@@ -1402,6 +1462,7 @@ toggleCalendarControls(); render(); loadRequests();
 <div id="toastContainer"></div>
 </body>
 </html>
+
 
 
 
