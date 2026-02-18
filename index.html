@@ -89,8 +89,9 @@ button{
 .password-wrapper i:hover{
   color:var(--fedex-purple);
 }
+
 .forgot-password {
-  text-align: left;
+  text-align: left;   /* aligns link to left */
   margin-top: 10px;
 }
 
@@ -196,34 +197,8 @@ button{
 
   <button id="loginBtn">Next</button>
   <div id="error"></div>
-
   <div class="forgot-password">
     <a href="#" id="forgotLink">Forgot password?</a>
-  </div>
-</div>
-
-<!-- Forgot Password Modal -->
-<div id="forgotModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Reset Password</h2>
-    <p>Enter your email to reset your password:</p>
-
-    <input type="text" id="resetEmail" placeholder="Your email">
-
-    <div class="password-wrapper">
-      <input type="password" id="newPassword" placeholder="New password">
-      <i class="fa-solid fa-eye" id="toggleNewPassword"></i>
-    </div>
-
-    <div class="password-wrapper">
-      <input type="password" id="confirmPassword" placeholder="Confirm new password">
-      <i class="fa-solid fa-eye" id="toggleConfirmPassword"></i>
-    </div>
-
-    <button id="resetBtn">Reset Password</button>
-    <div id="resetError" style="color:red; margin-top:5px;"></div>
-    <div id="resetSuccess" style="color:green; margin-top:5px;"></div>
   </div>
 </div>
 
@@ -231,9 +206,9 @@ button{
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-// ======================
-// FIREBASE INIT
-// ======================
+/* ======================
+   FIREBASE INIT
+====================== */
 firebase.initializeApp({
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain: "fedex-attendance-system.firebaseapp.com",
@@ -241,30 +216,30 @@ firebase.initializeApp({
 });
 const db = firebase.firestore();
 
-// ======================
-// ELEMENTS
-// ======================
+/* ======================
+   ELEMENTS
+====================== */
 const loginBtn = document.getElementById("loginBtn");
 const error = document.getElementById("error");
 const passwordInput = document.getElementById("password");
 const togglePassword = document.getElementById("togglePassword");
 
-// ======================
-// SHOW / HIDE PASSWORD
-// ======================
+/* ======================
+   SHOW / HIDE PASSWORD
+====================== */
 togglePassword.addEventListener("click", () => {
-  if (passwordInput.type === "password") {
+  if(passwordInput.type === "password"){
     passwordInput.type = "text";
-    togglePassword.classList.replace("fa-eye", "fa-eye-slash");
+    togglePassword.classList.replace("fa-eye","fa-eye-slash");
   } else {
     passwordInput.type = "password";
-    togglePassword.classList.replace("fa-eye-slash", "fa-eye");
+    togglePassword.classList.replace("fa-eye-slash","fa-eye");
   }
 });
 
-// ======================
-// LOGIN LOGIC
-// ======================
+/* ======================
+   LOGIN LOGIC
+====================== */
 loginBtn.addEventListener("click", async () => {
   error.textContent = "";
 
@@ -291,6 +266,7 @@ loginBtn.addEventListener("click", async () => {
         .where("name","==",username)
         .limit(1)
         .get();
+
       if(q.empty){ error.textContent="Manager not found."; return; }
       userData = q.docs[0].data();
       userId = q.docs[0].id;
@@ -301,16 +277,12 @@ loginBtn.addEventListener("click", async () => {
       return;
     }
 
-    localStorage.setItem("currentUser", JSON.stringify({ ...userData, id:userId }));
+    localStorage.setItem("currentUser", JSON.stringify({...userData, id:userId}));
 
     if(role === "team_leader"){
-      location.href = userData.role === "admin"
-        ? "admin.html"
-        : "employee.html";
+      location.href = userData.role === "admin" ? "admin.html" : "employee.html";
     } else {
-      location.href = userData.role === "manager-admin"
-        ? "manager-admin.html"
-        : "manager-employee.html";
+      location.href = userData.role === "manager-admin" ? "manager-admin.html" : "manager-employee.html";
     }
 
   } catch(e){
@@ -319,9 +291,7 @@ loginBtn.addEventListener("click", async () => {
   }
 });
 
-// ======================
-// FORGOT PASSWORD MODAL
-// ======================
+/* ===== FORGOT PASSWORD MODAL ===== */
 const forgotModal = document.getElementById("forgotModal");
 const forgotLink = document.getElementById("forgotLink");
 const closeModal = document.querySelector(".close");
@@ -333,8 +303,7 @@ const confirmPasswordInput = document.getElementById("confirmPassword");
 const toggleNewPassword = document.getElementById("toggleNewPassword");
 const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
 
-forgotLink.addEventListener("click", (e) => {
-  e.preventDefault(); // prevent page jump
+forgotLink.addEventListener("click", () => {
   forgotModal.style.display = "block";
   resetError.textContent = "";
   resetSuccess.textContent = "";
@@ -347,13 +316,11 @@ closeModal.addEventListener("click", () => {
   forgotModal.style.display = "none";
 });
 
-window.addEventListener("click", (e) => {
+window.addEventListener("click", e => {
   if(e.target === forgotModal) forgotModal.style.display = "none";
 });
 
-// ======================
-// RESET PASSWORD LOGIC
-// ======================
+/* ===== RESET PASSWORD LOGIC (WORKS FOR BOTH COLLECTIONS) ===== */
 resetBtn.addEventListener("click", async () => {
   resetError.textContent = "";
   resetSuccess.textContent = "";
@@ -373,22 +340,28 @@ resetBtn.addEventListener("click", async () => {
   }
 
   try {
-    let userRef, docId;
+    let userRef = null;
 
-    const snapTL = await db.collection("leave_users").where("email", "==", email).limit(1).get();
+    // Check leave_users by email
+    const snapTL = await db.collection("leave_users")
+      .where("email","==",email)
+      .limit(1)
+      .get();
     if(!snapTL.empty){
-      docId = snapTL.docs[0].id;
-      userRef = db.collection("leave_users").doc(docId);
+      userRef = db.collection("leave_users").doc(snapTL.docs[0].id);
     } else {
-      const snapM = await db.collection("manager_leave_user").where("email", "==", email).limit(1).get();
+      // Check manager_leave_user by email
+      const snapM = await db.collection("manager_leave_user")
+        .where("email","==",email)
+        .limit(1)
+        .get();
       if(!snapM.empty){
-        docId = snapM.docs[0].id;
-        userRef = db.collection("manager_leave_user").doc(docId);
+        userRef = db.collection("manager_leave_user").doc(snapM.docs[0].id);
       }
     }
 
     if(!userRef){
-      resetError.textContent = "Email not found.";
+      resetError.textContent = "Email not found in the system.";
       return;
     }
 
@@ -402,29 +375,52 @@ resetBtn.addEventListener("click", async () => {
   }
 });
 
-// ======================
-// SHOW / HIDE PASSWORD IN MODAL
-// ======================
+/* ===== SHOW / HIDE PASSWORD IN MODAL ===== */
 toggleNewPassword.addEventListener("click", () => {
-  if(newPasswordInput.type === "password"){
-    newPasswordInput.type = "text";
+  if(newPasswordInput.type==="password"){
+    newPasswordInput.type="text";
     toggleNewPassword.classList.replace("fa-eye","fa-eye-slash");
   } else {
-    newPasswordInput.type = "password";
+    newPasswordInput.type="password";
     toggleNewPassword.classList.replace("fa-eye-slash","fa-eye");
   }
 });
 
 toggleConfirmPassword.addEventListener("click", () => {
-  if(confirmPasswordInput.type === "password"){
-    confirmPasswordInput.type = "text";
+  if(confirmPasswordInput.type==="password"){
+    confirmPasswordInput.type="text";
     toggleConfirmPassword.classList.replace("fa-eye","fa-eye-slash");
   } else {
-    confirmPasswordInput.type = "password";
+    confirmPasswordInput.type="password";
     toggleConfirmPassword.classList.replace("fa-eye-slash","fa-eye");
   }
 });
 </script>
+
+<!-- Forgot Password Modal -->
+<div id="forgotModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Reset Password</h2>
+    <p>Enter your email to reset your password:</p>
+
+    <input type="text" id="resetEmail" placeholder="Your email">
+
+    <div class="password-wrapper">
+      <input type="password" id="newPassword" placeholder="New password">
+      <i class="fa-solid fa-eye" id="toggleNewPassword"></i>
+    </div>
+
+    <div class="password-wrapper">
+      <input type="password" id="confirmPassword" placeholder="Confirm new password">
+      <i class="fa-solid fa-eye" id="toggleConfirmPassword"></i>
+    </div>
+
+    <button id="resetBtn">Reset Password</button>
+    <div id="resetError"></div>
+    <div id="resetSuccess"></div>
+  </div>
+</div>
 
 </body>
 </html>
