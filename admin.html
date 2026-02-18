@@ -333,6 +333,44 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 
 
 /*admin header styling*/
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--fedex-purple);
+  color: white;
+  padding: 10px 20px;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.admin-header .header-left img {
+  display: block;
+}
+
+.admin-header .header-center {
+  flex: 1;
+  text-align: center;
+  font-size: 1.2em;
+}
+
+.admin-header .header-right button {
+  background: var(--fedex-orange);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.admin-header .header-right button:hover {
+  background: #e65c00;
+}
+
+/*admin header styling*/
 /* ===== PROFESSIONAL HEADER (replace old admin-header) ===== */
 .admin-header {
   background: linear-gradient(90deg, #4D148C, #3b0f70);
@@ -431,7 +469,6 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
     justify-content: space-between;
   }
 }
-
 
 
 </style>
@@ -1385,14 +1422,6 @@ toggleCalendarControls(); render(); loadRequests();
 <div id="toastContainer"></div>
 </body>
 </html>
-
-
-
-
-
-
-
-
 
 
 
