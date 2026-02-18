@@ -223,7 +223,7 @@ const db = firebase.firestore();
 // Login check
 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 if(!currentUser){ alert("Please login first"); location.href="index.html"; }
-document.getElementById("welcomeMsg").textContent = "Manager Employee Dashboard";
+document.getElementById("welcomeMsg").textContent = "Manager Dashboard";
 document.getElementById("headerUserName").textContent = currentUser.name;
 
 function logout() { if(confirm("Are you sure you want to logout?")){ localStorage.removeItem("currentUser"); location.href="index.html"; } }
@@ -352,3 +352,4 @@ function changeMonth(dir){ calMonth+=dir; if(calMonth<0){calMonth=11; calYear--;
 
 </body>
 </html>
+
