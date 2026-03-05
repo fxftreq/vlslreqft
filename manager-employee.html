@@ -199,7 +199,7 @@ td.reason-col { max-width:250px; }
     <h3>Manager Leave Tickets</h3>
     <table id="table">
       <tr>
-        <th>Type</th><th>Date</th><th>Reason</th><th>Status</th><th>Admin Notes</th><th>Submitted Date</th>
+        <th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Admin Notes</th><th>Submitted Date</th>
       </tr>
     </table>
   </div>
@@ -265,7 +265,7 @@ function loadLeaves(){
   db.collection("manager_single_day_leave")
     .where("managerId","==",currentUser.id)
     .onSnapshot(snapshot=>{
-      tableEl.innerHTML=`<tr><th>Type</th><th>Date</th><th>Reason</th><th>Status</th><th>Admin Notes</th><th>Submitted Date</th></tr>`;
+      tableEl.innerHTML=`<tr><th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Admin Notes</th><th>Submitted Date</th></tr>`;
       snapshot.forEach(doc=>{
         const l = doc.data();
         const submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt);
@@ -352,5 +352,6 @@ function changeMonth(dir){ calMonth+=dir; if(calMonth<0){calMonth=11; calYear--;
 
 </body>
 </html>
+
 
 
