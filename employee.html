@@ -510,7 +510,7 @@ td.reason-col {
     <h3>My Leave Tickets</h3>
     <table id="table">
       <tr>
-        <th>Type</th>
+        <th>Leave Type</th>
         <th>Leave Date</th>
         <th>Reason</th>
         <th>Status</th>
@@ -523,7 +523,6 @@ td.reason-col {
 
 <footer>© FedEx 2026</footer>
 
-<!-- 🔒 SCRIPT — LEFT COMPLETELY UNCHANGED -->
 <script>
 // Firebase config
 const firebaseConfig = {
@@ -610,8 +609,8 @@ function loadLeaves() {
     .where("employeeId","==",currentUser.id)
     .onSnapshot(snapshot => {
       tableEl.innerHTML = `<tr>
-  <th>Type</th>
-  <th>Date</th>
+  <th>Leave Type</th>
+  <th>Leave Date</th>
   <th>Reason</th>
   <th>Status</th>
   <th>Admin Notes</th>
@@ -849,4 +848,5 @@ function changeMonth(dir) {
 
 </body>
 </html>
+
 
