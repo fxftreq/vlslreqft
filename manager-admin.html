@@ -733,7 +733,7 @@ function toggleCalendarControls(){
   document.getElementById("monthSelect").style.display=(currentView==='table')?'inline-block':'none';
 }
 
-function logout(){ if(confirm("Are you sure?")){ localStorage.removeItem("currentUser"); location.href="index.html"; } }
+function logout(){ if(confirm("Are you sure you want to logout?")){ localStorage.removeItem("currentUser"); location.href="index.html"; } }
 
 function render(){
   const data = currentFilter==="All"?cachedRequests:cachedRequests.filter(r=>r.status===currentFilter);
@@ -782,7 +782,7 @@ function renderList(data) {
   t.innerHTML = `<tr>
     <th onclick="sortList('managerName')">Employee &#8597;</th>
     <th onclick="sortList('type')">Leave Type &#8597;</th>
-    <th onclick="sortList('date')">Date &#8597;</th>
+    <th onclick="sortList('date')">Leave Date &#8597;</th>
     <th onclick="sortList('submittedAt')">Submitted Date &#8597;</th>
     <th onclick="sortList('reason')">Reason &#8597;</th>
     <th onclick="sortList('status')">Status &#8597;</th>
@@ -1462,6 +1462,7 @@ toggleCalendarControls(); render(); loadRequests();
 <div id="toastContainer"></div>
 </body>
 </html>
+
 
 
 
