@@ -760,7 +760,7 @@ function toggleCalendarControls(){
   document.getElementById("monthSelect").style.display=(currentView==='table')?'inline-block':'none';
 }
 
-function logout(){ if(confirm("Are you sure?")){ localStorage.removeItem("currentUser"); location.href="index.html"; } }
+function logout(){ if(confirm("Are you sure you want to logout?")){ localStorage.removeItem("currentUser"); location.href="index.html"; } }
 
 function render(){
   const data = currentFilter==="All"?cachedRequests:cachedRequests.filter(r=>r.status===currentFilter);
@@ -1480,6 +1480,7 @@ toggleCalendarControls(); render(); loadRequests();
 <div id="toastContainer"></div>
 </body>
 </html>
+
 
 
 
