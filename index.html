@@ -6,7 +6,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-/* ====== KEEP YOUR STYLES EXACTLY AS BEFORE ====== */
 :root{
   --fedex-purple:#4D148C;
   --fedex-orange:#FF6600;
@@ -58,12 +57,6 @@ button{ width:100%; padding:12px; background:var(--fedex-purple); border:none; c
     <i class="fa-solid fa-eye" id="togglePassword"></i>
   </div>
 
-  <label>Login As</label>
-  <select id="loginType">
-    <option value="team_leader">Team Leader</option>
-    <option value="manager">Manager</option>
-  </select>
-
   <button id="loginBtn">Login</button>
   <div id="error"></div>
   <div class="forgot-password">
@@ -110,11 +103,6 @@ const resetBtn = document.getElementById("resetBtn");
 const resetError = document.getElementById("resetError");
 const resetSuccess = document.getElementById("resetSuccess");
 
-/* ===== HELPER ===== */
-function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
 /* ===== SHOW/HIDE PASSWORD ===== */
 togglePassword.addEventListener("click", () => {
   if(passwordInput.type === "password"){
@@ -130,30 +118,44 @@ togglePassword.addEventListener("click", () => {
 loginBtn.addEventListener("click", async () => {
   error.textContent = "";
   const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const loginType = document.getElementById("loginType").value;
+  const password = passwordInput.value.trim();
 
-  if(!email || !password){ error.textContent = "Please enter email and password."; return; }
-  if(!isValidEmail(email)){ error.textContent = "Please enter a valid email address."; return; }
+  if(!email || !password){
+    error.textContent = "Please enter email and password.";
+    return;
+  }
 
   try {
+    // Firebase Auth login
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
-    // Check role in Firestore
-    const collection = loginType === "team_leader" ? "leave_users" : "manager_leave_user";
-    const snap = await db.collection(collection).where("email","==",email).limit(1).get();
-    if(snap.empty){ 
-      error.textContent = "You do not have access as " + loginType;
+    // Fetch role from Firestore
+    const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
+    const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
+
+    let userData;
+    let redirectPage;
+
+    if(!snapTL.empty){
+      userData = snapTL.docs[0].data();
+      redirectPage = "team-leader-dashboard.html";
+    } else if(!snapM.empty){
+      userData = snapM.docs[0].data();
+      redirectPage = "manager-dashboard.html";
+    } else {
+      error.textContent = "You do not have access.";
       await auth.signOut();
       return;
     }
 
-    const userData = snap.docs[0].data();
-    localStorage.setItem("currentUser", JSON.stringify({ id: snap.docs[0].id, email: user.email, name: userData.name, role: loginType }));
+    localStorage.setItem("currentUser", JSON.stringify({
+      id: snapTL.empty ? snapM.docs[0].id : snapTL.docs[0].id,
+      email: user.email,
+      name: userData.name,
+      role: userData.role
+    }));
 
-    // Redirect
-    const redirectPage = loginType === "team_leader" ? "team-leader-dashboard.html" : "manager-dashboard.html";
     window.location.href = redirectPage;
 
   } catch(err){
@@ -162,7 +164,7 @@ loginBtn.addEventListener("click", async () => {
   }
 });
 
-/* ===== FORGOT PASSWORD MODAL ===== */
+/* ===== FORGOT PASSWORD ===== */
 forgotLink.addEventListener("click", e => {
   e.preventDefault();
   forgotModal.style.display = "block";
@@ -170,26 +172,25 @@ forgotLink.addEventListener("click", e => {
   resetSuccess.textContent = "";
   document.getElementById("resetEmail").value = "";
 });
+
 closeModal.addEventListener("click", () => forgotModal.style.display = "none");
 window.addEventListener("click", e => { if(e.target===forgotModal) forgotModal.style.display="none"; });
 
-/* ===== RESET PASSWORD (SECURE) ===== */
 resetBtn.addEventListener("click", async () => {
   resetError.textContent = "";
   resetSuccess.textContent = "";
 
   const email = document.getElementById("resetEmail").value.trim();
   if(!email){ resetError.textContent="Please enter your email."; return; }
-  if(!isValidEmail(email)){ resetError.textContent = "Please enter a valid email address."; return; }
 
   try {
-    let exists = false;
+    // Check email exists in Firestore
     const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
-    if(!snapTL.empty) exists = true;
     const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
-    if(!snapM.empty) exists = true;
-
-    if(!exists){ resetError.textContent="Email not found in system."; return; }
+    if(snapTL.empty && snapM.empty){
+      resetError.textContent="Email not found in system.";
+      return;
+    }
 
     await auth.sendPasswordResetEmail(email);
     resetSuccess.textContent = "Password reset email sent! Check your inbox.";
@@ -200,6 +201,5 @@ resetBtn.addEventListener("click", async () => {
   }
 });
 </script>
-
 </body>
 </html>
