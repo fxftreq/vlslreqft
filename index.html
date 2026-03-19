@@ -122,54 +122,68 @@ togglePassword.addEventListener("click", () => {
 });
 
 /* ===== LOGIN ===== */
+/* ===== LOGIN ===== */
 loginBtn.addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = passwordInput.value.trim();
 
+  if (!email || !password) {
+    alert("Please enter email and password.");
+    return;
+  }
+
   try {
+    // Sign in with Firebase Auth
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
     // Look in both collections
-    const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
-    const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
+    const snapTL = await db.collection("leave_users").where("email", "==", email).limit(1).get();
+    const snapM = await db.collection("manager_leave_user").where("email", "==", email).limit(1).get();
 
-    let role = null, userData = null;
+    let role = null;
+    let userData = null;
 
-    if(!snapM.empty){
+    // Manager login
+    if (!snapM.empty) {
       userData = snapM.docs[0].data();
-      role = "manager"; // always admin
-    } else if(!snapTL.empty){
+      role = "manager"; // all records in manager_leave_user are managers
+    }
+    // Team Leader login
+    else if (!snapTL.empty) {
       userData = snapTL.docs[0].data();
-      // Check if this TL user is actually an admin for TL page
-      if(userData.isAdmin) role = "manager";  // send to admin page
-      else role = "team_leader";              // regular TL
-    } else {
-      alert("You do not have access");
+      if (userData.isAdmin === true) role = "manager"; // TL admin goes to manager page
+      else role = "team_leader";
+    }
+    // Not found
+    else {
+      alert("You do not have access.");
       await auth.signOut();
       return;
     }
 
-    // Store user info
-localStorage.setItem("currentUser", JSON.stringify({
-  id: userData.id || user.uid,
-  email: user.email,
-  name: userData.name,
-  role: role,
-  isAdmin: userData.isAdmin === true // ensures false if undefined
-}));
+    // Store user info safely
+    localStorage.setItem("currentUser", JSON.stringify({
+      id: userData.id || user.uid,
+      email: user.email,
+      name: userData.name,
+      role: role,
+      isAdmin: userData.isAdmin === true // ensures false if undefined
+    }));
 
-// Redirect based on role and manager type safely
-if(role === "manager"){
-    const isAdmin = userData.isAdmin === true; // force boolean
-    if(isAdmin){
-        location.href = "manager-admin.html";
-    } else {
-        location.href = "manager-employee.html";
+    // Redirect based on role and manager type
+    if (role === "manager") {
+      const isAdmin = userData.isAdmin === true; // ensure boolean
+      if (isAdmin) location.href = "manager-admin.html"; // admin manager
+      else location.href = "manager-employee.html";       // regular manager
+    } else if (role === "team_leader") {
+      location.href = "employee.html"; // TL page
     }
-} else if(role === "team_leader"){
-    location.href = "employee.html"; // TL page
-}
+
+  } catch (err) {
+    console.error(err);
+    alert("Login failed: " + err.message);
+  }
 });
 
 /* ===== FORGOT PASSWORD MODAL ===== */
