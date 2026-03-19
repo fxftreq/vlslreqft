@@ -123,52 +123,48 @@ togglePassword.addEventListener("click", () => {
 
 /* ===== LOGIN ===== */
 loginBtn.addEventListener("click", async () => {
-  error.textContent = "";
   const email = document.getElementById("email").value.trim();
   const password = passwordInput.value.trim();
 
-  if(!email || !password){
-    error.textContent = "Please enter email and password.";
-    return;
-  }
-
   try {
-    // Firebase Auth login
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
-    // Check both TL and Manager collections
-    let snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
-    let snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
+    // Look in both collections
+    const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
+    const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
 
-    let userData, role;
-    if(!snapTL.empty){
-      userData = snapTL.docs[0].data();
-      role = "team_leader";
-    } else if(!snapM.empty){
+    let role = null, userData = null;
+
+    if(!snapM.empty){
       userData = snapM.docs[0].data();
-      role = "manager";
+      role = "manager"; // always admin
+    } else if(!snapTL.empty){
+      userData = snapTL.docs[0].data();
+      // Check if this TL user is actually an admin for TL page
+      if(userData.isAdmin) role = "manager";  // send to admin page
+      else role = "team_leader";              // regular TL
     } else {
-      error.textContent = "You do not have access to the system.";
+      alert("You do not have access");
       await auth.signOut();
       return;
     }
 
-    // Store in localStorage
+    // Store user info
     localStorage.setItem("currentUser", JSON.stringify({
-      id: snapTL.empty ? snapM.docs[0].id : snapTL.docs[0].id,
+      id: userData.id || user.uid,
       email: user.email,
       name: userData.name,
       role: role
     }));
 
-    // Redirect based on actual role
-    if(role === "team_leader") window.location.href = "employee.html";
-    if(role === "manager") window.location.href = "admin.html";
+    // Redirect based on role
+    if(role === "manager") location.href = "admin.html";       // admins go to admin page
+    else if(role === "team_leader") location.href = "employee.html"; // TL page
 
   } catch(err){
     console.error(err);
-    error.textContent = "Login failed: " + err.message;
+    alert("Login failed: " + err.message);
   }
 });
 
