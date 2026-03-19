@@ -126,7 +126,6 @@ loginBtn.addEventListener("click", async () => {
   error.textContent = "";
   const email = document.getElementById("email").value.trim();
   const password = passwordInput.value.trim();
-  const loginType = document.getElementById("loginType").value;
 
   if(!email || !password){
     error.textContent = "Please enter email and password.";
@@ -138,29 +137,34 @@ loginBtn.addEventListener("click", async () => {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
-    // Determine Firestore collection
-    const collection = loginType === "team_leader" ? "leave_users" : "manager_leave_user";
-    const snap = await db.collection(collection).where("email","==",email).limit(1).get();
+    // Check both TL and Manager collections
+    let snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
+    let snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
 
-    if(snap.empty){
-      error.textContent = `You do not have access as ${loginType}`;
+    let userData, role;
+    if(!snapTL.empty){
+      userData = snapTL.docs[0].data();
+      role = "team_leader";
+    } else if(!snapM.empty){
+      userData = snapM.docs[0].data();
+      role = "manager";
+    } else {
+      error.textContent = "You do not have access to the system.";
       await auth.signOut();
       return;
     }
 
-    const userData = snap.docs[0].data();
+    // Store in localStorage
     localStorage.setItem("currentUser", JSON.stringify({
-      id: snap.docs[0].id,
+      id: snapTL.empty ? snapM.docs[0].id : snapTL.docs[0].id,
       email: user.email,
       name: userData.name,
-      role: loginType
+      role: role
     }));
 
-    // Redirect
-    let redirectPage = "";
-    if(loginType === "team_leader") redirectPage = "employee.html";  // TL → Employee
-    if(loginType === "manager") redirectPage = "admin.html";         // Manager → Admin
-    window.location.href = redirectPage;
+    // Redirect based on actual role
+    if(role === "team_leader") window.location.href = "employee.html";
+    if(role === "manager") window.location.href = "admin.html";
 
   } catch(err){
     console.error(err);
