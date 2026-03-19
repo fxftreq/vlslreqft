@@ -6,208 +6,55 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+/* ====== KEEP YOUR STYLES EXACTLY AS BEFORE ====== */
 :root{
   --fedex-purple:#4D148C;
   --fedex-orange:#FF6600;
   --border:#d1d5db;
 }
 *{ box-sizing:border-box; }
-
-body{
-  margin:0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(-45deg, #4D148C, #FF6600, #4D148C, #FF6600);
-  background-size: 400% 400%;
-  animation: gradientAnimation 15s ease infinite;
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-
-@keyframes gradientAnimation {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.login-card{
-  background: rgba(255,255,255,0.95);
-  width:100%;
-  max-width:420px;
-  padding:32px 28px;
-  border-radius:6px;
-  box-shadow:0 10px 25px rgba(0,0,0,.15);
-}
-
+body{ margin:0; font-family: Arial, sans-serif; background: linear-gradient(-45deg, #4D148C, #FF6600, #4D148C, #FF6600); background-size: 400% 400%; animation: gradientAnimation 15s ease infinite; min-height:100vh; display:flex; justify-content:center; align-items:center; }
+@keyframes gradientAnimation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.login-card{ background: rgba(255,255,255,0.95); width:100%; max-width:420px; padding:32px 28px; border-radius:6px; box-shadow:0 10px 25px rgba(0,0,0,.15); }
 .logo{text-align:center; margin-bottom:18px;}
 .purple-id{text-align:center; font-weight:bold; color:#666; margin-bottom:20px;}
 label{ font-size:.85em; font-weight:bold; color:#333; }
-
-input, select{
-  width:100%;
-  padding:12px;
-  margin-top:6px;
-  margin-bottom:14px;
-  border:1px solid var(--border);
-  border-radius:4px;
-  font-size:.95em;
-}
-
-button{
-  width:100%;
-  padding:12px;
-  background:var(--fedex-purple);
-  border:none;
-  color:#fff;
-  font-weight:bold;
-  border-radius:4px;
-  cursor:pointer;
-}
-
-#error{
-  margin-top:10px;
-  color:#dc2626;
-  font-size:.85em;
-  text-align:center;
-}
-
+input, select{ width:100%; padding:12px; margin-top:6px; margin-bottom:14px; border:1px solid var(--border); border-radius:4px; font-size:.95em; }
+button{ width:100%; padding:12px; background:var(--fedex-purple); border:none; color:#fff; font-weight:bold; border-radius:4px; cursor:pointer; }
+#error{ margin-top:10px; color:#dc2626; font-size:.85em; text-align:center; }
 .password-wrapper{ position:relative; }
-.password-wrapper i{
-  position:absolute;
-  right:12px;
-  top:50%;
-  transform:translateY(-50%);
-  cursor:pointer;
-  color:#6b7280;
-}
+.password-wrapper i{ position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; color:#6b7280; }
 .password-wrapper i:hover{ color:var(--fedex-purple); }
-
 .forgot-password { text-align: left; margin-top: 10px; }
-.forgot-password a {
-  font-size: 0.85em;
-  color: var(--fedex-purple);
-  text-decoration: none;
-}
+.forgot-password a { font-size: 0.85em; color: var(--fedex-purple); text-decoration: none; }
 .forgot-password a:hover { text-decoration: underline; }
-
-/* Modal */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.4);
-}
-.modal-content {
-  background-color: #fff;
-  margin: 10% auto;
-  padding: 20px 30px;
-  border-radius: 6px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  position: relative;
-}
+.modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
+.modal-content { background-color: #fff; margin: 10% auto; padding: 20px 30px; border-radius: 6px; width: 90%; max-width: 400px; text-align: center; position: relative; }
 .modal-content input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: 1px solid var(--border);}
 .modal-content button { width: 100%; padding: 12px; margin-top: 10px; background: var(--fedex-purple); color:#fff; font-weight:bold; border:none; border-radius:4px; cursor:pointer; }
 .modal-content h2 { margin-bottom: 10px; }
 .modal-content p { font-size: 0.9em; margin-bottom: 10px; }
 .close { position: absolute; top: 10px; right: 15px; font-size: 1.5em; cursor: pointer; }
-
-/* succeess notifc */  
-  #resetError {
-  margin-top: 10px;
-  color: #dc2626; /* red for errors */
-  font-size: 0.85em;
-  text-align: center;
-}
-
-#resetSuccess {
-  margin-top: 10px;
-  color: #16a34a; /* green for success */
-  font-size: 0.9em;
-  font-weight: bold;
-  padding: 8px 10px;
-  border-radius: 4px;
-  text-align: center;
-  animation: fadeIn 0.5s ease;
-}
-
-/* optional fade-in effect */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ================= MOBILE RESPONSIVE ================= */
-@media screen and (max-width: 480px) {
-  body {
-    padding: 10px;
-    align-items: flex-start;
-  }
-
-  .login-card {
-    padding: 20px 16px;
-    width: 100%;
-    max-width: 360px;
-    margin-top: 30px;
-  }
-
-  .logo img {
-    height: 100px;
-  }
-
-  label {
-    font-size: 0.9em;
-  }
-
-  input, select, button {
-    font-size: 0.95em;
-    padding: 10px;
-  }
-
-  .password-wrapper i {
-    right: 10px;
-  }
-
-  .forgot-password a {
-    font-size: 0.8em;
-  }
-
-  .modal-content {
-    width: 95%;
-    padding: 15px 20px;
-    margin-top: 20%;
-  }
-
-  #resetSuccess, #resetError {
-    font-size: 0.85em;
-  }
-}
-
+#resetError { margin-top: 10px; color: #dc2626; font-size: 0.85em; text-align: center; }
+#resetSuccess { margin-top: 10px; color: #16a34a; font-size: 0.9em; font-weight: bold; padding: 8px 10px; border-radius: 4px; text-align: center; animation: fadeIn 0.5s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+@media screen and (max-width: 480px) { body { padding: 10px; align-items: flex-start; } .login-card { padding: 20px 16px; width: 100%; max-width: 360px; margin-top: 30px; } .logo img { height: 100px; } label { font-size: 0.9em; } input, select, button { font-size: 0.95em; padding: 10px; } .password-wrapper i { right: 10px; } .forgot-password a { font-size: 0.8em; } .modal-content { width: 95%; padding: 15px 20px; margin-top: 20%; } #resetSuccess, #resetError { font-size: 0.85em; } }
 </style>
 </head>
 <body>
 
 <div class="login-card">
-
   <div class="logo">
     <img src="fedex.png" style="height:130px;">
   </div>
-
   <div class="purple-id">Login</div>
 
-  <label>Username</label>
-  <input type="text" id="username">
+  <label>Email</label>
+  <input type="email" id="email" placeholder="Your email">
 
   <label>Password</label>
   <div class="password-wrapper">
-    <input type="password" id="password">
+    <input type="password" id="password" placeholder="Password">
     <i class="fa-solid fa-eye" id="togglePassword"></i>
   </div>
 
@@ -217,7 +64,7 @@ button{
     <option value="manager">Manager</option>
   </select>
 
-  <button id="loginBtn">Next</button>
+  <button id="loginBtn">Login</button>
   <div id="error"></div>
   <div class="forgot-password">
     <a href="#" id="forgotLink">Forgot password?</a>
@@ -230,170 +77,123 @@ button{
     <span class="close">&times;</span>
     <h2>Reset Password</h2>
     <p>Enter your email to reset your password:</p>
-
-    <input type="text" id="resetEmail" placeholder="Your email">
-
-    <div class="password-wrapper">
-      <input type="password" id="newPassword" placeholder="New password">
-      <i class="fa-solid fa-eye" id="toggleNewPassword"></i>
-    </div>
-
-    <div class="password-wrapper">
-      <input type="password" id="confirmPassword" placeholder="Confirm new password">
-      <i class="fa-solid fa-eye" id="toggleConfirmPassword"></i>
-    </div>
-
-    <button id="resetBtn">Reset Password</button>
+    <input type="email" id="resetEmail" placeholder="Your email">
+    <button id="resetBtn">Send Reset Email</button>
     <div id="resetError"></div>
     <div id="resetSuccess"></div>
   </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  /* ====================== FIREBASE INIT ====================== */
-  firebase.initializeApp({
-    apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
-    authDomain: "fedex-attendance-system.firebaseapp.com",
-    projectId: "fedex-attendance-system"
-  });
-  const db = firebase.firestore();
+firebase.initializeApp({
+  apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+  authDomain: "fedex-attendance-system.firebaseapp.com",
+  projectId: "fedex-attendance-system"
+});
 
-  /* ====================== ELEMENTS ====================== */
-  const loginBtn = document.getElementById("loginBtn");
-  const error = document.getElementById("error");
-  const passwordInput = document.getElementById("password");
-  const togglePassword = document.getElementById("togglePassword");
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-  /* SHOW/HIDE PASSWORD */
-  togglePassword.addEventListener("click", () => {
-    if(passwordInput.type === "password"){
-      passwordInput.type = "text";
-      togglePassword.classList.replace("fa-eye","fa-eye-slash");
-    } else {
-      passwordInput.type = "password";
-      togglePassword.classList.replace("fa-eye-slash","fa-eye");
+/* ===== ELEMENTS ===== */
+const loginBtn = document.getElementById("loginBtn");
+const error = document.getElementById("error");
+const passwordInput = document.getElementById("password");
+const togglePassword = document.getElementById("togglePassword");
+const forgotModal = document.getElementById("forgotModal");
+const forgotLink = document.getElementById("forgotLink");
+const closeModal = document.querySelector(".close");
+const resetBtn = document.getElementById("resetBtn");
+const resetError = document.getElementById("resetError");
+const resetSuccess = document.getElementById("resetSuccess");
+
+/* ===== SHOW/HIDE PASSWORD ===== */
+togglePassword.addEventListener("click", () => {
+  if(passwordInput.type === "password"){
+    passwordInput.type = "text";
+    togglePassword.classList.replace("fa-eye","fa-eye-slash");
+  } else {
+    passwordInput.type = "password";
+    togglePassword.classList.replace("fa-eye-slash","fa-eye");
+  }
+});
+
+/* ===== LOGIN ===== */
+loginBtn.addEventListener("click", async () => {
+  error.textContent = "";
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const loginType = document.getElementById("loginType").value;
+
+  if(!email || !password){ error.textContent = "Please enter email and password."; return; }
+
+  try {
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+
+    // Check role in Firestore
+    const collection = loginType === "team_leader" ? "leave_users" : "manager_leave_user";
+    const snap = await db.collection(collection).where("email","==",email).limit(1).get();
+    if(snap.empty){ 
+      error.textContent = "You do not have access as " + loginType;
+      await auth.signOut();
+      return;
     }
-  });
 
-  /* LOGIN LOGIC */
-  loginBtn.addEventListener("click", async () => {
-    error.textContent = "";
+    const userData = snap.docs[0].data();
+    localStorage.setItem("currentUser", JSON.stringify({ id: snap.docs[0].id, email: user.email, name: userData.name, role: loginType }));
 
-    const username = document.getElementById("username").value.trim();
-    const password = passwordInput.value.trim();
-    const role = document.getElementById("loginType").value;
+    // Redirect
+    const redirectPage = loginType === "team_leader" ? "team-leader-dashboard.html" : "manager-dashboard.html";
+    window.location.href = redirectPage;
 
-    if(!username || !password){ error.textContent = "Please complete all fields."; return; }
+  } catch(err){
+    console.error(err);
+    error.textContent = "Login failed: " + err.message;
+  }
+});
 
-    try {
-      let userData, userId;
+/* ===== FORGOT PASSWORD MODAL ===== */
+forgotLink.addEventListener("click", e => {
+  e.preventDefault();
+  forgotModal.style.display = "block";
+  resetError.textContent = "";
+  resetSuccess.textContent = "";
+  document.getElementById("resetEmail").value = "";
+});
+closeModal.addEventListener("click", () => forgotModal.style.display = "none");
+window.addEventListener("click", e => { if(e.target===forgotModal) forgotModal.style.display="none"; });
 
-      if(role==="team_leader"){
-        const snap = await db.collection("leave_users").doc(username).get();
-        if(!snap.exists){ error.textContent="User not found."; return; }
-        userData = snap.data();
-        userId = snap.id;
-      } else {
-        const q = await db.collection("manager_leave_user")
-          .where("name","==",username)
-          .limit(1).get();
-        if(q.empty){ error.textContent="Manager not found."; return; }
-        userData = q.docs[0].data();
-        userId = q.docs[0].id;
-      }
+/* ===== RESET PASSWORD (SECURE) ===== */
+resetBtn.addEventListener("click", async () => {
+  resetError.textContent = "";
+  resetSuccess.textContent = "";
 
-      if(password !== userData.tempPassword){ error.textContent="Incorrect password."; return; }
+  const email = document.getElementById("resetEmail").value.trim();
+  if(!email){ resetError.textContent="Please enter your email."; return; }
 
-      localStorage.setItem("currentUser", JSON.stringify({ ...userData, id:userId }));
+  try {
+    // Check email exists in any role
+    let exists = false;
+    const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
+    if(!snapTL.empty) exists = true;
+    const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
+    if(!snapM.empty) exists = true;
 
-      if(role==="team_leader"){
-        location.href = userData.role==="admin" ? "admin.html" : "employee.html";
-      } else {
-        location.href = userData.role==="manager-admin" ? "manager-admin.html" : "manager-employee.html";
-      }
+    if(!exists){ resetError.textContent="Email not found in system."; return; }
 
-    } catch(e){ console.error(e); error.textContent="Login failed."; }
-  });
-
-  /* ===== FORGOT PASSWORD MODAL ===== */
-  const forgotModal = document.getElementById("forgotModal");
-  const forgotLink = document.getElementById("forgotLink");
-  const closeModal = document.querySelector(".close");
-  const resetBtn = document.getElementById("resetBtn");
-  const resetError = document.getElementById("resetError");
-  const resetSuccess = document.getElementById("resetSuccess");
-
-  forgotLink.addEventListener("click", e => {
-    e.preventDefault();
-    forgotModal.style.display = "block";
-    resetError.textContent = "";
-    resetSuccess.textContent = "";
-    document.getElementById("resetEmail").value = "";
-    document.getElementById("newPassword").value = "";
-    document.getElementById("confirmPassword").value = "";
-  });
-
-  closeModal.addEventListener("click", () => forgotModal.style.display = "none");
-  window.addEventListener("click", e => { if(e.target===forgotModal) forgotModal.style.display="none"; });
-
-  /* RESET PASSWORD LOGIC (both collections) */
-  resetBtn.addEventListener("click", async () => {
-    resetError.textContent = "";
-    resetSuccess.textContent = "";
-
-    const email = document.getElementById("resetEmail").value.trim();
-    const newPass = document.getElementById("newPassword").value.trim();
-    const confirmPass = document.getElementById("confirmPassword").value.trim();
-
-    if(!email || !newPass || !confirmPass){ resetError.textContent="Please complete all fields."; return; }
-    if(newPass !== confirmPass){ resetError.textContent="Passwords do not match."; return; }
-
-    try {
-      let userRef = null;
-
-      // Check team_leader
-      const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
-      if(!snapTL.empty) userRef = db.collection("leave_users").doc(snapTL.docs[0].id);
-
-      // Check manager
-      const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
-      if(!snapM.empty) userRef = db.collection("manager_leave_user").doc(snapM.docs[0].id);
-
-      if(!userRef){ resetError.textContent="Email not found."; return; }
-
-      await userRef.update({ tempPassword:newPass });
-      resetSuccess.textContent = "Password reset successfully! You can now login.";
-      setTimeout(()=>{ forgotModal.style.display="none"; },2000);
-
-    } catch(e){ console.error(e); resetError.textContent="Failed to reset password. Try again."; }
-  });
-
-  /* SHOW/HIDE PASSWORD IN MODAL */
-  const toggleNewPassword = document.getElementById("toggleNewPassword");
-  const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
-  const newPasswordInput = document.getElementById("newPassword");
-  const confirmPasswordInput = document.getElementById("confirmPassword");
-
-  toggleNewPassword.addEventListener("click", () => {
-    if(newPasswordInput.type==="password"){ newPasswordInput.type="text"; toggleNewPassword.classList.replace("fa-eye","fa-eye-slash"); }
-    else { newPasswordInput.type="password"; toggleNewPassword.classList.replace("fa-eye-slash","fa-eye"); }
-  });
-
-  toggleConfirmPassword.addEventListener("click", () => {
-    if(confirmPasswordInput.type==="password"){ confirmPasswordInput.type="text"; toggleConfirmPassword.classList.replace("fa-eye","fa-eye-slash"); }
-    else { confirmPasswordInput.type="password"; toggleConfirmPassword.classList.replace("fa-eye-slash","fa-eye"); }
-  });
-
+    await auth.sendPasswordResetEmail(email);
+    resetSuccess.textContent = "Password reset email sent! Check your inbox.";
+    setTimeout(()=>{ forgotModal.style.display="none"; }, 2500);
+  } catch(err){
+    console.error(err);
+    resetError.textContent = "Failed to send reset email: " + err.message;
+  }
 });
 </script>
 
 </body>
 </html>
-
-
-
-
