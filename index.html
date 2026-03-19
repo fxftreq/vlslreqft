@@ -110,6 +110,11 @@ const resetBtn = document.getElementById("resetBtn");
 const resetError = document.getElementById("resetError");
 const resetSuccess = document.getElementById("resetSuccess");
 
+/* ===== HELPER ===== */
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 /* ===== SHOW/HIDE PASSWORD ===== */
 togglePassword.addEventListener("click", () => {
   if(passwordInput.type === "password"){
@@ -129,6 +134,7 @@ loginBtn.addEventListener("click", async () => {
   const loginType = document.getElementById("loginType").value;
 
   if(!email || !password){ error.textContent = "Please enter email and password."; return; }
+  if(!isValidEmail(email)){ error.textContent = "Please enter a valid email address."; return; }
 
   try {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
@@ -174,9 +180,9 @@ resetBtn.addEventListener("click", async () => {
 
   const email = document.getElementById("resetEmail").value.trim();
   if(!email){ resetError.textContent="Please enter your email."; return; }
+  if(!isValidEmail(email)){ resetError.textContent = "Please enter a valid email address."; return; }
 
   try {
-    // Check email exists in any role
     let exists = false;
     const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
     if(!snapTL.empty) exists = true;
