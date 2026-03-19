@@ -151,21 +151,25 @@ loginBtn.addEventListener("click", async () => {
     }
 
     // Store user info
-    localStorage.setItem("currentUser", JSON.stringify({
-      id: userData.id || user.uid,
-      email: user.email,
-      name: userData.name,
-      role: role
-    }));
+localStorage.setItem("currentUser", JSON.stringify({
+  id: userData.id || user.uid,
+  email: user.email,
+  name: userData.name,
+  role: role,
+  isAdmin: userData.isAdmin || false
+}));
 
     // Redirect based on role
-    if(role === "manager") location.href = "admin.html";       // admins go to admin page
-    else if(role === "team_leader") location.href = "employee.html"; // TL page
-
-  } catch(err){
-    console.error(err);
-    alert("Login failed: " + err.message);
-  }
+   // Redirect based on role and manager type
+if(role === "manager"){
+    if(userData.isAdmin){           // manager with admin rights
+        location.href = "manager-admin.html";
+    } else {                        // regular manager
+        location.href = "manager-employee.html";
+    }
+} else if(role === "team_leader"){
+    location.href = "employee.html"; // TL page
+}
 });
 
 /* ===== FORGOT PASSWORD MODAL ===== */
