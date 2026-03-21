@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>FedEx Leave System - Manager Employee</title>
+<title>FedEx Leave System - Manager</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root {
@@ -13,14 +13,16 @@
   --table-border: #ddd;
   --status-cancelled: #888888;
 }
-
 body { margin:0; font-family: Arial,sans-serif; background: var(--bg-gray); display:flex; flex-direction:column; min-height:100vh; }
-
 header, footer { background: var(--fedex-purple); color:white; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; }
-
 main { flex:1; padding:20px 30px; }
-
 h2 { color: var(--fedex-purple); text-align:center; margin-bottom:20px; }
+.top-controls { display:flex; flex-wrap:wrap; align-items:flex-end; gap:20px; background:#fff; padding:16px 20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-bottom:20px; }
+.control-group { display:flex; flex-direction:column; font-size:0.85em; }
+.control-group label { font-weight:bold; margin-bottom:4px; color:#333; }
+.control-group select, .control-group input { padding:8px 12px; border-radius:6px; border:1px solid #ccc; font-size:0.95em; min-width:180px; }
+.submit-inline { margin-top:22px; padding:10px 20px; background:var(--fedex-orange); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; height:42px; }
+.submit-inline:hover { background:darkorange; }
 
 .card { background:white; padding:25px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); }
 table { width:100%; border-collapse:collapse; min-width:600px; table-layout: fixed; }
@@ -71,6 +73,14 @@ th { background:var(--table-header-bg); color:white; }
 .user-chip { background: rgba(255,255,255,0.15); padding:6px 12px; border-radius:20px; font-size:13px; display:flex; align-items:center; gap:6px; }
 .logout-btn { background: var(--fedex-orange); color:white; border:none; padding:7px 14px; border-radius:6px; cursor:pointer; font-weight:bold; transition:0.2s; }
 .logout-btn:hover { background:darkorange; transform:translateY(-1px); }
+
+@media(max-width:768px){
+  .main-header { flex-direction:column; align-items:flex-start; gap:10px; }
+  .header-right { width:100%; justify-content:space-between; }
+  .top-controls { flex-direction:column; align-items:stretch; }
+  .control-group select, .control-group input { min-width:100%; }
+  .submit-inline { width:100%; }
+}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -78,15 +88,16 @@ th { background:var(--table-header-bg); color:white; }
 </head>
 
 <body>
+
 <header class="main-header">
   <div class="header-left">
     <div class="logo-circle"><i class="fas fa-plane"></i></div>
     <div class="system-info">
       <div class="system-title">FedEx Leave Portal</div>
-      <div class="system-subtitle">Manager Employee Dashboard</div>
+      <div class="system-subtitle">Manager Self-Service</div>
     </div>
   </div>
-  <div class="header-center"><span id="welcomeMsg">Manager Employee Dashboard</span></div>
+  <div class="header-center"><span id="welcomeMsg">Manager Dashboard</span></div>
   <div class="header-right">
     <div class="user-chip"><i class="fas fa-user"></i> <span id="headerUserName"></span></div>
     <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -96,7 +107,23 @@ th { background:var(--table-header-bg); color:white; }
 <main>
   <h2 id="userName">Welcome!</h2>
 
-  <button class="accordion">Click to View Plotted Leave Requests</button>
+  <div class="top-controls">
+    <div class="control-group">
+      <label for="type">Leave Type</label>
+      <select id="type"><option>Vacation</option><option>CTO</option><option>RDCO</option></select>
+    </div>
+    <div class="control-group">
+      <label for="date">Leave Date</label>
+      <input type="date" id="date">
+    </div>
+    <div class="control-group" style="flex:1">
+      <label for="reason">Reason</label>
+      <input type="text" id="reason" placeholder="Enter reason">
+    </div>
+    <button class="submit-inline" id="submitBtn">Submit Leave</button>
+  </div>
+
+  <button class="accordion">Click to View Managed Leave Requests</button>
   <div class="panel">
     <div class="card" style="margin-bottom:20px;">
       <div class="calendar-controls">
@@ -111,9 +138,9 @@ th { background:var(--table-header-bg); color:white; }
   </div>
 
   <div class="card">
-    <h3>My Leave Tickets</h3>
+    <h3>Managed Leave Tickets</h3>
     <table id="table">
-      <tr><th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Admin Notes</th><th>Submitted Date</th></tr>
+      <tr><th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Submitted By</th><th>Submitted Date</th></tr>
     </table>
   </div>
 </main>
@@ -126,90 +153,84 @@ const firebaseConfig = {
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain: "fedex-attendance-system.firebaseapp.com",
   projectId: "fedex-attendance-system",
+  storageBucket: "fedex-attendance-system.firebasestorage.app",
+  messagingSenderId: "1049424874301",
+  appId: "1:1049424874301:web:f94559159b19ee39c19354"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Current user & superadmins
+// Current user
 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
-
 if(!currentUser){ alert("Please login first"); location.href="index.html"; }
 document.getElementById("headerUserName").textContent = currentUser.name;
 
 // Logout
 function logout(){ if(confirm("Are you sure you want to logout?")){ localStorage.removeItem("currentUser"); location.href="index.html"; } }
 
-// Load manager-employee leave tickets
-function loadLeaves() {
+// Set default PH date
+const dateEl = document.getElementById("date");
+const nowPH = new Date().toLocaleString("en-US",{timeZone:"Asia/Manila"});
+const phDate = new Date(nowPH);
+dateEl.value = `${phDate.getFullYear()}-${String(phDate.getMonth()+1).padStart(2,"0")}-${String(phDate.getDate()).padStart(2,"0")}`;
+
+// Submit leave
+document.getElementById("submitBtn").addEventListener("click", async ()=>{
+  if(!dateEl.value||!document.getElementById("reason").value){ alert("Complete all fields"); return; }
+  const now = new Date();
+  const leaveData = {
+    managerId: currentUser.id,
+    managerName: currentUser.name,
+    type: document.getElementById("type").value,
+    date: dateEl.value,
+    reason: document.getElementById("reason").value,
+    status:"Pending",
+    submittedAt: now
+  };
+  try{
+    await db.collection("manager_single_day_leave").add(leaveData);
+    alert("Leave request submitted!");
+    dateEl.value = ""; document.getElementById("reason").value = "";
+  }catch(err){ alert("Error submitting leave: "+err.message); }
+});
+
+// Load manager leaves
+let managerLeaves = [];
+function loadLeaves(){
   const tableEl = document.getElementById("table");
   db.collection("manager_single_day_leave")
-    .orderBy("date", "asc")
-    .onSnapshot(snapshot => {
-      tableEl.innerHTML = `<tr>
-        <th>Leave Type</th>
-        <th>Leave Date</th>
-        <th>Reason</th>
-        <th>Status</th>
-        <th>Admin Notes</th>
-        <th>Submitted Date</th>
-      </tr>`;
-
-      snapshot.forEach(doc => {
+    .orderBy("date","asc")
+    .onSnapshot(snapshot=>{
+      managerLeaves=[];
+      tableEl.innerHTML = `<tr><th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Submitted By</th><th>Submitted Date</th></tr>`;
+      snapshot.forEach(doc=>{
         const l = doc.data();
-
-        // Only show leaves managed by this manager
-        if (l.managerId !== currentUser.id) return;
-
-        let submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
-        const dateStr = submittedDate.toLocaleString("en-PH", {
-          timeZone: "Asia/Manila",
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit"
-        });
-
+        if(l.managerId!==currentUser.id) return;  // Only this manager's leaves
+        managerLeaves.push({...l, submittedAt: l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt)});
+        const subDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
+        const dateStr = subDate.toLocaleString("en-PH",{timeZone:"Asia/Manila", year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit"});
         tableEl.innerHTML += `<tr>
           <td>${l.type}</td>
           <td>${l.date}</td>
           <td class="reason-col">${l.reason}</td>
           <td class="status-${l.status}">${l.status}</td>
-          <td class="reason-col">${l.notes ? l.notes : (l.status === "Rejected" ? "No note provided" : "-")}</td>
+          <td>${l.managerName}</td>
           <td>${dateStr}</td>
         </tr>`;
       });
-    }, err => { 
-      console.error("Error loading leaves:", err); 
-    });
+      renderCalendar();
+    }, err=>{ console.error(err); });
 }
 loadLeaves();
 
-
 // Accordion
-const acc = document.querySelector(".accordion");
-const panel = document.querySelector(".panel");
+const acc=document.querySelector(".accordion");
+const panel=document.querySelector(".panel");
 acc.addEventListener("click",()=>{ acc.classList.toggle("active"); panel.style.display = (panel.style.display==="block"?"none":"block"); });
 
 // Calendar
-let viewMode="year", calMonth=new Date().getMonth(), calYear=new Date().getFullYear(), managerLeaves=[];
-
-db.collection("manager_single_day_leave").orderBy("date","asc").onSnapshot(snapshot=>{
-  managerLeaves=[];
-  snapshot.forEach(doc=>{
-    const data = doc.data();
-    if(superAdmins.includes(currentUser.email) || data.managerId===currentUser.id){
-      managerLeaves.push({...data, submittedAt: data.submittedAt?.toDate ? data.submittedAt.toDate() : new Date(data.submittedAt)});
-    }
-  });
-  const years = managerLeaves.map(l=>parseInt(l.date.split("-")[0]));
-  calYear = years.length ? Math.max(...years) : new Date().getFullYear();
-  renderCalendar();
-});
-
-function renderCalendar(){ if(viewMode==="month") renderMonth(); else renderYear(); }
+let viewMode="year", calMonth=new Date().getMonth(), calYear=new Date().getFullYear();
+function renderCalendar(){ viewMode==="month"?renderMonth():renderYear(); }
 
 function renderMonth(){
   const container=document.getElementById("calendarContainer"); container.className="calendar"; container.innerHTML="";
@@ -232,7 +253,7 @@ function renderYear(){
   const container=document.getElementById("calendarContainer"); container.className="year-view"; container.innerHTML="";
   for(let m=0;m<12;m++){
     const monthDiv=document.createElement("div"); monthDiv.className="year-box";
-    const monthTitle=document.createElement("div"); monthTitle.innerHTML=`<strong>${new Date(calYear,m,1).toLocaleString('default',{month:'short'})} ${calYear}</strong>`; monthDiv.appendChild(monthTitle)
+    const monthTitle=document.createElement("div"); monthTitle.innerHTML=`<strong>${new Date(calYear,m,1).toLocaleString('default',{month:'short'})} ${calYear}</strong>`; monthDiv.appendChild(monthTitle);
     const monthCalendar=document.createElement("div"); monthCalendar.className="calendar"; monthCalendar.style.marginTop="8px";
     ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(dayName=>{ const header=document.createElement("div"); header.className="cal-header"; header.textContent=dayName; monthCalendar.appendChild(header); });
     const first=new Date(calYear,m,1); const daysInMonth=new Date(calYear,m+1,0).getDate(); const startDay=first.getDay();
