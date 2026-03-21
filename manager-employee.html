@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FedEx Leave System - Manager Employee</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
@@ -15,102 +14,41 @@
   --status-cancelled: #888888;
 }
 
-/* BODY */
-body {
-  margin:0;
-  font-family: Arial, sans-serif;
-  background: var(--bg-gray);
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-}
+body { margin:0; font-family: Arial,sans-serif; background: var(--bg-gray); display:flex; flex-direction:column; min-height:100vh; }
 
-/* HEADER */
-.main-header {
-  background: linear-gradient(90deg, #4D148C, #3b0f70);
-  color: white;
-  padding: 14px 30px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
+header, footer { background: var(--fedex-purple); color:white; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; }
 
-.header-left { display: flex; align-items: center; gap: 12px; }
-.logo-circle {
-  background: var(--fedex-orange);
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-}
-.system-info { display:flex; flex-direction:column; }
-.system-title { font-weight:bold; font-size:16px; letter-spacing:0.5px; }
-.system-subtitle { font-size:11px; opacity:0.8; }
-
-.header-center { font-size:14px; font-weight:500; opacity:0.9; }
-
-.header-right { display:flex; align-items:center; gap:15px; }
-.user-chip {
-  background: rgba(255,255,255,0.15);
-  padding: 6px 12px; border-radius: 20px;
-  font-size:13px; display:flex; align-items:center; gap:6px;
-}
-.logout-btn {
-  background: var(--fedex-orange); color:white;
-  border:none; padding:7px 14px; border-radius:6px;
-  cursor:pointer; font-weight:bold; transition:0.2s;
-}
-.logout-btn:hover { background:darkorange; transform:translateY(-1px); }
-
-/* MAIN */
 main { flex:1; padding:20px 30px; }
+
 h2 { color: var(--fedex-purple); text-align:center; margin-bottom:20px; }
 
-/* TOP CONTROLS */
-.top-controls {
-  display:flex; flex-wrap:wrap; align-items:flex-end; gap:20px;
-  background:#fff; padding:16px 20px; border-radius:10px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-bottom:20px;
-}
+.top-controls { display:flex; flex-wrap:wrap; align-items:flex-end; gap:20px; background:#fff; padding:16px 20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-bottom:20px; }
 .control-group { display:flex; flex-direction:column; font-size:0.85em; }
 .control-group label { font-weight:bold; margin-bottom:4px; color:#333; }
-.control-group select, .control-group input {
-  padding:8px 12px; border-radius:6px; border:1px solid #ccc; font-size:0.95em; min-width:180px;
-}
+.control-group select, .control-group input { padding:8px 12px; border-radius:6px; border:1px solid #ccc; font-size:0.95em; min-width:180px; }
 .submit-inline { margin-top:22px; padding:10px 20px; background:var(--fedex-orange); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; height:42px; }
 .submit-inline:hover { background:darkorange; }
 
-/* TABLE */
 .card { background:white; padding:25px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); }
-table { width:100%; border-collapse:collapse; min-width:600px; table-layout:fixed; }
+table { width:100%; border-collapse:collapse; min-width:600px; table-layout: fixed; }
 th, td { padding:12px; border-bottom:1px solid var(--table-border); text-align:left; word-wrap:break-word; overflow-wrap:break-word; }
-th { background:var(--table-header-bg); color:white; }
 td.reason-col { max-width:250px; }
+th { background:var(--table-header-bg); color:white; }
+
 .status-Pending { color:orange; font-weight:bold; }
 .status-Approved { color:green; font-weight:bold; }
 .status-Rejected { color:red; font-weight:bold; }
 .status-Cancelled { color:var(--status-cancelled); font-style:italic; font-weight:bold; }
 
-/* ACCORDION */
-.accordion {
-  background: var(--fedex-purple);
-  color: white; cursor: pointer;
-  padding: 14px 18px; width: 100%; border:none; border-radius:8px;
-  text-align:left; font-size:0.95em; font-weight:bold; margin-bottom:10px; transition:0.3s;
-}
+.accordion { background: var(--fedex-purple); color:white; cursor:pointer; padding:14px 18px; width:100%; border:none; border-radius:8px; text-align:left; font-size:0.95em; font-weight:bold; margin-bottom:10px; transition:0.3s; }
 .accordion:hover { background:#3a0f6f; }
 .accordion:after { content:'\f078'; font-family:"Font Awesome 6 Free"; font-weight:900; float:right; }
 .accordion.active:after { content:'\f077'; }
 .panel { display:none; }
 
-/* CALENDAR */
 .calendar-controls { display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:15px; flex-wrap:wrap; }
 .calendar-controls button { background: var(--fedex-orange); border:none; padding:6px 12px; border-radius:6px; color:white; cursor:pointer; font-weight:bold; }
+
 .calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
 .cal-header { background: var(--table-header-bg); color:white; padding:6px; text-align:center; font-weight:bold; border-radius:4px; }
 .cal-cell { border:1px solid #ddd; min-height:80px; padding:4px; font-size:12px; border-radius:6px; }
@@ -121,7 +59,6 @@ td.reason-col { max-width:250px; }
 .tag-Rejected { background:red; }
 .tag-Cancelled { background:#888; }
 
-/* YEAR VIEW */
 .year-view { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
 .year-view .calendar { gap:2px; }
 .year-view .cal-header { padding:4px; font-size:10px; }
@@ -130,20 +67,31 @@ td.reason-col { max-width:250px; }
 .year-view .cal-tag { display:none; }
 .year-box { border:1px solid #ddd; border-radius:8px; padding:10px; background:#fff; cursor:pointer; text-align:center; font-weight:bold; }
 
-/* MOBILE */
+.main-header { background: linear-gradient(90deg,#4D148C,#3b0f70); color:white; padding:14px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 15px rgba(0,0,0,0.2); position:sticky; top:0; z-index:100; }
+.header-left { display:flex; align-items:center; gap:12px; }
+.logo-circle { background: var(--fedex-orange); width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 3px 8px rgba(0,0,0,0.3); }
+.system-info { display:flex; flex-direction:column; }
+.system-title { font-weight:bold; font-size:16px; letter-spacing:0.5px; }
+.system-subtitle { font-size:11px; opacity:0.8; }
+.header-center { font-size:14px; font-weight:500; opacity:0.9; }
+.header-right { display:flex; align-items:center; gap:15px; }
+.user-chip { background: rgba(255,255,255,0.15); padding:6px 12px; border-radius:20px; font-size:13px; display:flex; align-items:center; gap:6px; }
+.logout-btn { background: var(--fedex-orange); color:white; border:none; padding:7px 14px; border-radius:6px; cursor:pointer; font-weight:bold; transition:0.2s; }
+.logout-btn:hover { background:darkorange; transform:translateY(-1px); }
+
 @media(max-width:768px){
-  .top-controls { flex-direction:column; align-items:stretch; } 
-  .control-group select, .control-group input { min-width:100%; } 
-  .submit-inline { width:100%; } 
-  .main-header { flex-direction:column; align-items:flex-start; gap:10px; } 
-  .header-right { width:100%; justify-content:space-between; } 
+  .main-header { flex-direction:column; align-items:flex-start; gap:10px; }
+  .header-right { width:100%; justify-content:space-between; }
+  .top-controls { flex-direction:column; align-items:stretch; }
+  .control-group select, .control-group input { min-width:100%; }
+  .submit-inline { width:100%; }
 }
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
 </head>
+
 <body>
 
 <header class="main-header">
@@ -151,12 +99,12 @@ td.reason-col { max-width:250px; }
     <div class="logo-circle"><i class="fas fa-plane"></i></div>
     <div class="system-info">
       <div class="system-title">FedEx Leave Portal</div>
-      <div class="system-subtitle">Manager Employee System</div>
+      <div class="system-subtitle">Manager Employee Dashboard</div>
     </div>
   </div>
-  <div class="header-center"><span id="welcomeMsg">Welcome</span></div>
+  <div class="header-center"><span id="welcomeMsg">Manager Employee Dashboard</span></div>
   <div class="header-right">
-    <div class="user-chip"><i class="fas fa-user"></i><span id="headerUserName"></span></div>
+    <div class="user-chip"><i class="fas fa-user"></i> <span id="headerUserName"></span></div>
     <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
   </div>
 </header>
@@ -164,15 +112,10 @@ td.reason-col { max-width:250px; }
 <main>
   <h2 id="userName">Welcome!</h2>
 
-  <!-- TOP CONTROLS -->
   <div class="top-controls">
     <div class="control-group">
       <label for="type">Leave Type</label>
-      <select id="type">
-        <option>Vacation</option>
-        <option>CTO</option>
-        <option>RDCO</option>
-      </select>
+      <select id="type"><option>Vacation</option><option>CTO</option><option>RDCO</option></select>
     </div>
     <div class="control-group">
       <label for="date">Leave Date</label>
@@ -185,7 +128,6 @@ td.reason-col { max-width:250px; }
     <button class="submit-inline" id="submitBtn">Submit Leave</button>
   </div>
 
-  <!-- ACCORDION CALENDAR -->
   <button class="accordion">Click to View Plotted Leave Requests</button>
   <div class="panel">
     <div class="card" style="margin-bottom:20px;">
@@ -200,13 +142,10 @@ td.reason-col { max-width:250px; }
     </div>
   </div>
 
-  <!-- LEAVE TABLE -->
   <div class="card">
     <h3>My Leave Tickets</h3>
     <table id="table">
-      <tr>
-        <th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Admin Notes</th><th>Submitted Date</th>
-      </tr>
+      <tr><th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Admin Notes</th><th>Submitted Date</th></tr>
     </table>
   </div>
 </main>
@@ -214,7 +153,7 @@ td.reason-col { max-width:250px; }
 <footer>© FedEx 2026</footer>
 
 <script>
-// Firebase Init
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain: "fedex-attendance-system.firebaseapp.com",
@@ -223,157 +162,130 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Check Login
+// Current user
 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 if(!currentUser){ alert("Please login first"); location.href="index.html"; }
-
-document.getElementById("welcomeMsg").textContent = "Manager Dashboard";
 document.getElementById("headerUserName").textContent = currentUser.name;
 
+// SuperAdmins can see all
+const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
+
 // Logout
-function logout() { 
-  if(confirm("Are you sure you want to logout?")){ 
-    localStorage.removeItem("currentUser"); 
-    location.href="index.html"; 
-  } 
-}
+function logout(){ if(confirm("Are you sure you want to logout?")){ localStorage.removeItem("currentUser"); location.href="index.html"; } }
 
 // Set default PH date
+const dateEl = document.getElementById("date");
 const nowPH = new Date().toLocaleString("en-US",{timeZone:"Asia/Manila"});
 const phDate = new Date(nowPH);
-const year = phDate.getFullYear();
-const month = phDate.getMonth();
-const day = phDate.getDate();
-document.getElementById("date").value = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+dateEl.value = `${phDate.getFullYear()}-${String(phDate.getMonth()+1).padStart(2,"0")}-${String(phDate.getDate()).padStart(2,"0")}`;
 
-// Elements
-const typeEl = document.getElementById("type");
-const dateEl = document.getElementById("date");
-const reasonEl = document.getElementById("reason");
-const submitBtn = document.getElementById("submitBtn");
-
-// Submit Leave
-submitBtn.addEventListener("click", async ()=>{
-  if(!dateEl.value || !reasonEl.value){ alert("Complete all fields"); return; }
+// Submit leave
+document.getElementById("submitBtn").addEventListener("click", async ()=>{
+  if(!dateEl.value||!document.getElementById("reason").value){ alert("Complete all fields"); return; }
+  const now = new Date();
+  const leaveData = { 
+    managerId: currentUser.id, 
+    managerName: currentUser.name, 
+    type: document.getElementById("type").value, 
+    date: dateEl.value, 
+    reason: document.getElementById("reason").value, 
+    status:"Pending", 
+    submittedAt: now 
+  };
   try{
-    await db.collection("manager_single_day_leave").add({
-      managerId: currentUser.id,
-      managerName: currentUser.name,
-      type: typeEl.value,
-      date: dateEl.value,
-      reason: reasonEl.value,
-      status: "Pending",
-      submittedAt: new Date()
-    });
+    await db.collection("manager_single_day_leave").add(leaveData); 
     alert("Leave request submitted!");
-    reasonEl.value=""; 
-    dateEl.value=`${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-  } catch(err){ alert("Error: "+err.message); }
+    dateEl.value = ""; document.getElementById("reason").value = "";
+  }catch(err){ alert("Error submitting leave: "+err.message); }
 });
 
-// Load Leave Tickets
+// Load leaves
 function loadLeaves(){
   const tableEl = document.getElementById("table");
-
-  let query = db.collection("manager_single_day_leave");
-
-  // SuperAdmins (see all tickets)
-  const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
-  if(superAdmins.includes(currentUser.email)){
-    query = query.orderBy("date","asc");
-  } else {
-    // Normal manager-employee users: only their own tickets
-    query = query.where("managerId","==",currentUser.id).orderBy("date","asc");
-  }
-
-  query.onSnapshot(snapshot=>{
-    tableEl.innerHTML=`<tr>
-      <th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Admin Notes</th><th>Submitted Date</th>
-    </tr>`;
-    snapshot.forEach(doc=>{
-      const l = doc.data();
-      const submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt);
-      const dateStr = submittedDate.toLocaleString("en-PH",{timeZone:"Asia/Manila",year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
-      tableEl.innerHTML += `<tr>
-        <td>${l.type}</td><td>${l.date}</td><td class="reason-col">${l.reason}</td>
-        <td class="status-${l.status}">${l.status}</td>
-        <td class="reason-col">${l.notes?l.notes:(l.status==="Rejected"?"No note provided":"-")}</td>
-        <td>${dateStr}</td>
-      </tr>`;
-    });
-  });
+  db.collection("manager_single_day_leave").orderBy("date","asc")
+    .onSnapshot(snapshot=>{
+      tableEl.innerHTML = `<tr><th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Admin Notes</th><th>Submitted Date</th></tr>`;
+      snapshot.forEach(doc=>{
+        const l = doc.data();
+        if(!superAdmins.includes(currentUser.email) && l.managerId !== currentUser.id) return;
+        let submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
+        const dateStr = submittedDate.toLocaleString("en-PH",{timeZone:"Asia/Manila",year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+        tableEl.innerHTML += `<tr>
+<td>${l.type}</td>
+<td>${l.date}</td>
+<td class="reason-col">${l.reason}</td>
+<td class="status-${l.status}">${l.status}</td>
+<td class="reason-col">${l.notes ? l.notes : (l.status==="Rejected"?"No note provided":"-")}</td>
+<td>${dateStr}</td>
+</tr>`;
+      });
+    }, err=>{ alert("Error loading leaves: "+err.message); });
 }
-
 loadLeaves();
 
 // Accordion
-const acc = document.querySelector(".accordion");
-const panel = document.querySelector(".panel");
-acc.addEventListener("click", function(){ 
-  this.classList.toggle("active"); 
-  panel.style.display = panel.style.display==="block"?"none":"block"; 
-});
+const acc=document.querySelector(".accordion");
+const panel=document.querySelector(".panel");
+acc.addEventListener("click",()=>{ acc.classList.toggle("active"); panel.style.display = (panel.style.display==="block"?"none":"block"); });
 
 // Calendar
-let viewMode="year", calMonth=month, calYear=year;
-let managerLeaves=[];
-
+let viewMode="year", calMonth=new Date().getMonth(), calYear=new Date().getFullYear(), managerLeaves=[];
 db.collection("manager_single_day_leave").orderBy("date","asc").onSnapshot(snapshot=>{
   managerLeaves=[];
   snapshot.forEach(doc=>{
-    const d = doc.data();
-    managerLeaves.push({...d, submittedAt:d.submittedAt?.toDate?d.submittedAt.toDate():new Date(d.submittedAt)});
+    const data = doc.data();
+    if(!superAdmins.includes(currentUser.email) && data.managerId !== currentUser.id) return;
+    managerLeaves.push({...data, submittedAt: data.submittedAt?.toDate ? data.submittedAt.toDate() : new Date(data.submittedAt)});
   });
   const years = managerLeaves.map(l=>parseInt(l.date.split("-")[0]));
-  calYear = years.length ? Math.max(...years):year;
+  calYear = years.length ? Math.max(...years) : new Date().getFullYear();
   renderCalendar();
 });
 
-function renderCalendar(){ viewMode==="month"?renderMonth():renderYear(); }
+function renderCalendar(){ if(viewMode==="month") renderMonth(); else renderYear(); }
 
 function renderMonth(){
-  const container=document.getElementById("calendarContainer");
-  container.className="calendar"; container.innerHTML="";
-  const first=new Date(calYear,calMonth,1);
-  const days=new Date(calYear,calMonth+1,0).getDate();
-  const start=first.getDay();
-  document.getElementById("calendarLabel").textContent=first.toLocaleString('default',{month:'long'})+" "+calYear;
-  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{const h=document.createElement("div"); h.className="cal-header"; h.textContent=d; container.appendChild(h);});
+  const container=document.getElementById("calendarContainer"); container.className="calendar"; container.innerHTML="";
+  const first=new Date(calYear, calMonth,1); const days=new Date(calYear, calMonth+1,0).getDate(); const start=first.getDay();
+  document.getElementById("calendarLabel").textContent = first.toLocaleString('default',{month:'long'})+" "+calYear;
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{ const h=document.createElement("div"); h.className="cal-header"; h.textContent=d; container.appendChild(h); });
   for(let i=0;i<start;i++) container.appendChild(document.createElement("div"));
   for(let d=1;d<=days;d++){
     const cell=document.createElement("div"); cell.className="cal-cell";
-    const dayDiv=document.createElement("div"); dayDiv.className="cal-day"; dayDiv.textContent=d; cell.appendChild(dayDiv);
-    const fullDate=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const day=document.createElement("div"); day.className="cal-day"; day.textContent=d; cell.appendChild(day);
+    const fullDate=calYear+"-"+String(calMonth+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
     managerLeaves.filter(l=>l.date===fullDate).forEach(l=>{
-      const tag=document.createElement("div"); tag.className="cal-tag tag-"+l.status; 
-      tag.textContent=`${l.managerName}: ${l.type} (${l.status})`; 
-      cell.appendChild(tag);
+      const tag=document.createElement("div"); tag.className="cal-tag tag-"+l.status; tag.textContent=`${l.managerName}: ${l.type} (${l.status})`; cell.appendChild(tag);
     });
     container.appendChild(cell);
   }
 }
 
 function renderYear(){
-  const container=document.getElementById("calendarContainer");
-  container.className="year-view"; container.innerHTML="";
+  const container=document.getElementById("calendarContainer"); container.className="year-view"; container.innerHTML="";
   for(let m=0;m<12;m++){
     const monthDiv=document.createElement("div"); monthDiv.className="year-box";
     const monthTitle=document.createElement("div"); monthTitle.innerHTML=`<strong>${new Date(calYear,m,1).toLocaleString('default',{month:'short'})} ${calYear}</strong>`; monthDiv.appendChild(monthTitle);
     const monthCalendar=document.createElement("div"); monthCalendar.className="calendar"; monthCalendar.style.marginTop="8px";
-    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(dayName=>{const header=document.createElement("div"); header.className="cal-header"; header.textContent=dayName; monthCalendar.appendChild(header);});
+    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(dayName=>{ const header=document.createElement("div"); header.className="cal-header"; header.textContent=dayName; monthCalendar.appendChild(header); });
     const first=new Date(calYear,m,1); const daysInMonth=new Date(calYear,m+1,0).getDate(); const startDay=first.getDay();
     for(let i=0;i<startDay;i++) monthCalendar.appendChild(document.createElement("div"));
     for(let d=1;d<=daysInMonth;d++){
-      const cell=document.createElement("div"); cell.className="cal-cell"; cell.textContent=d;
+      const cell=document.createElement("div"); cell.className="cal-cell";
+      const dayNumber=document.createElement("div"); dayNumber.className="cal-day"; dayNumber.textContent=d; cell.appendChild(dayNumber);
+      const fullDate=calYear+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+      if(managerLeaves.some(l=>l.date===fullDate)) cell.style.background="#f3e8ff";
+      cell.addEventListener("click",()=>{ calMonth=m; viewMode="month"; renderCalendar(); });
       monthCalendar.appendChild(cell);
     }
     monthDiv.appendChild(monthCalendar);
     container.appendChild(monthDiv);
   }
+  document.getElementById("calendarLabel").textContent=calYear;
 }
 
-function changeMonth(offset){ calMonth+=offset; if(calMonth<0){calMonth=11; calYear--; }else if(calMonth>11){ calMonth=0; calYear++; } renderCalendar(); }
 function setViewMode(mode){ viewMode=mode; renderCalendar(); }
+function changeMonth(dir){ calMonth+=dir; if(calMonth<0){ calMonth=11; calYear--; } if(calMonth>11){ calMonth=0; calYear++; } renderCalendar(); }
 </script>
 
 </body>
