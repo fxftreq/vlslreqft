@@ -100,15 +100,8 @@ const db = firebase.firestore();
 
 /* ===== ELEMENTS ===== */
 const loginBtn = document.getElementById("loginBtn");
-const error = document.getElementById("error");
 const passwordInput = document.getElementById("password");
 const togglePassword = document.getElementById("togglePassword");
-const forgotModal = document.getElementById("forgotModal");
-const forgotLink = document.getElementById("forgotLink");
-const closeModal = document.querySelector(".close");
-const resetBtn = document.getElementById("resetBtn");
-const resetError = document.getElementById("resetError");
-const resetSuccess = document.getElementById("resetSuccess");
 
 /* ===== SHOW/HIDE PASSWORD ===== */
 togglePassword.addEventListener("click", () => {
@@ -125,87 +118,71 @@ togglePassword.addEventListener("click", () => {
 loginBtn.addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = passwordInput.value.trim();
+  const loginType = document.getElementById("loginType").value;
+
+  if(!email || !password){
+    alert("Please enter email and password");
+    return;
+  }
 
   try {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
-    // Look in both collections
-    const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
-    const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
+    // 🔍 Check Firestore role
+    const snapM = await db.collection("manager_leave_user")
+      .where("email","==",email).limit(1).get();
 
-    let role = null, userData = null;
+    const snapTL = await db.collection("leave_users")
+      .where("email","==",email).limit(1).get();
+
+    let role = null;
+    let userData = null;
 
     if(!snapM.empty){
+      role = "manager";
       userData = snapM.docs[0].data();
-      role = "manager"; // always admin
-    } else if(!snapTL.empty){
+    } 
+    else if(!snapTL.empty){
       userData = snapTL.docs[0].data();
-      // Check if this TL user is actually an admin for TL page
-      if(userData.isAdmin) role = "manager";  // send to admin page
-      else role = "team_leader";              // regular TL
-    } else {
-      alert("You do not have access");
+      role = userData.isAdmin ? "manager" : "team_leader";
+    }
+
+    if(!role){
+      alert("No access found.");
       await auth.signOut();
       return;
     }
 
-    // Store user info
+    // 💾 Save user session
     localStorage.setItem("currentUser", JSON.stringify({
-      id: userData.id || user.uid,
+      id: user.uid,
       email: user.email,
       name: userData.name,
       role: role
     }));
 
- const loginType = document.getElementById("loginType").value;
+    /* ===== ✅ FIXED REDIRECTION ===== */
 
-// 🚀 Redirect logic
-if(role === "manager" && loginType === "manager"){
-  location.href = "manager-admin.html";
-}
-else if(role === "manager" && loginType === "team_leader"){
-  location.href = "admin.html";
-}
-else if(role === "team_leader" && loginType === "team_leader"){
-  location.href = "employee.html";
-}
-else {
-  alert("Invalid login type for your account.");
-  await auth.signOut();
-}
-});
+    if(role === "manager"){
+      if(loginType === "manager"){
+        location.href = "manager-admin.html";
+      } else {
+        location.href = "manager-employee.html";
+      }
+    }
+    else if(role === "team_leader"){
+      if(loginType === "team_leader"){
+        location.href = "employee.html";
+      } else {
+        alert("You are not allowed to login as Manager.");
+        await auth.signOut();
+      }
+    }
 
-/* ===== FORGOT PASSWORD MODAL ===== */
-forgotLink.addEventListener("click", e => {
-  e.preventDefault();
-  forgotModal.style.display = "block";
-  resetError.textContent = "";
-  resetSuccess.textContent = "";
-  document.getElementById("resetEmail").value = "";
-});
-closeModal.addEventListener("click", () => forgotModal.style.display = "none");
-window.addEventListener("click", e => { if(e.target===forgotModal) forgotModal.style.display="none"; });
-
-/* ===== RESET PASSWORD ===== */
-resetBtn.addEventListener("click", async () => {
-  resetError.textContent = "";
-  resetSuccess.textContent = "";
-  const email = document.getElementById("resetEmail").value.trim();
-  if(!email){ resetError.textContent="Please enter your email."; return; }
-
-  try {
-    // Check email exists in Firestore
-    const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
-    const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
-    if(snapTL.empty && snapM.empty){ resetError.textContent="Email not found in system."; return; }
-
-    await auth.sendPasswordResetEmail(email);
-    resetSuccess.textContent = "Password reset email sent! Check your inbox.";
-    setTimeout(()=>{ forgotModal.style.display="none"; }, 2500);
   } catch(err){
     console.error(err);
-    resetError.textContent = "Failed to send reset email: " + err.message;
+    alert("Login failed: " + err.message);
   }
 });
 </script>
