@@ -199,25 +199,47 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
 });
 
 // Load leaves for table
+const tableEl = document.getElementById("table");
 let managerLeaves = [];
-function loadLeaves(){
-  db.collection("manager_single_day_leave").orderBy("date","asc")
-    .onSnapshot(snapshot=>{
-      managerLeaves=[];
-      const tableEl = document.getElementById("table");
-      tableEl.innerHTML = `<tr><th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Submitted Date</th></tr>`;
-      snapshot.forEach(doc=>{
+
+function loadLeaves() {
+  db.collection("manager_single_day_leave")
+    .orderBy("date", "asc")
+    .onSnapshot(snapshot => {
+      tableEl.innerHTML = `
+        <tr>
+          <th>Leave Type</th>
+          <th>Leave Date</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Submitted Date</th>
+        </tr>`;
+      managerLeaves = [];
+      snapshot.forEach(doc => {
         const l = doc.data();
-        if(l.managerId !== currentUser.id) return;
-        managerLeaves.push({...l, submittedAt: l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt)});
-        const submittedStr = new Date(managerLeaves[managerLeaves.length-1].submittedAt).toLocaleString("en-PH",{timeZone:"Asia/Manila",year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+        if(l.managerId !== currentUser.id) return; // only current manager
+        // Convert timestamp if needed
+        const submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
+        const submittedStr = submittedDate.toLocaleString("en-PH", {
+          timeZone: "Asia/Manila",
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
         tableEl.innerHTML += `<tr>
-<td>${l.type}</td><td>${l.date}</td><td class="reason-col">${l.reason}</td>
-<td class="status-${l.status}">${l.status}</td>
-<td>${submittedStr}</td></tr>`;
+          <td>${l.type}</td>
+          <td>${l.date}</td>
+          <td class="reason-col">${l.reason}</td>
+          <td class="status-${l.status}">${l.status}</td>
+          <td>${submittedStr}</td>
+        </tr>`;
+        managerLeaves.push({...l, submittedAt: submittedDate});
       });
-    });
+    }, err => { alert("Error loading leaves: " + err.message); });
 }
+
 loadLeaves();
 
 // Accordion
