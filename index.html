@@ -158,14 +158,22 @@ loginBtn.addEventListener("click", async () => {
       role: role
     }));
 
-    // Redirect based on role
-    if(role === "manager") location.href = "admin.html";       // admins go to admin page
-    else if(role === "team_leader") location.href = "employee.html"; // TL page
+ const loginType = document.getElementById("loginType").value;
 
-  } catch(err){
-    console.error(err);
-    alert("Login failed: " + err.message);
-  }
+// 🚀 Redirect logic
+if(role === "manager" && loginType === "manager"){
+  location.href = "manager-admin.html";
+}
+else if(role === "manager" && loginType === "team_leader"){
+  location.href = "admin.html";
+}
+else if(role === "team_leader" && loginType === "team_leader"){
+  location.href = "employee.html";
+}
+else {
+  alert("Invalid login type for your account.");
+  await auth.signOut();
+}
 });
 
 /* ===== FORGOT PASSWORD MODAL ===== */
