@@ -7,12 +7,17 @@
 
 <style>
 :root{
---fedex-purple:#4D148C;
---fedex-orange:#FF6600;
---border:#d1d5db;
+  --fedex-purple:#4D148C;
+  --fedex-orange:#FF6600;
+  --border:#d1d5db;
 }
 *{ box-sizing:border-box; }
-body{ margin:0; font-family: Arial, sans-serif; background: linear-gradient(-45deg, #4D148C, #FF6600, #4D148C, #FF6600); background-size: 400% 400%; animation: gradientAnimation 15s ease infinite; min-height:100vh; display:flex; justify-content:center; align-items:center; }
+body{
+  margin:0; font-family: Arial, sans-serif; 
+  background: linear-gradient(-45deg, #4D148C, #FF6600, #4D148C, #FF6600); 
+  background-size: 400% 400%; animation: gradientAnimation 15s ease infinite; 
+  min-height:100vh; display:flex; justify-content:center; align-items:center; 
+}
 @keyframes gradientAnimation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 .login-card{ background: rgba(255,255,255,0.95); width:100%; max-width:420px; padding:32px 28px; border-radius:6px; box-shadow:0 10px 25px rgba(0,0,0,.15); }
 .logo{text-align:center; margin-bottom:18px;}
@@ -43,44 +48,44 @@ button{ width:100%; padding:12px; background:var(--fedex-purple); border:none; c
 <body>
 
 <div class="login-card">
-<div class="logo">
-<img src="fedex.png" style="height:130px;">
-</div>
-<div class="purple-id">Login</div>
+  <div class="logo">
+    <img src="fedex.png" style="height:130px;">
+  </div>
+  <div class="purple-id">Login</div>
 
-<label>Email</label>
-<input type="email" id="email" placeholder="Your email">
+  <label>Email</label>
+  <input type="email" id="email" placeholder="Your email">
 
-<label>Password</label>
-<div class="password-wrapper">
-<input type="password" id="password" placeholder="Password">
-<i class="fa-solid fa-eye" id="togglePassword"></i>
-</div>
+  <label>Password</label>
+  <div class="password-wrapper">
+    <input type="password" id="password" placeholder="Password">
+    <i class="fa-solid fa-eye" id="togglePassword"></i>
+  </div>
 
-<label>Login As</label>
+  <label>Login As</label>
   <select id="loginType">
     <option value="team_leader">Team Leader</option>
     <option value="manager">Manager</option>
   </select>
 
-<button id="loginBtn">Login</button>
-<div id="error"></div>
-<div class="forgot-password">
-<a href="#" id="forgotLink">Forgot password?</a>
-</div>
+  <button id="loginBtn">Login</button>
+  <div id="error"></div>
+  <div class="forgot-password">
+    <a href="#" id="forgotLink">Forgot password?</a>
+  </div>
 </div>
 
 <!-- Forgot Password Modal -->
 <div id="forgotModal" class="modal">
-<div class="modal-content">
-<span class="close">&times;</span>
-<h2>Reset Password</h2>
-<p>Enter your email to reset your password:</p>
-<input type="email" id="resetEmail" placeholder="Your email">
-<button id="resetBtn">Send Reset Email</button>
-<div id="resetError"></div>
-<div id="resetSuccess"></div>
-</div>
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Reset Password</h2>
+    <p>Enter your email to reset your password:</p>
+    <input type="email" id="resetEmail" placeholder="Your email">
+    <button id="resetBtn">Send Reset Email</button>
+    <div id="resetError"></div>
+    <div id="resetSuccess"></div>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -114,7 +119,7 @@ togglePassword.addEventListener("click", () => {
   }
 });
 
-// Login
+// Login logic
 loginBtn.addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = passwordInput.value.trim();
@@ -129,12 +134,10 @@ loginBtn.addEventListener("click", async () => {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
-    // Super Admins (full access)
     const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
-    // Team Leader admin exceptions (can access admin.html even if manager-employee)
     const teamLeaderAdmins = ["Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com", ...superAdmins];
 
-    // Get user role from Firestore
+    // Fetch role
     let role = null;
     let userData = null;
 
@@ -153,39 +156,43 @@ loginBtn.addEventListener("click", async () => {
       return;
     }
 
-    // Super admin override
+    // SuperAdmin routing
     if(superAdmins.includes(email)){
-      if(loginType==="team_leader") location.href="admin.html";
-      else if(loginType==="manager") location.href="manager-admin.html";
-      return;
-    }
-
-    // Team Leader login
-    if(loginType==="team_leader"){
-      if(teamLeaderAdmins.includes(email)){
-        location.href = "admin.html";
-        localStorage.setItem("currentUser", JSON.stringify({
-          id: user.uid,
-          email: user.email,
-          name: userData.name,
-          role: role
-        }));
-        return;
-      }
-
-      if(role !== "team_leader"){
-        alert("You are not allowed to login as Team Leader.");
-        await auth.signOut();
-        return;
-      }
-
-      location.href = "employee.html";
       localStorage.setItem("currentUser", JSON.stringify({
         id: user.uid,
         email: user.email,
         name: userData.name,
         role: role
       }));
+      if(loginType==="team_leader") location.href = "admin.html";
+      else if(loginType==="manager") location.href = "manager-admin.html";
+      return;
+    }
+
+    // Team Leader login
+    if(loginType==="team_leader"){
+      if(teamLeaderAdmins.includes(email)){
+        localStorage.setItem("currentUser", JSON.stringify({
+          id: user.uid,
+          email: user.email,
+          name: userData.name,
+          role: role
+        }));
+        location.href = "admin.html";
+        return;
+      }
+      if(role !== "team_leader"){
+        alert("You are not allowed to login as Team Leader.");
+        await auth.signOut();
+        return;
+      }
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role
+      }));
+      location.href = "employee.html";
       return;
     }
 
@@ -196,19 +203,17 @@ loginBtn.addEventListener("click", async () => {
         await auth.signOut();
         return;
       }
-
-      if(superAdmins.includes(email)){
-        location.href = "manager-admin.html";
-      } else {
-        location.href = "manager-employee.html";
-      }
-
       localStorage.setItem("currentUser", JSON.stringify({
         id: user.uid,
         email: user.email,
         name: userData.name,
         role: role
       }));
+      if(superAdmins.includes(email)){
+        location.href = "manager-admin.html";
+      } else {
+        location.href = "manager-employee.html";
+      }
       return;
     }
 
