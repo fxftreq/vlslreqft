@@ -141,29 +141,52 @@ document.getElementById("headerUserName").textContent = currentUser.name;
 function logout(){ if(confirm("Are you sure you want to logout?")){ localStorage.removeItem("currentUser"); location.href="index.html"; } }
 
 // Load manager-employee leave tickets
-function loadLeaves(){
+function loadLeaves() {
   const tableEl = document.getElementById("table");
-  db.collection("manager_single_day_leave").orderBy("date","asc")
-    .onSnapshot(snapshot=>{
-      tableEl.innerHTML = `<tr><th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Admin Notes</th><th>Submitted Date</th></tr>`;
-      snapshot.forEach(doc=>{
-        const l = doc.data();
-        if(!superAdmins.includes(currentUser.email) && l.managerId !== currentUser.id) return;
+  db.collection("manager_single_day_leave")
+    .orderBy("date", "asc")
+    .onSnapshot(snapshot => {
+      tableEl.innerHTML = `<tr>
+        <th>Leave Type</th>
+        <th>Leave Date</th>
+        <th>Reason</th>
+        <th>Status</th>
+        <th>Admin Notes</th>
+        <th>Submitted Date</th>
+      </tr>`;
 
-        const submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
-        const dateStr = submittedDate.toLocaleString("en-PH",{timeZone:"Asia/Manila",year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+      snapshot.forEach(doc => {
+        const l = doc.data();
+
+        // Only show leaves managed by this manager
+        if (l.managerId !== currentUser.id) return;
+
+        let submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
+        const dateStr = submittedDate.toLocaleString("en-PH", {
+          timeZone: "Asia/Manila",
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+
         tableEl.innerHTML += `<tr>
-<td>${l.type}</td>
-<td>${l.date}</td>
-<td class="reason-col">${l.reason}</td>
-<td class="status-${l.status}">${l.status}</td>
-<td class="reason-col">${l.notes || (l.status==="Rejected"?"No note provided":"-")}</td>
-<td>${dateStr}</td>
-</tr>`;
+          <td>${l.type}</td>
+          <td>${l.date}</td>
+          <td class="reason-col">${l.reason}</td>
+          <td class="status-${l.status}">${l.status}</td>
+          <td class="reason-col">${l.notes ? l.notes : (l.status === "Rejected" ? "No note provided" : "-")}</td>
+          <td>${dateStr}</td>
+        </tr>`;
       });
+    }, err => { 
+      console.error("Error loading leaves:", err); 
     });
 }
 loadLeaves();
+
 
 // Accordion
 const acc = document.querySelector(".accordion");
