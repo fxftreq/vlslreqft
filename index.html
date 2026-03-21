@@ -2,188 +2,219 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FedEx Leave Portal - Login</title>
+<title>FedEx Leave System | Login</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-body{
-  font-family: Arial;
-  background:#f4f4f6;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
+:root{
+  --fedex-purple:#4D148C;
+  --fedex-orange:#FF6600;
+  --border:#d1d5db;
 }
-
-.login-box{
-  background:white;
-  padding:30px;
-  border-radius:10px;
-  box-shadow:0 4px 15px rgba(0,0,0,0.2);
-  width:320px;
+*{ box-sizing:border-box; }
+body{ 
+  margin:0; 
+  font-family: Arial, sans-serif; 
+  background: linear-gradient(-45deg, #4D148C, #FF6600, #4D148C, #FF6600); 
+  background-size: 400% 400%; 
+  animation: gradientAnimation 15s ease infinite; 
+  min-height:100vh; 
+  display:flex; 
+  justify-content:center; 
+  align-items:center; 
 }
-
-h2{
-  text-align:center;
-  color:#4D148C;
+@keyframes gradientAnimation { 
+  0% { background-position: 0% 50%; } 
+  50% { background-position: 100% 50%; } 
+  100% { background-position: 0% 50%; } 
 }
-
-input, select{
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  border-radius:6px;
-  border:1px solid #ccc;
+.login-card{ 
+  background: rgba(255,255,255,0.95); 
+  width:100%; max-width:420px; 
+  padding:32px 28px; 
+  border-radius:6px; 
+  box-shadow:0 10px 25px rgba(0,0,0,.15); 
 }
-
-button{
-  width:100%;
-  margin-top:15px;
-  padding:10px;
-  background:#FF6600;
-  color:white;
-  border:none;
-  border-radius:6px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-button:hover{
-  background:darkorange;
+.logo{text-align:center; margin-bottom:18px;}
+.purple-id{text-align:center; font-weight:bold; color:#666; margin-bottom:20px;}
+label{ font-size:.85em; font-weight:bold; color:#333; }
+input, select{ width:100%; padding:12px; margin-top:6px; margin-bottom:14px; border:1px solid var(--border); border-radius:4px; font-size:.95em; }
+button{ width:100%; padding:12px; background:var(--fedex-purple); border:none; color:#fff; font-weight:bold; border-radius:4px; cursor:pointer; }
+#error{ margin-top:10px; color:#dc2626; font-size:.85em; text-align:center; }
+.password-wrapper{ position:relative; }
+.password-wrapper i{ position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; color:#6b7280; }
+.password-wrapper i:hover{ color:var(--fedex-purple); }
+.forgot-password { text-align: left; margin-top: 10px; }
+.forgot-password a { font-size: 0.85em; color: var(--fedex-purple); text-decoration: none; }
+.forgot-password a:hover { text-decoration: underline; }
+.modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
+.modal-content { background-color: #fff; margin: 10% auto; padding: 20px 30px; border-radius: 6px; width: 90%; max-width: 400px; text-align: center; position: relative; }
+.modal-content input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: 1px solid var(--border);}
+.modal-content button { width: 100%; padding: 12px; margin-top: 10px; background: var(--fedex-purple); color:#fff; font-weight:bold; border:none; border-radius:4px; cursor:pointer; }
+.modal-content h2 { margin-bottom: 10px; }
+.modal-content p { font-size: 0.9em; margin-bottom: 10px; }
+.close { position: absolute; top: 10px; right: 15px; font-size: 1.5em; cursor: pointer; }
+#resetError { margin-top: 10px; color: #dc2626; font-size: 0.85em; text-align: center; }
+#resetSuccess { margin-top: 10px; color: #16a34a; font-size: 0.9em; font-weight: bold; padding: 8px 10px; border-radius: 4px; text-align: center; animation: fadeIn 0.5s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+@media screen and (max-width: 480px) { 
+  body { padding: 10px; align-items: flex-start; } 
+  .login-card { padding: 20px 16px; width: 100%; max-width: 360px; margin-top: 30px; } 
+  .logo img { height: 100px; } 
+  label { font-size: 0.9em; } 
+  input, select, button { font-size: 0.95em; padding: 10px; } 
+  .password-wrapper i { right: 10px; } 
+  .forgot-password a { font-size: 0.8em; } 
+  .modal-content { width: 95%; padding: 15px 20px; margin-top: 20%; } 
+  #resetSuccess, #resetError { font-size: 0.85em; } 
 }
 </style>
+</head>
+<body>
 
-<!-- Firebase -->
+<div class="login-card">
+  <div class="logo">
+    <img src="fedex.png" style="height:130px;">
+  </div>
+  <div class="purple-id">Login</div>
+
+  <label>Email</label>
+  <input type="email" id="email" placeholder="Your email">
+
+  <label>Password</label>
+  <div class="password-wrapper">
+    <input type="password" id="password" placeholder="Password">
+    <i class="fa-solid fa-eye" id="togglePassword"></i>
+  </div>
+
+  <label>Login As</label>
+  <select id="loginType">
+    <option value="team_leader">Team Leader</option>
+    <option value="manager">Manager</option>
+  </select>
+
+  <button id="loginBtn">Login</button>
+  <div id="error"></div>
+  <div class="forgot-password">
+    <a href="#" id="forgotLink">Forgot password?</a>
+  </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div id="forgotModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Reset Password</h2>
+    <p>Enter your email to reset your password:</p>
+    <input type="email" id="resetEmail" placeholder="Your email">
+    <button id="resetBtn">Send Reset Email</button>
+    <div id="resetError"></div>
+    <div id="resetSuccess"></div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-</head>
-<body>
-
-<div class="login-box">
-  <h2>Login</h2>
-
-  <select id="loginAs">
-    <option value="">Login As</option>
-    <option value="Team Leader">Team Leader</option>
-    <option value="Manager">Manager</option>
-  </select>
-
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
-
-  <button onclick="loginUser()">Login</button>
-</div>
-
 <script>
-// Firebase config
-const firebaseConfig = {
+// Firebase init
+firebase.initializeApp({
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain: "fedex-attendance-system.firebaseapp.com",
-  projectId: "fedex-attendance-system",
-  storageBucket: "fedex-attendance-system.firebasestorage.app",
-  messagingSenderId: "1049424874301",
-  appId: "1:1049424874301:web:f94559159b19ee39c19354"
-};
+  projectId: "fedex-attendance-system"
+});
 
-firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// LOGIN FUNCTION
-async function loginUser(){
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const loginAs = document.getElementById("loginAs").value;
+/* ===== ELEMENTS ===== */
+const loginBtn = document.getElementById("loginBtn");
+const passwordInput = document.getElementById("password");
+const togglePassword = document.getElementById("togglePassword");
+const forgotModal = document.getElementById("forgotModal");
+const closeModal = document.querySelector(".close");
+const forgotLink = document.getElementById("forgotLink");
+const resetBtn = document.getElementById("resetBtn");
+const resetEmail = document.getElementById("resetEmail");
+const resetError = document.getElementById("resetError");
+const resetSuccess = document.getElementById("resetSuccess");
 
-  if(!email || !password || !loginAs){
-    alert("Please complete all fields");
-    return;
+/* ===== SHOW/HIDE PASSWORD ===== */
+togglePassword.addEventListener("click", () => {
+  if(passwordInput.type === "password"){
+    passwordInput.type = "text";
+    togglePassword.classList.replace("fa-eye","fa-eye-slash");
+  } else {
+    passwordInput.type = "password";
+    togglePassword.classList.replace("fa-eye-slash","fa-eye");
   }
+});
 
+/* ===== OPEN/CLOSE FORGOT PASSWORD ===== */
+forgotLink.addEventListener("click", e=>{
+  e.preventDefault(); forgotModal.style.display="block";
+});
+closeModal.addEventListener("click", ()=>forgotModal.style.display="none");
+window.addEventListener("click", e=>{ if(e.target===forgotModal) forgotModal.style.display="none"; });
+
+/* ===== RESET PASSWORD ===== */
+resetBtn.addEventListener("click", async ()=>{
+  resetError.textContent=""; resetSuccess.textContent="";
+  const email = resetEmail.value.trim();
+  if(!email){ resetError.textContent="Enter your email"; return; }
   try{
-    const userCred = await auth.signInWithEmailAndPassword(email, password);
-    const uid = userCred.user.uid;
+    await auth.sendPasswordResetEmail(email);
+    resetSuccess.textContent="Reset email sent!";
+  } catch(err){ resetError.textContent=err.message; }
+});
 
-    // 🔹 Get role from Firestore
-    const userDoc = await db.collection("users").doc(uid).get();
+/* ===== LOGIN ===== */
+loginBtn.addEventListener("click", async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = passwordInput.value.trim();
+  const loginType = document.getElementById("loginType").value;
+  if(!email || !password){ alert("Enter email and password"); return; }
 
-    if(!userDoc.exists){
-      alert("User role not found.");
-      return;
-    }
+  try {
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
 
-    const userData = userDoc.data();
-    const role = userData.role;
+    const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
+    const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
 
-    // Save session
+    let role=null, userData=null;
+    if(!snapM.empty){ role="manager"; userData=snapM.docs[0].data(); }
+    else if(!snapTL.empty){ role="team_leader"; userData=snapTL.docs[0].data(); }
+
+    if(!role){ alert("No access found."); await auth.signOut(); return; }
+
     localStorage.setItem("currentUser", JSON.stringify({
-      id: uid,
+      id: user.uid,
+      email: user.email,
       name: userData.name,
-      email: email,
       role: role
     }));
 
-    // 🔹 ADMIN EMAIL LISTS
-    const teamLeaderAdmins = [
-      "julanguinto@gmail.com",
-      "Trevorbarry.Imatong@iqor.com",
-      "Jenileemae.David@iqor.com",
-      "Jonie.Kabigting@iqor.com"
-    ];
+    const teamLeaderAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com","Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com"];
+    const managerAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
 
-    const managerAdmins = [
-      "julanguinto@gmail.com",
-      "Trevorbarry.Imatong@iqor.com"
-    ];
-
-    // ======================
-    // TEAM LEADER FLOW
-    // ======================
-    if(loginAs === "Team Leader"){
-
-      if(teamLeaderAdmins.includes(email)){
-        window.location.href = "admin.html";
-        return;
-      }
-
-      if(role === "admin"){
-        window.location.href = "admin.html";
-      }
-      else if(role === "employee"){
-        window.location.href = "employee.html";
-      }
-      else{
-        alert("Unauthorized role for Team Leader.");
-      }
+    // Team Leader flow
+    if(loginType==="team_leader"){
+      if(role!=="team_leader"){ alert("You are not allowed to login as Team Leader."); await auth.signOut(); return; }
+      if(teamLeaderAdmins.includes(email)){ location.href="admin.html"; return; }
+      location.href="employee.html";
     }
 
-    // ======================
-    // MANAGER FLOW
-    // ======================
-    else if(loginAs === "Manager"){
-
-      if(managerAdmins.includes(email)){
-        window.location.href = "manager-admin.html";
-        return;
-      }
-
-      if(role === "manager-admin"){
-        window.location.href = "manager-admin.html";
-      }
-      else if(role === "manager-employee"){
-        window.location.href = "manager-employee.html";
-      }
-      else{
-        alert("Unauthorized role for Manager.");
-      }
+    // Manager flow
+    else if(loginType==="manager"){
+      if(role!=="manager"){ alert("You are not allowed to login as Manager."); await auth.signOut(); return; }
+      if(managerAdmins.includes(email)){ location.href="manager-admin.html"; return; }
+      location.href="manager-employee.html";
     }
 
-  } catch(err){
-    alert("Login failed: " + err.message);
-  }
-}
+  } catch(err){ console.error(err); alert("Login failed: "+err.message); }
+});
 </script>
 
 </body>
