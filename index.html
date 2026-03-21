@@ -12,29 +12,9 @@
 --border:#d1d5db;
 }
 *{ box-sizing:border-box; }
-body{ 
-  margin:0; 
-  font-family: Arial, sans-serif; 
-  background: linear-gradient(-45deg, #4D148C, #FF6600, #4D148C, #FF6600); 
-  background-size: 400% 400%; 
-  animation: gradientAnimation 15s ease infinite; 
-  min-height:100vh; 
-  display:flex; 
-  justify-content:center; 
-  align-items:center; 
-}
-@keyframes gradientAnimation { 
-  0% { background-position: 0% 50%; } 
-  50% { background-position: 100% 50%; } 
-  100% { background-position: 0% 50%; } 
-}
-.login-card{ 
-  background: rgba(255,255,255,0.95); 
-  width:100%; max-width:420px; 
-  padding:32px 28px; 
-  border-radius:6px; 
-  box-shadow:0 10px 25px rgba(0,0,0,.15); 
-}
+body{ margin:0; font-family: Arial, sans-serif; background: linear-gradient(-45deg, #4D148C, #FF6600, #4D148C, #FF6600); background-size: 400% 400%; animation: gradientAnimation 15s ease infinite; min-height:100vh; display:flex; justify-content:center; align-items:center; }
+@keyframes gradientAnimation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.login-card{ background: rgba(255,255,255,0.95); width:100%; max-width:420px; padding:32px 28px; border-radius:6px; box-shadow:0 10px 25px rgba(0,0,0,.15); }
 .logo{text-align:center; margin-bottom:18px;}
 .purple-id{text-align:center; font-weight:bold; color:#666; margin-bottom:20px;}
 label{ font-size:.85em; font-weight:bold; color:#333; }
@@ -57,60 +37,50 @@ button{ width:100%; padding:12px; background:var(--fedex-purple); border:none; c
 #resetError { margin-top: 10px; color: #dc2626; font-size: 0.85em; text-align: center; }
 #resetSuccess { margin-top: 10px; color: #16a34a; font-size: 0.9em; font-weight: bold; padding: 8px 10px; border-radius: 4px; text-align: center; animation: fadeIn 0.5s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-@media screen and (max-width: 480px) { 
-  body { padding: 10px; align-items: flex-start; } 
-  .login-card { padding: 20px 16px; width: 100%; max-width: 360px; margin-top: 30px; } 
-  .logo img { height: 100px; } 
-  label { font-size: 0.9em; } 
-  input, select, button { font-size: 0.95em; padding: 10px; } 
-  .password-wrapper i { right: 10px; } 
-  .forgot-password a { font-size: 0.8em; } 
-  .modal-content { width: 95%; padding: 15px 20px; margin-top: 20%; } 
-  #resetSuccess, #resetError { font-size: 0.85em; } 
-}
+@media screen and (max-width: 480px) { body { padding: 10px; align-items: flex-start; } .login-card { padding: 20px 16px; width: 100%; max-width: 360px; margin-top: 30px; } .logo img { height: 100px; } label { font-size: 0.9em; } input, select, button { font-size: 0.95em; padding: 10px; } .password-wrapper i { right: 10px; } .forgot-password a { font-size: 0.8em; } .modal-content { width: 95%; padding: 15px 20px; margin-top: 20%; } #resetSuccess, #resetError { font-size: 0.85em; } }
 </style>
 </head>
 <body>
 
 <div class="login-card">
-  <div class="logo">
-    <img src="fedex.png" style="height:130px;">
-  </div>
-  <div class="purple-id">Login</div>
+<div class="logo">
+<img src="fedex.png" style="height:130px;">
+</div>
+<div class="purple-id">Login</div>
 
-  <label>Email</label>
-  <input type="email" id="email" placeholder="Your email">
+<label>Email</label>
+<input type="email" id="email" placeholder="Your email">
 
-  <label>Password</label>
-  <div class="password-wrapper">
-    <input type="password" id="password" placeholder="Password">
-    <i class="fa-solid fa-eye" id="togglePassword"></i>
-  </div>
+<label>Password</label>
+<div class="password-wrapper">
+<input type="password" id="password" placeholder="Password">
+<i class="fa-solid fa-eye" id="togglePassword"></i>
+</div>
 
-  <label>Login As</label>
+<label>Login As</label>
   <select id="loginType">
     <option value="team_leader">Team Leader</option>
     <option value="manager">Manager</option>
   </select>
 
-  <button id="loginBtn">Login</button>
-  <div id="error"></div>
-  <div class="forgot-password">
-    <a href="#" id="forgotLink">Forgot password?</a>
-  </div>
+<button id="loginBtn">Login</button>
+<div id="error"></div>
+<div class="forgot-password">
+<a href="#" id="forgotLink">Forgot password?</a>
+</div>
 </div>
 
 <!-- Forgot Password Modal -->
 <div id="forgotModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Reset Password</h2>
-    <p>Enter your email to reset your password:</p>
-    <input type="email" id="resetEmail" placeholder="Your email">
-    <button id="resetBtn">Send Reset Email</button>
-    <div id="resetError"></div>
-    <div id="resetSuccess"></div>
-  </div>
+<div class="modal-content">
+<span class="close">&times;</span>
+<h2>Reset Password</h2>
+<p>Enter your email to reset your password:</p>
+<input type="email" id="resetEmail" placeholder="Your email">
+<button id="resetBtn">Send Reset Email</button>
+<div id="resetError"></div>
+<div id="resetSuccess"></div>
+</div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -120,9 +90,9 @@ button{ width:100%; padding:12px; background:var(--fedex-purple); border:none; c
 <script>
 // Firebase config
 firebase.initializeApp({
-  apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
-  authDomain: "fedex-attendance-system.firebaseapp.com",
-  projectId: "fedex-attendance-system"
+apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+authDomain: "fedex-attendance-system.firebaseapp.com",
+projectId: "fedex-attendance-system"
 });
 
 const auth = firebase.auth();
@@ -133,7 +103,7 @@ const loginBtn = document.getElementById("loginBtn");
 const passwordInput = document.getElementById("password");
 const togglePassword = document.getElementById("togglePassword");
 
-// Show/hide password
+// Show/Hide password
 togglePassword.addEventListener("click", () => {
   if(passwordInput.type === "password"){
     passwordInput.type = "text";
@@ -144,40 +114,45 @@ togglePassword.addEventListener("click", () => {
   }
 });
 
-// Login handler
+// Login
 loginBtn.addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = passwordInput.value.trim();
   const loginType = document.getElementById("loginType").value;
 
-  if(!email || !password){ alert("Please enter email and password"); return; }
+  if(!email || !password){
+    alert("Please enter email and password");
+    return;
+  }
 
   try {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
-    // Fetch Firestore user data
+    // Super Admins (full access)
+    const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
+
+    // Team Leader admin exceptions (can access admin.html)
+    const teamLeaderAdmins = ["Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com", ...superAdmins];
+
+    // Fetch role from Firestore
+    let role = null;
+    let userData = null;
+
     const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
     const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
 
-    let role = null, userData = null;
-    if(!snapM.empty){ role="manager"; userData = snapM.docs[0].data(); }
-    else if(!snapTL.empty){ role="team_leader"; userData = snapTL.docs[0].data(); }
-
-    if(!role){ alert("No access found."); await auth.signOut(); return; }
-
-    // Save session
-    localStorage.setItem("currentUser", JSON.stringify({
-      id: user.uid,
-      email: user.email,
-      name: userData.name,
-      role: role
-    }));
-
-    // Super Admins
-    const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
-    const teamLeaderAdmins = ["Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com"];
-    const managerAdmins = []; // Only superAdmins handled
+    if(!snapM.empty){
+      role = "manager";
+      userData = snapM.docs[0].data();
+    } else if(!snapTL.empty){
+      userData = snapTL.docs[0].data();
+      role = "team_leader";
+    } else {
+      alert("No access found.");
+      await auth.signOut();
+      return;
+    }
 
     // Super admin override
     if(superAdmins.includes(email)){
@@ -186,18 +161,38 @@ loginBtn.addEventListener("click", async () => {
       return;
     }
 
-    // Team Leader flow
+    // Team Leader login
     if(loginType==="team_leader"){
-      if(role!=="team_leader"){ alert("You are not allowed to login as Team Leader."); await auth.signOut(); return; }
-      if(teamLeaderAdmins.includes(email)){ location.href="admin.html"; return; }
+      if(role!=="team_leader" && !teamLeaderAdmins.includes(email)){
+        alert("You are not allowed to login as Team Leader.");
+        await auth.signOut();
+        return;
+      }
+      if(teamLeaderAdmins.includes(email)){
+        location.href="admin.html";
+        return;
+      }
       location.href="employee.html";
     }
 
-    // Manager flow
+    // Manager login
     else if(loginType==="manager"){
-      if(role!=="manager"){ alert("You are not allowed to login as Manager."); await auth.signOut(); return; }
+      if(role!=="manager"){
+        alert("You are not allowed to login as Manager.");
+        await auth.signOut();
+        return;
+      }
+      // Manager-admin exception handled by superAdmins
       location.href="manager-employee.html";
     }
+
+    // Save session
+    localStorage.setItem("currentUser", JSON.stringify({
+      id: user.uid,
+      email: user.email,
+      name: userData.name,
+      role: role
+    }));
 
   } catch(err){
     console.error(err);
