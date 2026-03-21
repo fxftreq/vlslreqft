@@ -90,9 +90,9 @@ button{ width:100%; padding:12px; background:var(--fedex-purple); border:none; c
 <script>
 // Firebase config
 firebase.initializeApp({
-apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
-authDomain: "fedex-attendance-system.firebaseapp.com",
-projectId: "fedex-attendance-system"
+  apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+  authDomain: "fedex-attendance-system.firebaseapp.com",
+  projectId: "fedex-attendance-system"
 });
 
 const auth = firebase.auth();
@@ -103,7 +103,7 @@ const loginBtn = document.getElementById("loginBtn");
 const passwordInput = document.getElementById("password");
 const togglePassword = document.getElementById("togglePassword");
 
-// Show/Hide password
+// Show/hide password
 togglePassword.addEventListener("click", () => {
   if(passwordInput.type === "password"){
     passwordInput.type = "text";
@@ -131,11 +131,10 @@ loginBtn.addEventListener("click", async () => {
 
     // Super Admins (full access)
     const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
-
-    // Team Leader admin exceptions (can access admin.html)
+    // Team Leader admin exceptions (can access admin.html even if manager-employee)
     const teamLeaderAdmins = ["Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com", ...superAdmins];
 
-    // Fetch role from Firestore
+    // Get user role from Firestore
     let role = null;
     let userData = null;
 
@@ -146,8 +145,8 @@ loginBtn.addEventListener("click", async () => {
       role = "manager";
       userData = snapM.docs[0].data();
     } else if(!snapTL.empty){
-      userData = snapTL.docs[0].data();
       role = "team_leader";
+      userData = snapTL.docs[0].data();
     } else {
       alert("No access found.");
       await auth.signOut();
@@ -163,36 +162,55 @@ loginBtn.addEventListener("click", async () => {
 
     // Team Leader login
     if(loginType==="team_leader"){
-      if(role!=="team_leader" && !teamLeaderAdmins.includes(email)){
+      if(teamLeaderAdmins.includes(email)){
+        location.href = "admin.html";
+        localStorage.setItem("currentUser", JSON.stringify({
+          id: user.uid,
+          email: user.email,
+          name: userData.name,
+          role: role
+        }));
+        return;
+      }
+
+      if(role !== "team_leader"){
         alert("You are not allowed to login as Team Leader.");
         await auth.signOut();
         return;
       }
-      if(teamLeaderAdmins.includes(email)){
-        location.href="admin.html";
-        return;
-      }
-      location.href="employee.html";
+
+      location.href = "employee.html";
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role
+      }));
+      return;
     }
 
     // Manager login
-    else if(loginType==="manager"){
-      if(role!=="manager"){
+    if(loginType==="manager"){
+      if(role !== "manager"){
         alert("You are not allowed to login as Manager.");
         await auth.signOut();
         return;
       }
-      // Manager-admin exception handled by superAdmins
-      location.href="manager-employee.html";
-    }
 
-    // Save session
-    localStorage.setItem("currentUser", JSON.stringify({
-      id: user.uid,
-      email: user.email,
-      name: userData.name,
-      role: role
-    }));
+      if(superAdmins.includes(email)){
+        location.href = "manager-admin.html";
+      } else {
+        location.href = "manager-employee.html";
+      }
+
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role
+      }));
+      return;
+    }
 
   } catch(err){
     console.error(err);
