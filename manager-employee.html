@@ -207,15 +207,26 @@ function loadLeaves(){
       tableEl.innerHTML = `<tr><th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Admin Notes</th><th>Submitted Date</th></tr>`;
       snapshot.forEach(doc=>{
         const l = doc.data();
+
+        // Show only tickets for this manager (by ID) unless superadmin
         if(!superAdmins.includes(currentUser.email) && l.managerId !== currentUser.id) return;
-        let submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
-        const dateStr = submittedDate.toLocaleString("en-PH",{timeZone:"Asia/Manila",year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+
+        const submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
+        const dateStr = submittedDate.toLocaleString("en-PH",{
+          timeZone:"Asia/Manila",
+          year:"numeric",
+          month:"short",
+          day:"numeric",
+          hour:"2-digit",
+          minute:"2-digit"
+        });
+
         tableEl.innerHTML += `<tr>
 <td>${l.type}</td>
 <td>${l.date}</td>
 <td class="reason-col">${l.reason}</td>
 <td class="status-${l.status}">${l.status}</td>
-<td class="reason-col">${l.notes ? l.notes : (l.status==="Rejected"?"No note provided":"-")}</td>
+<td class="reason-col">${l.notes || (l.status==="Rejected"?"No note provided":"-")}</td>
 <td>${dateStr}</td>
 </tr>`;
       });
