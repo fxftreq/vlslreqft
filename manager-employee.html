@@ -22,13 +22,6 @@ main { flex:1; padding:20px 30px; }
 
 h2 { color: var(--fedex-purple); text-align:center; margin-bottom:20px; }
 
-.top-controls { display:flex; flex-wrap:wrap; align-items:flex-end; gap:20px; background:#fff; padding:16px 20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-bottom:20px; }
-.control-group { display:flex; flex-direction:column; font-size:0.85em; }
-.control-group label { font-weight:bold; margin-bottom:4px; color:#333; }
-.control-group select, .control-group input { padding:8px 12px; border-radius:6px; border:1px solid #ccc; font-size:0.95em; min-width:180px; }
-.submit-inline { margin-top:22px; padding:10px 20px; background:var(--fedex-orange); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; height:42px; }
-.submit-inline:hover { background:darkorange; }
-
 .card { background:white; padding:25px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); }
 table { width:100%; border-collapse:collapse; min-width:600px; table-layout: fixed; }
 th, td { padding:12px; border-bottom:1px solid var(--table-border); text-align:left; word-wrap:break-word; overflow-wrap:break-word; }
@@ -78,21 +71,13 @@ th { background:var(--table-header-bg); color:white; }
 .user-chip { background: rgba(255,255,255,0.15); padding:6px 12px; border-radius:20px; font-size:13px; display:flex; align-items:center; gap:6px; }
 .logout-btn { background: var(--fedex-orange); color:white; border:none; padding:7px 14px; border-radius:6px; cursor:pointer; font-weight:bold; transition:0.2s; }
 .logout-btn:hover { background:darkorange; transform:translateY(-1px); }
-
-@media(max-width:768px){
-  .main-header { flex-direction:column; align-items:flex-start; gap:10px; }
-  .header-right { width:100%; justify-content:space-between; }
-  .top-controls { flex-direction:column; align-items:stretch; }
-  .control-group select, .control-group input { min-width:100%; }
-  .submit-inline { width:100%; }
-}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
-<body>
 
+<body>
 <header class="main-header">
   <div class="header-left">
     <div class="logo-circle"><i class="fas fa-plane"></i></div>
@@ -136,10 +121,11 @@ th { background:var(--table-header-bg); color:white; }
 <footer>© FedEx 2026</footer>
 
 <script>
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain: "fedex-attendance-system.firebaseapp.com",
-  projectId: "fedex-attendance-system"
+  projectId: "fedex-attendance-system",
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
@@ -162,7 +148,6 @@ function loadLeaves(){
       tableEl.innerHTML = `<tr><th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Admin Notes</th><th>Submitted Date</th></tr>`;
       snapshot.forEach(doc=>{
         const l = doc.data();
-        // Show only tickets for this manager unless superadmin
         if(!superAdmins.includes(currentUser.email) && l.managerId !== currentUser.id) return;
 
         const submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
@@ -176,7 +161,7 @@ function loadLeaves(){
 <td>${dateStr}</td>
 </tr>`;
       });
-    }, err=>{ alert("Error loading leaves: "+err.message); });
+    });
 }
 loadLeaves();
 
