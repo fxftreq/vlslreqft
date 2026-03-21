@@ -58,10 +58,12 @@ button{ width:100%; padding:12px; background:var(--fedex-purple); border:none; c
   </div>
 
   <label>Login As</label>
-  <select id="loginType">
-    <option value="team_leader">Team Leader</option>
-    <option value="manager">Manager</option>
-  </select>
+<select id="loginType">
+  <option value="employee">Team Leader</option>
+  <option value="admin">Admin</option>
+  <option value="manager-admin">Manager Admin</option>
+  <option value="manager-employee">Manager Employee</option>
+</select>
 
   <button id="loginBtn">Login</button>
   <div id="error"></div>
@@ -144,8 +146,8 @@ loginBtn.addEventListener("click", async () => {
       userData = snapM.docs[0].data();
     } 
     else if(!snapTL.empty){
+      role = "team_leader"; // ✅ FIXED (removed isAdmin logic)
       userData = snapTL.docs[0].data();
-      role = userData.isAdmin ? "manager" : "team_leader";
     }
 
     if(!role){
@@ -162,20 +164,30 @@ loginBtn.addEventListener("click", async () => {
       role: role
     }));
 
-    /* ===== ✅ FIXED REDIRECTION ===== */
+    /* ===== ✅ FINAL REDIRECTION ===== */
 
-    if(role === "manager"){
-      if(loginType === "manager"){
-        location.href = "manager-admin.html";
-      } else {
-        location.href = "manager-employee.html";
+    if(role === "team_leader"){
+      if(loginType === "employee"){
+        location.href = "employee.html";
+      } 
+      else if(loginType === "admin"){
+        location.href = "admin.html";
+      } 
+      else {
+        alert("Invalid login type for Team Leader.");
+        await auth.signOut();
       }
     }
-    else if(role === "team_leader"){
-      if(loginType === "team_leader"){
-        location.href = "employee.html";
-      } else {
-        alert("You are not allowed to login as Manager.");
+
+    else if(role === "manager"){
+      if(loginType === "manager-admin"){
+        location.href = "manager-admin.html";
+      } 
+      else if(loginType === "manager-employee"){
+        location.href = "manager-employee.html";
+      } 
+      else {
+        alert("Invalid login type for Manager.");
         await auth.signOut();
       }
     }
