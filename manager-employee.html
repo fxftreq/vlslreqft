@@ -215,16 +215,17 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
   }
 });
 
-// Load leaves
+// Load leaves for table
 const tableEl = document.getElementById("table");
 let managerLeaves = [];
 
 function loadLeaves() {
-  db.collection("manager_single_day_leave")
-    .where("managerId", "==", currentUser.id)
-    .orderBy("date", "asc")
-    .onSnapshot(snapshot => {
+  if (!currentUser) return; // safety check
 
+  // Query the collection
+  db.collection("manager_single_day_leave")
+    .get() // get all records
+    .then(snapshot => {
       tableEl.innerHTML = `
         <tr>
           <th>Leave Type</th>
@@ -233,16 +234,16 @@ function loadLeaves() {
           <th>Status</th>
           <th>Submitted Date</th>
         </tr>`;
-
       managerLeaves = [];
 
       snapshot.forEach(doc => {
         const l = doc.data();
 
-        const submittedDate = l.submittedAt?.toDate
-          ? l.submittedAt.toDate()
-          : new Date(l.submittedAt || Date.now());
+        // Filter for CURRENT manager only
+        if (l.managerId !== currentUser.id) return;
 
+        // Convert timestamp if needed
+        const submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
         const submittedStr = submittedDate.toLocaleString("en-PH", {
           timeZone: "Asia/Manila",
           year: "numeric",
@@ -263,24 +264,17 @@ function loadLeaves() {
         managerLeaves.push({...l, submittedAt: submittedDate});
       });
 
-      // Empty state
-      if(managerLeaves.length === 0){
-        tableEl.innerHTML += `
-          <tr>
-            <td colspan="5" style="text-align:center; padding:20px; color:#777;">
-              No leave records found
-            </td>
-          </tr>`;
+      if(managerLeaves.length === 0) {
+        tableEl.innerHTML += `<tr><td colspan="5" style="text-align:center;">No leave records found</td></tr>`;
       }
-
-      // 🔥 IMPORTANT: update calendar in real-time
-      renderCalendar();
-
-    }, err => {
+    })
+    .catch(err => {
+      console.error("Error loading leaves: ", err);
       alert("Error loading leaves: " + err.message);
     });
 }
 
+// Call the function
 loadLeaves();
 
 // Accordion
