@@ -121,7 +121,7 @@ togglePassword.addEventListener("click", () => {
 
 // Login logic
 loginBtn.addEventListener("click", async () => {
-  const email = document.getElementById("email").value.trim().toLowerCase(); // lowercase for consistency
+  const email = document.getElementById("email").value.trim().toLowerCase();
   const password = passwordInput.value.trim();
   const loginType = document.getElementById("loginType").value;
 
@@ -141,7 +141,6 @@ loginBtn.addEventListener("click", async () => {
     let role = null;
     let userData = null;
 
-    // ✅ FIXED: use the actual email field
     const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
     const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
 
@@ -159,7 +158,12 @@ loginBtn.addEventListener("click", async () => {
 
     // SuperAdmin routing
     if(superAdmins.includes(email)){
-      localStorage.setItem("currentUser", JSON.stringify({ id: user.uid, email: user.email, name: userData.name, role: role }));
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role
+      }));
       if(loginType==="team_leader") location.href = "admin.html";
       else if(loginType==="manager") location.href = "manager-admin.html";
       return;
@@ -168,7 +172,12 @@ loginBtn.addEventListener("click", async () => {
     // Team Leader login
     if(loginType==="team_leader"){
       if(teamLeaderAdmins.includes(email)){
-        localStorage.setItem("currentUser", JSON.stringify({ id: user.uid, email: user.email, name: userData.name, role: role }));
+        localStorage.setItem("currentUser", JSON.stringify({
+          id: user.uid,
+          email: user.email,
+          name: userData.name,
+          role: role
+        }));
         location.href = "admin.html";
         return;
       }
@@ -177,7 +186,12 @@ loginBtn.addEventListener("click", async () => {
         await auth.signOut();
         return;
       }
-      localStorage.setItem("currentUser", JSON.stringify({ id: user.uid, email: user.email, name: userData.name, role: role }));
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role
+      }));
       location.href = "employee.html";
       return;
     }
@@ -189,9 +203,17 @@ loginBtn.addEventListener("click", async () => {
         await auth.signOut();
         return;
       }
-      localStorage.setItem("currentUser", JSON.stringify({ id: user.uid, email: user.email, name: userData.name, role: role }));
-      if(superAdmins.includes(email)) location.href = "manager-admin.html";
-      else location.href = "manager-employee.html";
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role
+      }));
+      if(superAdmins.includes(email)){
+        location.href = "manager-admin.html";
+      } else {
+        location.href = "manager-employee.html";
+      }
       return;
     }
 
