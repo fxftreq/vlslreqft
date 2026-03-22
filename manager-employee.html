@@ -11,17 +11,12 @@
   --bg-gray: #f4f4f6;
   --table-header-bg: #4D148C;
   --table-border: #ddd;
-  --status-Pending: orange;
-  --status-Approved: green;
-  --status-Rejected: red;
-  --status-Cancelled: #888;
-  --my-leave-border: 2px solid limegreen;
+  --status-cancelled: #888888;
+  --my-leave-border: 2px solid green;
 }
 
 body { margin:0; font-family: Arial,sans-serif; background: var(--bg-gray); display:flex; flex-direction:column; min-height:100vh; }
-
 header, footer { background: var(--fedex-purple); color:white; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; }
-
 main { flex:1; padding:20px 30px; }
 
 h2 { color: var(--fedex-purple); text-align:center; margin-bottom:20px; }
@@ -42,7 +37,7 @@ th { background:var(--table-header-bg); color:white; }
 .status-Pending { color:orange; font-weight:bold; }
 .status-Approved { color:green; font-weight:bold; }
 .status-Rejected { color:red; font-weight:bold; }
-.status-Cancelled { color:var(--status-Cancelled); font-style:italic; font-weight:bold; }
+.status-Cancelled { color:var(--status-cancelled); font-style:italic; font-weight:bold; }
 
 .accordion { background: var(--fedex-purple); color:white; cursor:pointer; padding:14px 18px; width:100%; border:none; border-radius:8px; text-align:left; font-size:0.95em; font-weight:bold; margin-bottom:10px; transition:0.3s; }
 .accordion:hover { background:#3a0f6f; }
@@ -55,18 +50,20 @@ th { background:var(--table-header-bg); color:white; }
 
 .calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
 .cal-header { background: var(--table-header-bg); color:white; padding:6px; text-align:center; font-weight:bold; border-radius:4px; }
-.cal-cell { border:1px solid #ddd; min-height:60px; padding:4px; font-size:12px; border-radius:6px; position:relative; overflow:hidden; }
-.cal-day { font-weight:bold; font-size:12px; margin-bottom:4px; }
-
-.cal-tag { display:block; padding:1px 2px; border-radius:4px; font-size:10px; color:white; margin-top:2px; }
+.cal-cell { border:1px solid #ddd; min-height:80px; padding:4px; font-size:12px; border-radius:6px; position:relative; }
+.cal-day { font-weight:bold; }
+.cal-tag { margin-top:3px; font-size:10px; padding:2px 4px; border-radius:4px; color:white; cursor:default; }
+.tag-Pending { background:orange; }
+.tag-Approved { background:green; }
+.tag-Rejected { background:red; }
+.tag-Cancelled { background:#888; }
 
 .year-view { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
 .year-view .calendar { gap:2px; }
 .year-view .cal-header { padding:4px; font-size:10px; }
 .year-view .cal-cell { min-height:26px; padding:2px; font-size:9px; cursor:pointer; position:relative; }
 .year-view .cal-day { font-size:9px; }
-.year-view .cal-tag { width:100%; height:6px; border-radius:3px; position:absolute; bottom:1px; left:1px; display:block; }
-
+.year-view .cal-tag { display:block; width:100%; height:100%; border-radius:4px; }
 .year-box { border:1px solid #ddd; border-radius:8px; padding:10px; background:#fff; cursor:pointer; text-align:center; font-weight:bold; }
 
 .main-header { background: linear-gradient(90deg,#4D148C,#3b0f70); color:white; padding:14px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 15px rgba(0,0,0,0.2); position:sticky; top:0; z-index:100; }
@@ -93,6 +90,7 @@ th { background:var(--table-header-bg); color:white; }
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
+
 <body>
 <header class="main-header">
   <div class="header-left">
@@ -148,6 +146,9 @@ th { background:var(--table-header-bg); color:white; }
 <tr><th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Submitted Date</th></tr>
 </table>
 </div>
+</main>
+
+<footer>© FedEx 2026</footer>
 
 <script>
 const firebaseConfig = {
@@ -169,11 +170,13 @@ function logout(){
   } 
 }
 
+// Default PH date
 const dateEl = document.getElementById("date");
 const nowPH = new Date().toLocaleString("en-US",{timeZone:"Asia/Manila"});
 const phDate = new Date(nowPH);
 dateEl.value = `${phDate.getFullYear()}-${String(phDate.getMonth()+1).padStart(2,"0")}-${String(phDate.getDate()).padStart(2,"0")}`;
 
+// Submit leave
 document.getElementById("submitBtn").addEventListener("click", async ()=>{
   if(!dateEl.value || !document.getElementById("reason").value){ alert("Complete all fields"); return; }
   const now = new Date();
@@ -189,31 +192,30 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
     await db.collection("manager_single_day_leave").add(leaveData);
     alert("Leave submitted!");
     dateEl.value = ""; document.getElementById("reason").value = "";
-    loadLeaves(); 
+    loadLeaves(); renderCalendar();
   }catch(err){ alert("Error: "+err.message); }
 });
 
-const tableEl = document.getElementById("table");
 let managerLeaves = [];
-
+const tableEl = document.getElementById("table");
 function loadLeaves() {
   db.collection("manager_single_day_leave")
     .orderBy("date","asc")
     .onSnapshot(snapshot => {
-      tableEl.innerHTML = `<tr>
-        <th>Leave Type</th>
-        <th>Leave Date</th>
-        <th>Reason</th>
-        <th>Status</th>
-        <th>Submitted Date</th>
-      </tr>`;
+      tableEl.innerHTML = `
+        <tr>
+          <th>Leave Type</th>
+          <th>Leave Date</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Submitted Date</th>
+        </tr>`;
       managerLeaves = [];
       snapshot.forEach(doc => {
         const l = doc.data();
         const submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
-        managerLeaves.push({...l, submittedAt: submittedDate});
         if(l.managerName === currentUser.name){
-          const submittedStr = submittedDate.toLocaleString("en-PH", {timeZone:"Asia/Manila", year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});
+          const submittedStr = submittedDate.toLocaleString("en-PH",{timeZone:"Asia/Manila", year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});
           tableEl.innerHTML += `<tr>
             <td>${l.type}</td>
             <td>${l.date}</td>
@@ -222,6 +224,7 @@ function loadLeaves() {
             <td>${submittedStr}</td>
           </tr>`;
         }
+        managerLeaves.push({...l, submittedAt: submittedDate});
       });
       if(managerLeaves.filter(l=>l.managerName===currentUser.name).length===0){
         tableEl.innerHTML += `<tr><td colspan="5" style="text-align:center">No leave records found</td></tr>`;
@@ -230,6 +233,9 @@ function loadLeaves() {
     });
 }
 
+loadLeaves();
+
+// Accordion
 const acc=document.querySelector(".accordion");
 const panel=document.querySelector(".panel");
 acc.addEventListener("click",()=>{ 
@@ -237,81 +243,108 @@ acc.addEventListener("click",()=>{
   panel.style.display=(panel.style.display==="block"?"none":"block"); 
 });
 
+// Calendar
 let viewMode="year", calMonth=new Date().getMonth(), calYear=new Date().getFullYear();
-
 function renderCalendar(){ viewMode==="month"?renderMonth():renderYear(); }
 
-// Month view: color + name
 function renderMonth(){
-  const container=document.getElementById("calendarContainer"); 
-  container.className="calendar"; 
-  container.innerHTML="";
-  const first=new Date(calYear, calMonth,1); 
-  const days=new Date(calYear, calMonth+1,0).getDate(); 
-  const start=first.getDay();
-  document.getElementById("calendarLabel").textContent = first.toLocaleString('default',{month:'long'})+" "+calYear;
+  const container = document.getElementById("calendarContainer"); 
+  container.className = "calendar"; 
+  container.innerHTML = "";
+  const first = new Date(calYear, calMonth, 1); 
+  const days = new Date(calYear, calMonth + 1, 0).getDate(); 
+  const start = first.getDay();
+  document.getElementById("calendarLabel").textContent = first.toLocaleString('default',{month:'long'}) + " " + calYear;
+
   ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{
-    const h=document.createElement("div"); 
-    h.className="cal-header"; 
-    h.textContent=d; 
+    const h = document.createElement("div"); 
+    h.className = "cal-header"; 
+    h.textContent = d; 
     container.appendChild(h);
   });
-  for(let i=0;i<start;i++) container.appendChild(document.createElement("div"));
-  for(let d=1;d<=days;d++){
-    const cell=document.createElement("div"); cell.className="cal-cell";
-    const day=document.createElement("div"); day.className="cal-day"; day.textContent=d; cell.appendChild(day);
-    const fullDate=calYear+"-"+String(calMonth+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+
+  for(let i=0; i<start; i++) container.appendChild(document.createElement("div"));
+
+  for(let d=1; d<=days; d++){
+    const cell = document.createElement("div"); 
+    cell.className = "cal-cell";
+    const dayDiv = document.createElement("div"); 
+    dayDiv.className = "cal-day"; 
+    dayDiv.textContent = d; 
+    cell.appendChild(dayDiv);
+
+    const fullDate = calYear + "-" + String(calMonth+1).padStart(2,"0") + "-" + String(d).padStart(2,"0");
+
     managerLeaves.forEach(l=>{
-      if(l.date===fullDate){
-        const tag=document.createElement("div"); tag.className="cal-tag tag-"+l.status;
-        tag.textContent = l.managerName + " ("+l.type+")";
-        if(l.managerName===currentUser.name) cell.style.border= "var(--my-leave-border)";
+      if(l.date === fullDate){
+        const tag = document.createElement("div"); 
+        tag.className = "cal-tag tag-" + l.status;
+        tag.textContent = l.managerName + " (" + l.type + ")";
         cell.appendChild(tag);
+
+        if(l.managerName === currentUser.name){
+          cell.style.border = "var(--my-leave-border)";
+        }
       }
     });
+
     container.appendChild(cell);
   }
 }
 
-// Year view: only color, tooltip shows info
 function renderYear(){
-  const container=document.getElementById("calendarContainer");
-  container.className="year-view";
-  container.innerHTML="";
-  document.getElementById("calendarLabel").textContent = calYear;
+  const container = document.getElementById("calendarContainer"); 
+  container.className = "year-view"; 
+  container.innerHTML = "";
 
-  for(let m=0;m<12;m++){
-    const monthDiv=document.createElement("div"); monthDiv.className="year-box";
-    const monthTitle=document.createElement("div"); monthTitle.innerHTML=`<strong>${new Date(calYear,m,1).toLocaleString('default',{month:'short'})}</strong>`; 
+  for(let m=0; m<12; m++){
+    const monthDiv = document.createElement("div"); 
+    monthDiv.className = "year-box";
+
+    const monthTitle = document.createElement("div"); 
+    monthTitle.innerHTML = `<strong>${new Date(calYear,m,1).toLocaleString('default',{month:'short'})} ${calYear}</strong>`; 
     monthDiv.appendChild(monthTitle);
 
-    const monthCalendar=document.createElement("div"); monthCalendar.className="calendar"; monthCalendar.style.marginTop="8px";
-    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{
-      const h=document.createElement("div"); h.className="cal-header"; h.textContent=d; monthCalendar.appendChild(h);
+    const monthCalendar = document.createElement("div"); 
+    monthCalendar.className = "calendar"; 
+    monthCalendar.style.marginTop = "8px";
+
+    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(dayName=>{
+      const header=document.createElement("div"); header.className="cal-header"; header.textContent=dayName; monthCalendar.appendChild(header);
     });
 
-    const first=new Date(calYear,m,1); 
-    const daysInMonth=new Date(calYear,m+1,0).getDate(); 
-    const startDay=first.getDay();
+    const first = new Date(calYear,m,1); 
+    const daysInMonth = new Date(calYear,m+1,0).getDate(); 
+    const startDay = first.getDay();
+
     for(let i=0;i<startDay;i++) monthCalendar.appendChild(document.createElement("div"));
 
-    for(let d=1;d<=daysInMonth;d++){
-      const cell=document.createElement("div"); cell.className="cal-cell";
+    for(let d=1; d<=daysInMonth; d++){
+      const cell=document.createElement("div"); 
+      cell.className="cal-cell";
       const dayNumber=document.createElement("div"); dayNumber.className="cal-day"; dayNumber.textContent=d; cell.appendChild(dayNumber);
+
       const fullDate=calYear+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
-      managerLeaves.forEach(l=>{
-        if(l.date===fullDate){
-          const tag=document.createElement("div"); tag.className="cal-tag tag-"+l.status;
-          tag.title = `Manager: ${l.managerName}\nType: ${l.type}\nStatus: ${l.status}`;
-          cell.appendChild(tag);
-        }
+
+      // Check if any leaves exist for this day
+      const leavesForDay = managerLeaves.filter(l=>l.date===fullDate);
+      leavesForDay.forEach(l=>{
+        const tag = document.createElement("div");
+        tag.className = "cal-tag tag-" + l.status;
+        tag.title = `Manager: ${l.managerName}\nType: ${l.type}\nStatus: ${l.status}`;
+        tag.style.height="100%"; tag.style.width="100%";
+        cell.appendChild(tag);
       });
+
+      cell.addEventListener("click",()=>{ calMonth=m; viewMode="month"; renderCalendar(); });
       monthCalendar.appendChild(cell);
     }
 
     monthDiv.appendChild(monthCalendar);
     container.appendChild(monthDiv);
   }
+
+  document.getElementById("calendarLabel").textContent = calYear;
 }
 
 function setViewMode(mode){ viewMode=mode; renderCalendar(); }
@@ -321,8 +354,6 @@ function changeMonth(dir){
   if(calMonth>11){ calMonth=0; calYear++; } 
   renderCalendar(); 
 }
-
-loadLeaves();
 </script>
 </body>
 </html>
