@@ -110,118 +110,90 @@ const togglePassword = document.getElementById("togglePassword");
 
 // Show/hide password
 togglePassword.addEventListener("click", () => {
-if(passwordInput.type === "password"){
-passwordInput.type = "text";
-togglePassword.classList.replace("fa-eye","fa-eye-slash");
-} else {
-passwordInput.type = "password";
-togglePassword.classList.replace("fa-eye-slash","fa-eye");
-}
+  if(passwordInput.type === "password"){
+    passwordInput.type = "text";
+    togglePassword.classList.replace("fa-eye","fa-eye-slash");
+  } else {
+    passwordInput.type = "password";
+    togglePassword.classList.replace("fa-eye-slash","fa-eye");
+  }
 });
 
 // Login logic
 loginBtn.addEventListener("click", async () => {
-  const email = document.getElementById("email").value.trim();
-  const email = document.getElementById("email").value.trim().toLowerCase();
-const password = passwordInput.value.trim();
-const loginType = document.getElementById("loginType").value;
+  const email = document.getElementById("email").value.trim().toLowerCase(); // lowercase
+  const password = passwordInput.value.trim();
+  const loginType = document.getElementById("loginType").value;
 
-if(!email || !password){
-alert("Please enter email and password");
-return;
-}
+  if(!email || !password){
+    alert("Please enter email and password");
+    return;
+  }
 
-try {
-const userCredential = await auth.signInWithEmailAndPassword(email, password);
-const user = userCredential.user;
+  try {
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
 
-const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
-const teamLeaderAdmins = ["Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com", ...superAdmins];
+    const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
+    const teamLeaderAdmins = ["Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com", ...superAdmins];
 
-// Fetch role
-let role = null;
-let userData = null;
+    // Fetch role using emailLower field
+    let role = null;
+    let userData = null;
 
-const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
-const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
+    const snapM = await db.collection("manager_leave_user").where("emailLower","==",email).limit(1).get();
+    const snapTL = await db.collection("leave_users").where("emailLower","==",email).limit(1).get();
 
-if(!snapM.empty){
-role = "manager";
-userData = snapM.docs[0].data();
-} else if(!snapTL.empty){
-role = "team_leader";
-userData = snapTL.docs[0].data();
-} else {
-alert("No access found.");
-await auth.signOut();
-return;
-}
+    if(!snapM.empty){
+      role = "manager";
+      userData = snapM.docs[0].data();
+    } else if(!snapTL.empty){
+      role = "team_leader";
+      userData = snapTL.docs[0].data();
+    } else {
+      alert("No access found.");
+      await auth.signOut();
+      return;
+    }
 
-// SuperAdmin routing
-if(superAdmins.includes(email)){
-localStorage.setItem("currentUser", JSON.stringify({
-id: user.uid,
-email: user.email,
-name: userData.name,
-role: role
-}));
-if(loginType==="team_leader") location.href = "admin.html";
-else if(loginType==="manager") location.href = "manager-admin.html";
-return;
-}
+    // Save current user
+    localStorage.setItem("currentUser", JSON.stringify({
+      id: user.uid,
+      email: user.email,
+      name: userData.name,
+      role: role
+    }));
 
-// Team Leader login
-if(loginType==="team_leader"){
-if(teamLeaderAdmins.includes(email)){
-localStorage.setItem("currentUser", JSON.stringify({
-id: user.uid,
-email: user.email,
-name: userData.name,
-role: role
-}));
-location.href = "admin.html";
-return;
-}
-if(role !== "team_leader"){
-alert("You are not allowed to login as Team Leader.");
-await auth.signOut();
-return;
-}
-localStorage.setItem("currentUser", JSON.stringify({
-id: user.uid,
-email: user.email,
-name: userData.name,
-role: role
-}));
-location.href = "employee.html";
-return;
-}
+    // Routing
+    if(superAdmins.includes(email)){
+      location.href = loginType === "team_leader" ? "admin.html" : "manager-admin.html";
+      return;
+    }
 
-// Manager login
-if(loginType==="manager"){
-if(role !== "manager"){
-alert("You are not allowed to login as Manager.");
-await auth.signOut();
-return;
-}
-localStorage.setItem("currentUser", JSON.stringify({
-id: user.uid,
-email: user.email,
-name: userData.name,
-role: role
-}));
-if(superAdmins.includes(email)){
-location.href = "manager-admin.html";
-} else {
-location.href = "manager-employee.html";
-}
-return;
-}
+    if(loginType === "team_leader"){
+      if(teamLeaderAdmins.includes(email)){
+        location.href = "admin.html";
+        return;
+      }
+      if(role !== "team_leader"){
+        alert("You are not allowed to login as Team Leader.");
+        await auth.signOut();
+        return;
+      }
+      location.href = "employee.html";
+    } else if(loginType === "manager"){
+      if(role !== "manager"){
+        alert("You are not allowed to login as Manager.");
+        await auth.signOut();
+        return;
+      }
+      location.href = superAdmins.includes(email) ? "manager-admin.html" : "manager-employee.html";
+    }
 
-} catch(err){
-console.error(err);
-alert("Login failed: " + err.message);
-}
+  } catch(err){
+    console.error(err);
+    alert("Login failed: " + err.message);
+  }
 });
 
 // Forgot Password Logic
