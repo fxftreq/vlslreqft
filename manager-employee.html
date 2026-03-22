@@ -86,23 +86,23 @@ th { background:var(--table-header-bg); color:white; }
   .submit-inline { width:100%; }
 }
  /* year view colorinmg */
-.year-view .cal-cell {
-  min-height:26px;
-  padding:0;           /* remove padding */
-  font-size:9px;
-  cursor:pointer;
-  position:relative;   /* for absolute children */
-  border-radius:4px;
-  overflow:hidden;     /* clip the tag inside cell */
+.cal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-top: 2px;
 }
 
 .year-view .cal-tag {
-  display:block;
-  position:absolute;   /* fill the cell */
-  top:0; left:0; right:0; bottom:0;
-  border-radius:4px;
-  cursor:default;
-}  
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+} 
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -310,51 +310,66 @@ function renderMonth(){
   }
 }
 
-function renderYear(){
-  const container = document.getElementById("calendarContainer"); 
-  container.className = "year-view"; 
+function renderYear() {
+  const container = document.getElementById("calendarContainer");
+  container.className = "year-view";
   container.innerHTML = "";
 
-  for(let m=0; m<12; m++){
-    const monthDiv = document.createElement("div"); 
+  for (let m = 0; m < 12; m++) {
+    const monthDiv = document.createElement("div");
     monthDiv.className = "year-box";
 
-    const monthTitle = document.createElement("div"); 
-    monthTitle.innerHTML = `<strong>${new Date(calYear,m,1).toLocaleString('default',{month:'short'})} ${calYear}</strong>`; 
+    const monthTitle = document.createElement("div");
+    monthTitle.innerHTML = `<strong>${new Date(calYear, m, 1).toLocaleString('default', { month: 'short' })} ${calYear}</strong>`;
     monthDiv.appendChild(monthTitle);
 
-    const monthCalendar = document.createElement("div"); 
-    monthCalendar.className = "calendar"; 
+    const monthCalendar = document.createElement("div");
+    monthCalendar.className = "calendar";
     monthCalendar.style.marginTop = "8px";
+    monthCalendar.style.position = "relative";
 
-    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(dayName=>{
-      const header=document.createElement("div"); header.className="cal-header"; header.textContent=dayName; monthCalendar.appendChild(header);
+    // Weekday headers
+    ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(dayName => {
+      const header = document.createElement("div");
+      header.className = "cal-header";
+      header.textContent = dayName;
+      monthCalendar.appendChild(header);
     });
 
-    const first = new Date(calYear,m,1); 
-    const daysInMonth = new Date(calYear,m+1,0).getDate(); 
+    const first = new Date(calYear, m, 1);
+    const daysInMonth = new Date(calYear, m + 1, 0).getDate();
     const startDay = first.getDay();
 
-    for(let i=0;i<startDay;i++) monthCalendar.appendChild(document.createElement("div"));
+    // Empty cells before first day
+    for (let i = 0; i < startDay; i++) monthCalendar.appendChild(document.createElement("div"));
 
-    for(let d=1; d<=daysInMonth; d++){
-      const cell=document.createElement("div"); 
-      cell.className="cal-cell";
-      const dayNumber=document.createElement("div"); dayNumber.className="cal-day"; dayNumber.textContent=d; cell.appendChild(dayNumber);
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cell = document.createElement("div");
+      cell.className = "cal-cell";
+      cell.style.position = "relative";
 
-      const fullDate=calYear+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+      const dayNumber = document.createElement("div");
+      dayNumber.className = "cal-day";
+      dayNumber.textContent = d;
+      cell.appendChild(dayNumber);
 
-      // Check if any leaves exist for this day
-      const leavesForDay = managerLeaves.filter(l=>l.date===fullDate);
-      leavesForDay.forEach(l=>{
-        const tag = document.createElement("div");
-        tag.className = "cal-tag tag-" + l.status;
-        tag.title = `Manager: ${l.managerName}\nType: ${l.type}\nStatus: ${l.status}`;
-        tag.style.height="100%"; tag.style.width="100%";
-        cell.appendChild(tag);
+      const fullDate = calYear + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+
+      // Add colored dots for each leave on this date
+      managerLeaves.filter(l => l.date === fullDate).forEach(l => {
+        const dot = document.createElement("div");
+        dot.className = "cal-dot tag-" + l.status;
+        dot.title = `Manager: ${l.managerName}\nType: ${l.type}\nStatus: ${l.status}`;
+        cell.appendChild(dot);
       });
 
-      cell.addEventListener("click",()=>{ calMonth=m; viewMode="month"; renderCalendar(); });
+      // Clicking a cell switches to month view
+      cell.addEventListener("click", () => { 
+        calMonth = m; 
+        viewMode = "month"; 
+        renderCalendar(); 
+      });
+
       monthCalendar.appendChild(cell);
     }
 
