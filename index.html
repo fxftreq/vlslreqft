@@ -119,9 +119,9 @@ togglePassword.addEventListener("click", () => {
   }
 });
 
-// Login logic
+// Login logic (case-insensitive email)
 loginBtn.addEventListener("click", async () => {
-  const email = document.getElementById("email").value.trim();
+  let email = document.getElementById("email").value.trim().toLowerCase(); // lowercase
   const password = passwordInput.value.trim();
   const loginType = document.getElementById("loginType").value;
 
@@ -134,15 +134,18 @@ loginBtn.addEventListener("click", async () => {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
-    const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
-    const teamLeaderAdmins = ["Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com", ...superAdmins];
+    // lowercase emails for consistent comparison
+    const superAdmins = ["julanguinto@gmail.com","trevorbarry.imatong@iqor.com"];
+    const teamLeaderAdmins = ["jenileemae.david@iqor.com","jonie.kabigting@iqor.com", ...superAdmins];
 
-    // Fetch role
+    // Fetch role (case-insensitive)
     let role = null;
     let userData = null;
 
-    const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
-    const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
+    const snapM = await db.collection("manager_leave_user")
+                          .where("email_lower","==", email).limit(1).get();
+    const snapTL = await db.collection("leave_users")
+                           .where("email_lower","==", email).limit(1).get();
 
     if(!snapM.empty){
       role = "manager";
@@ -223,8 +226,9 @@ loginBtn.addEventListener("click", async () => {
   }
 });
 </script>
-  <script>
-// Forgot Password Modal Logic
+
+<script>
+// Forgot Password Modal Logic (case-insensitive)
 const forgotLink = document.getElementById("forgotLink");
 const forgotModal = document.getElementById("forgotModal");
 const closeModal = document.querySelector(".close");
@@ -252,9 +256,9 @@ window.addEventListener("click", (e) => {
   }
 });
 
-// Password Reset
+// Password Reset (case-insensitive)
 resetBtn.addEventListener("click", async () => {
-  const email = resetEmail.value.trim();
+  let email = resetEmail.value.trim().toLowerCase(); // lowercase
   resetError.textContent = "";
   resetSuccess.textContent = "";
 
