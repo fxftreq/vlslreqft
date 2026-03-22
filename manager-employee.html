@@ -85,6 +85,24 @@ th { background:var(--table-header-bg); color:white; }
   .control-group select, .control-group input { min-width:100%; }
   .submit-inline { width:100%; }
 }
+ /* year view colorinmg */
+.year-view .cal-cell {
+  min-height:26px;
+  padding:0;           /* remove padding */
+  font-size:9px;
+  cursor:pointer;
+  position:relative;   /* for absolute children */
+  border-radius:4px;
+  overflow:hidden;     /* clip the tag inside cell */
+}
+
+.year-view .cal-tag {
+  display:block;
+  position:absolute;   /* fill the cell */
+  top:0; left:0; right:0; bottom:0;
+  border-radius:4px;
+  cursor:default;
+}  
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
