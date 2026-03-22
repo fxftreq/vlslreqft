@@ -110,91 +110,117 @@ const togglePassword = document.getElementById("togglePassword");
 
 // Show/hide password
 togglePassword.addEventListener("click", () => {
-  passwordInput.type = passwordInput.type === "password" ? "text" : "password";
-  togglePassword.classList.toggle("fa-eye");
-  togglePassword.classList.toggle("fa-eye-slash");
+  if(passwordInput.type === "password"){
+    passwordInput.type = "text";
+    togglePassword.classList.replace("fa-eye","fa-eye-slash");
+  } else {
+    passwordInput.type = "password";
+    togglePassword.classList.replace("fa-eye-slash","fa-eye");
+  }
 });
 
 // Login logic
 loginBtn.addEventListener("click", async () => {
-  const emailInput = document.getElementById("email").value.trim().toLowerCase();
+  const email = document.getElementById("email").value.trim();
   const password = passwordInput.value.trim();
   const loginType = document.getElementById("loginType").value;
 
-  if(!emailInput || !password){
+  if(!email || !password){
     alert("Please enter email and password");
     return;
   }
 
   try {
-    const userCredential = await auth.signInWithEmailAndPassword(emailInput, password);
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
     const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
     const teamLeaderAdmins = ["Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com", ...superAdmins];
 
-    // Query Firestore (case-insensitive)
-    const snapM = await db.collection("manager_leave_user").where("email_lower","==",emailInput).limit(1).get();
-    const snapTL = await db.collection("leave_users").where("email_lower","==",emailInput).limit(1).get();
-
+    // Fetch role
     let role = null;
     let userData = null;
 
-    if(!snapM.empty){ role="manager"; userData = snapM.docs[0].data(); }
-    else if(!snapTL.empty){ role="team_leader"; userData = snapTL.docs[0].data(); }
-    else { alert("No access found."); await auth.signOut(); return; }
+    const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
+    const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
+
+    if(!snapM.empty){
+      role = "manager";
+      userData = snapM.docs[0].data();
+    } else if(!snapTL.empty){
+      role = "team_leader";
+      userData = snapTL.docs[0].data();
+    } else {
+      alert("No access found.");
+      await auth.signOut();
+      return;
+    }
 
     // SuperAdmin routing
-    if(superAdmins.includes(emailInput)){
-      localStorage.setItem("currentUser", JSON.stringify({id:user.uid,email:user.email,name:userData.name,role}));
-      location.href = loginType==="team_leader" ? "admin.html" : "manager-admin.html";
+    if(superAdmins.includes(email)){
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role
+      }));
+      if(loginType==="team_leader") location.href = "admin.html";
+      else if(loginType==="manager") location.href = "manager-admin.html";
       return;
     }
 
     // Team Leader login
     if(loginType==="team_leader"){
-      if(teamLeaderAdmins.includes(emailInput) || role==="team_leader"){
-        localStorage.setItem("currentUser", JSON.stringify({id:user.uid,email:user.email,name:userData.name,role}));
-        location.href = role==="team_leader" ? "employee.html" : "admin.html";
+      if(teamLeaderAdmins.includes(email)){
+        localStorage.setItem("currentUser", JSON.stringify({
+          id: user.uid,
+          email: user.email,
+          name: userData.name,
+          role: role
+        }));
+        location.href = "admin.html";
         return;
-      } else { alert("You are not allowed to login as Team Leader."); await auth.signOut(); return; }
+      }
+      if(role !== "team_leader"){
+        alert("You are not allowed to login as Team Leader.");
+        await auth.signOut();
+        return;
+      }
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role
+      }));
+      location.href = "employee.html";
+      return;
     }
 
     // Manager login
     if(loginType==="manager"){
-      if(role!=="manager"){ alert("You are not allowed to login as Manager."); await auth.signOut(); return; }
-      localStorage.setItem("currentUser", JSON.stringify({id:user.uid,email:user.email,name:userData.name,role}));
-      location.href = superAdmins.includes(emailInput) ? "manager-admin.html" : "manager-employee.html";
+      if(role !== "manager"){
+        alert("You are not allowed to login as Manager.");
+        await auth.signOut();
+        return;
+      }
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role
+      }));
+      if(superAdmins.includes(email)){
+        location.href = "manager-admin.html";
+      } else {
+        location.href = "manager-employee.html";
+      }
       return;
     }
 
   } catch(err){
     console.error(err);
-    alert("Login failed: "+err.message);
+    alert("Login failed: " + err.message);
   }
-});
-
-// Forgot Password Logic
-const forgotLink = document.getElementById("forgotLink");
-const forgotModal = document.getElementById("forgotModal");
-const closeModal = forgotModal.querySelector(".close");
-const resetBtn = document.getElementById("resetBtn");
-const resetEmail = document.getElementById("resetEmail");
-const resetError = document.getElementById("resetError");
-const resetSuccess = document.getElementById("resetSuccess");
-
-// Open modal
-forgotLink.addEventListener("click",(e)=>{ e.preventDefault(); forgotModal.style.display="block"; resetEmail.value=""; resetError.textContent=""; resetSuccess.textContent=""; });
-closeModal.addEventListener("click",()=>{ forgotModal.style.display="none"; });
-window.addEventListener("click",(e)=>{ if(e.target==forgotModal) forgotModal.style.display="none"; });
-
-// Reset password
-resetBtn.addEventListener("click", async () => {
-  const email = resetEmail.value.trim().toLowerCase();
-  if(!email){ resetError.textContent="Please enter your email"; resetSuccess.textContent=""; return; }
-  resetError.textContent=""; resetSuccess.textContent="";
-  try { await auth.sendPasswordResetEmail(email); resetSuccess.textContent="Reset email sent successfully!"; }
-  catch(err){ resetError.textContent=err.message; }
 });
 </script>
 
