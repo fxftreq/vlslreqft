@@ -121,7 +121,7 @@ togglePassword.addEventListener("click", () => {
 
 // Login logic
 loginBtn.addEventListener("click", async () => {
-  const email = document.getElementById("email").value.trim();
+  const email = document.getElementById("email").value.trim().toLowerCase();
   const password = passwordInput.value.trim();
   const loginType = document.getElementById("loginType").value;
 
@@ -220,6 +220,53 @@ loginBtn.addEventListener("click", async () => {
   } catch(err){
     console.error(err);
     alert("Login failed: " + err.message);
+  }
+});
+
+// Forgot Password Logic
+const forgotLink = document.getElementById("forgotLink");
+const forgotModal = document.getElementById("forgotModal");
+const closeModal = forgotModal.querySelector(".close");
+const resetBtn = document.getElementById("resetBtn");
+const resetEmail = document.getElementById("resetEmail");
+const resetError = document.getElementById("resetError");
+const resetSuccess = document.getElementById("resetSuccess");
+
+// Open modal
+forgotLink.addEventListener("click", (e) => {
+  e.preventDefault();
+  forgotModal.style.display = "block";
+  resetEmail.value = "";
+  resetError.textContent = "";
+  resetSuccess.textContent = "";
+});
+
+// Close modal
+closeModal.addEventListener("click", () => {
+  forgotModal.style.display = "none";
+});
+
+// Click outside modal to close
+window.addEventListener("click", (e) => {
+  if (e.target == forgotModal) forgotModal.style.display = "none";
+});
+
+// Reset password
+resetBtn.addEventListener("click", async () => {
+  const email = resetEmail.value.trim().toLowerCase();
+  if (!email){
+    resetError.textContent = "Please enter your email";
+    resetSuccess.textContent = "";
+    return;
+  }
+  resetError.textContent = "";
+  resetSuccess.textContent = "";
+
+  try {
+    await auth.sendPasswordResetEmail(email);
+    resetSuccess.textContent = "Reset email sent successfully!";
+  } catch (err) {
+    resetError.textContent = err.message;
   }
 });
 </script>
