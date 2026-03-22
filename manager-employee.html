@@ -26,7 +26,7 @@ h2 { color: var(--fedex-purple); text-align:center; margin-bottom:20px; }
 .submit-inline { margin-top:22px; padding:10px 20px; background:var(--fedex-orange); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; height:42px; }
 .submit-inline:hover { background:darkorange; }
 
-.card { background:white; padding:25px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); }
+.card { background:white; padding:25px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); margin-bottom:20px; }
 table { width:100%; border-collapse:collapse; min-width:600px; table-layout: fixed; }
 th, td { padding:12px; border-bottom:1px solid var(--table-border); text-align:left; word-wrap:break-word; overflow-wrap:break-word; }
 td.reason-col { max-width:250px; }
@@ -48,9 +48,10 @@ th { background:var(--table-header-bg); color:white; }
 
 .calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
 .cal-header { background: var(--table-header-bg); color:white; padding:6px; text-align:center; font-weight:bold; border-radius:4px; }
-.cal-cell { border:1px solid #ddd; min-height:80px; padding:4px; font-size:12px; border-radius:6px; }
+.cal-cell { border:1px solid #ddd; min-height:80px; padding:4px; font-size:12px; border-radius:6px; position:relative; overflow:hidden; }
 .cal-day { font-weight:bold; }
-.cal-tag { margin-top:3px; font-size:10px; padding:2px 4px; border-radius:4px; color:white; }
+.cal-tag { margin-top:2px; font-size:10px; padding:2px 4px; border-radius:4px; color:white; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; }
+
 .tag-Pending { background:orange; }
 .tag-Approved { background:green; }
 .tag-Rejected { background:red; }
@@ -59,9 +60,9 @@ th { background:var(--table-header-bg); color:white; }
 .year-view { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
 .year-view .calendar { gap:2px; }
 .year-view .cal-header { padding:4px; font-size:10px; }
-.year-view .cal-cell { min-height:26px; padding:2px; font-size:9px; cursor:pointer; }
+.year-view .cal-cell { min-height:26px; padding:2px; font-size:9px; cursor:pointer; position:relative; }
 .year-view .cal-day { font-size:9px; }
-.year-view .cal-tag { display:block; font-size:8px; margin-top:2px; }
+.year-view .cal-tag { display:block; font-size:8px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .year-box { border:1px solid #ddd; border-radius:8px; padding:10px; background:#fff; cursor:pointer; text-align:center; font-weight:bold; }
 
 .main-header { background: linear-gradient(90deg,#4D148C,#3b0f70); color:white; padding:14px 30px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 15px rgba(0,0,0,0.2); position:sticky; top:0; z-index:100; }
@@ -126,7 +127,7 @@ th { background:var(--table-header-bg); color:white; }
 
 <button class="accordion">Click to View Plotted Leave Requests</button>
 <div class="panel">
-  <div class="card" style="margin-bottom:20px;">
+  <div class="card">
     <div class="calendar-controls">
       <button onclick="changeMonth(-1)">◀</button>
       <span id="calendarLabel"></span>
@@ -149,7 +150,6 @@ th { background:var(--table-header-bg); color:white; }
 <footer>© FedEx 2026</footer>
 
 <script>
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain: "fedex-attendance-system.firebaseapp.com",
@@ -196,11 +196,11 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
     await db.collection("manager_single_day_leave").add(leaveData);
     alert("Leave submitted!");
     dateEl.value = ""; document.getElementById("reason").value = "";
-    loadLeaves(); renderCalendar();
+    loadLeaves();
   }catch(err){ alert("Error: "+err.message); }
 });
 
-// Load leaves for table
+// Load leaves for table and calendar
 const tableEl = document.getElementById("table");
 let managerLeaves = [];
 
@@ -208,35 +208,27 @@ function loadLeaves() {
   db.collection("manager_single_day_leave")
     .orderBy("date","asc")
     .onSnapshot(snapshot => {
-      tableEl.innerHTML = `
-        <tr>
-          <th>Leave Type</th>
-          <th>Leave Date</th>
-          <th>Reason</th>
-          <th>Status</th>
-          <th>Submitted Date</th>
-        </tr>`;
+      tableEl.innerHTML = `<tr><th>Leave Type</th><th>Leave Date</th><th>Reason</th><th>Status</th><th>Submitted Date</th></tr>`;
       managerLeaves = [];
       snapshot.forEach(doc => {
         const l = doc.data();
-        if(l.managerName !== currentUser.name) return;
         const submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
         const submittedStr = submittedDate.toLocaleString("en-PH",{timeZone:"Asia/Manila",year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
-        tableEl.innerHTML += `<tr>
-          <td>${l.type}</td>
-          <td>${l.date}</td>
-          <td class="reason-col">${l.reason}</td>
-          <td class="status-${l.status}">${l.status}</td>
-          <td>${submittedStr}</td>
-        </tr>`;
+        if(l.managerName === currentUser.name){
+          tableEl.innerHTML += `<tr>
+            <td>${l.type}</td>
+            <td>${l.date}</td>
+            <td class="reason-col">${l.reason}</td>
+            <td class="status-${l.status}">${l.status}</td>
+            <td>${submittedStr}</td>
+          </tr>`;
+        }
         managerLeaves.push({...l, submittedAt: submittedDate});
       });
       if(managerLeaves.length === 0) tableEl.innerHTML += `<tr><td colspan="5" style="text-align:center">No leave records found</td></tr>`;
-      renderCalendar(); // render after leaves load
-    }, err => { alert("Error loading leaves: " + err.message); });
+      renderCalendar();
+    });
 }
-
-loadLeaves();
 
 // Accordion
 const acc=document.querySelector(".accordion");
@@ -246,19 +238,18 @@ acc.addEventListener("click",()=>{
   panel.style.display=(panel.style.display==="block"?"none":"block"); 
 });
 
-// Calendar functions
+// Calendar
 let calMonth=new Date().getMonth(), calYear=new Date().getFullYear(), viewMode="year";
 
-function renderCalendar() {
-  if (!managerLeaves) return;
-  viewMode === "month" ? renderMonth() : renderYear();
-}
+function setViewMode(mode){ viewMode=mode; renderCalendar(); }
+function changeMonth(dir){ calMonth+=dir; if(calMonth<0){ calMonth=11; calYear--;} if(calMonth>11){ calMonth=0; calYear++;} renderCalendar(); }
 
-function renderMonth() {
-  const container=document.getElementById("calendarContainer");
-  container.className="calendar"; container.innerHTML="";
-  const first=new Date(calYear,calMonth,1); 
-  const days=new Date(calYear,calMonth+1,0).getDate(); 
+function renderCalendar(){ viewMode==="month"?renderMonth():renderYear(); }
+
+function renderMonth(){
+  const container=document.getElementById("calendarContainer"); container.className="calendar"; container.innerHTML="";
+  const first=new Date(calYear, calMonth,1); 
+  const days=new Date(calYear, calMonth+1,0).getDate(); 
   const start=first.getDay();
   document.getElementById("calendarLabel").textContent = first.toLocaleString('default',{month:'long'})+" "+calYear;
   ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{ const h=document.createElement("div"); h.className="cal-header"; h.textContent=d; container.appendChild(h); });
@@ -268,15 +259,14 @@ function renderMonth() {
     const day=document.createElement("div"); day.className="cal-day"; day.textContent=d; cell.appendChild(day);
     const fullDate=calYear+"-"+String(calMonth+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
     managerLeaves.filter(l=>l.date===fullDate).forEach(l=>{
-      const tag=document.createElement("div"); tag.className="cal-tag tag-"+l.status; tag.textContent=`${l.type} (${l.status})`; cell.appendChild(tag);
+      const tag=document.createElement("div"); tag.className="cal-tag tag-"+l.status; tag.title=`${l.managerName}: ${l.type} (${l.status})`; tag.textContent=`${l.type} (${l.status})`; cell.appendChild(tag);
     });
     container.appendChild(cell);
   }
 }
 
-function renderYear() {
-  const container=document.getElementById("calendarContainer");
-  container.className="year-view"; container.innerHTML="";
+function renderYear(){
+  const container=document.getElementById("calendarContainer"); container.className="year-view"; container.innerHTML="";
   for(let m=0;m<12;m++){
     const monthDiv=document.createElement("div"); monthDiv.className="year-box";
     const monthTitle=document.createElement("div"); monthTitle.innerHTML=`<strong>${new Date(calYear,m,1).toLocaleString('default',{month:'short'})} ${calYear}</strong>`; monthDiv.appendChild(monthTitle);
@@ -288,8 +278,8 @@ function renderYear() {
       const cell=document.createElement("div"); cell.className="cal-cell";
       const dayNumber=document.createElement("div"); dayNumber.className="cal-day"; dayNumber.textContent=d; cell.appendChild(dayNumber);
       const fullDate=calYear+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+      managerLeaves.filter(l=>l.date===fullDate).forEach(l=>{ const tag=document.createElement("div"); tag.className="cal-tag tag-"+l.status; tag.title=`${l.managerName}: ${l.type} (${l.status})`; tag.textContent=`${l.type} (${l.status})`; cell.appendChild(tag); });
       if(managerLeaves.some(l=>l.date===fullDate)) cell.style.background="#f3e8ff";
-      managerLeaves.filter(l=>l.date===fullDate).forEach(l=>{ const tag=document.createElement("div"); tag.className="cal-tag tag-"+l.status; tag.textContent=`${l.type} (${l.status})`; cell.appendChild(tag); });
       cell.addEventListener("click",()=>{ calMonth=m; viewMode="month"; renderCalendar(); });
       monthCalendar.appendChild(cell);
     }
@@ -299,8 +289,7 @@ function renderYear() {
   document.getElementById("calendarLabel").textContent=calYear;
 }
 
-function setViewMode(mode){ viewMode=mode; renderCalendar(); }
-function changeMonth(dir){ calMonth+=dir; if(calMonth<0){ calMonth=11; calYear--;} if(calMonth>11){ calMonth=0; calYear++;} renderCalendar(); }
+loadLeaves();
 </script>
 </body>
 </html>
