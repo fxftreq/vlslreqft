@@ -93,7 +93,13 @@ button{ width:100%; padding:12px; background:var(--fedex-purple); border:none; c
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-// Firebase references
+// Firebase config
+firebase.initializeApp({
+  apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+  authDomain: "fedex-attendance-system.firebaseapp.com",
+  projectId: "fedex-attendance-system"
+});
+
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -105,17 +111,17 @@ const togglePassword = document.getElementById("togglePassword");
 // Show/hide password
 togglePassword.addEventListener("click", () => {
   passwordInput.type = passwordInput.type === "password" ? "text" : "password";
-  togglePassword.classList.toggle("fa-eye-slash");
   togglePassword.classList.toggle("fa-eye");
+  togglePassword.classList.toggle("fa-eye-slash");
 });
 
-// LOGIN: case-insensitive
+// Login logic
 loginBtn.addEventListener("click", async () => {
   const emailInput = document.getElementById("email").value.trim().toLowerCase();
   const password = passwordInput.value.trim();
   const loginType = document.getElementById("loginType").value;
 
-  if (!emailInput || !password) {
+  if(!emailInput || !password){
     alert("Please enter email and password");
     return;
   }
@@ -127,51 +133,48 @@ loginBtn.addEventListener("click", async () => {
     const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
     const teamLeaderAdmins = ["Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com", ...superAdmins];
 
-    // Fetch role (case-insensitive)
+    // Query Firestore (case-insensitive)
+    const snapM = await db.collection("manager_leave_user").where("email_lower","==",emailInput).limit(1).get();
+    const snapTL = await db.collection("leave_users").where("email_lower","==",emailInput).limit(1).get();
+
     let role = null;
     let userData = null;
 
-    const snapM = await db.collection("manager_leave_user").get();
-    const snapTL = await db.collection("leave_users").get();
-
-    const managerDoc = snapM.docs.find(doc => (doc.data().email || "").toLowerCase() === emailInput);
-    const tlDoc = snapTL.docs.find(doc => (doc.data().email || "").toLowerCase() === emailInput);
-
-    if (managerDoc) { role = "manager"; userData = managerDoc.data(); }
-    else if (tlDoc) { role = "team_leader"; userData = tlDoc.data(); }
+    if(!snapM.empty){ role="manager"; userData = snapM.docs[0].data(); }
+    else if(!snapTL.empty){ role="team_leader"; userData = snapTL.docs[0].data(); }
     else { alert("No access found."); await auth.signOut(); return; }
 
     // SuperAdmin routing
-    if (superAdmins.includes(emailInput)) {
+    if(superAdmins.includes(emailInput)){
       localStorage.setItem("currentUser", JSON.stringify({id:user.uid,email:user.email,name:userData.name,role}));
-      location.href = loginType === "team_leader" ? "admin.html" : "manager-admin.html";
+      location.href = loginType==="team_leader" ? "admin.html" : "manager-admin.html";
       return;
     }
 
-    // Team Leader
-    if (loginType === "team_leader") {
-      if (teamLeaderAdmins.includes(emailInput) || role === "team_leader") {
+    // Team Leader login
+    if(loginType==="team_leader"){
+      if(teamLeaderAdmins.includes(emailInput) || role==="team_leader"){
         localStorage.setItem("currentUser", JSON.stringify({id:user.uid,email:user.email,name:userData.name,role}));
-        location.href = role === "team_leader" ? "employee.html" : "admin.html";
+        location.href = role==="team_leader" ? "employee.html" : "admin.html";
         return;
       } else { alert("You are not allowed to login as Team Leader."); await auth.signOut(); return; }
     }
 
-    // Manager
-    if (loginType === "manager") {
-      if (role !== "manager") { alert("You are not allowed to login as Manager."); await auth.signOut(); return; }
+    // Manager login
+    if(loginType==="manager"){
+      if(role!=="manager"){ alert("You are not allowed to login as Manager."); await auth.signOut(); return; }
       localStorage.setItem("currentUser", JSON.stringify({id:user.uid,email:user.email,name:userData.name,role}));
       location.href = superAdmins.includes(emailInput) ? "manager-admin.html" : "manager-employee.html";
       return;
     }
 
-  } catch(err) {
+  } catch(err){
     console.error(err);
-    alert("Login failed: " + err.message);
+    alert("Login failed: "+err.message);
   }
 });
 
-// PASSWORD RESET (case-insensitive)
+// Forgot Password Logic
 const forgotLink = document.getElementById("forgotLink");
 const forgotModal = document.getElementById("forgotModal");
 const closeModal = forgotModal.querySelector(".close");
@@ -180,25 +183,18 @@ const resetEmail = document.getElementById("resetEmail");
 const resetError = document.getElementById("resetError");
 const resetSuccess = document.getElementById("resetSuccess");
 
-forgotLink.addEventListener("click", e => {
-  e.preventDefault();
-  forgotModal.style.display = "block";
-  resetEmail.value = "";
-  resetError.textContent = "";
-  resetSuccess.textContent = "";
-});
+// Open modal
+forgotLink.addEventListener("click",(e)=>{ e.preventDefault(); forgotModal.style.display="block"; resetEmail.value=""; resetError.textContent=""; resetSuccess.textContent=""; });
+closeModal.addEventListener("click",()=>{ forgotModal.style.display="none"; });
+window.addEventListener("click",(e)=>{ if(e.target==forgotModal) forgotModal.style.display="none"; });
 
-closeModal.addEventListener("click", () => { forgotModal.style.display = "none"; });
-window.addEventListener("click", e => { if(e.target == forgotModal) forgotModal.style.display = "none"; });
-
+// Reset password
 resetBtn.addEventListener("click", async () => {
   const email = resetEmail.value.trim().toLowerCase();
-  if (!email) { resetError.textContent = "Please enter your email"; resetSuccess.textContent = ""; return; }
-  resetError.textContent = ""; resetSuccess.textContent = "";
-  try { 
-    await auth.sendPasswordResetEmail(email);
-    resetSuccess.textContent = "Reset email sent successfully!";
-  } catch(err) { resetError.textContent = err.message; }
+  if(!email){ resetError.textContent="Please enter your email"; resetSuccess.textContent=""; return; }
+  resetError.textContent=""; resetSuccess.textContent="";
+  try { await auth.sendPasswordResetEmail(email); resetSuccess.textContent="Reset email sent successfully!"; }
+  catch(err){ resetError.textContent=err.message; }
 });
 </script>
 
