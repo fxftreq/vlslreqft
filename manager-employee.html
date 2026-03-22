@@ -11,7 +11,11 @@
   --bg-gray: #f4f4f6;
   --table-header-bg: #4D148C;
   --table-border: #ddd;
-  --status-cancelled: #888888;
+  --status-Pending: orange;
+  --status-Approved: green;
+  --status-Rejected: red;
+  --status-Cancelled: #888;
+  --my-leave-border: 2px solid limegreen;
 }
 
 body { margin:0; font-family: Arial,sans-serif; background: var(--bg-gray); display:flex; flex-direction:column; min-height:100vh; }
@@ -38,7 +42,7 @@ th { background:var(--table-header-bg); color:white; }
 .status-Pending { color:orange; font-weight:bold; }
 .status-Approved { color:green; font-weight:bold; }
 .status-Rejected { color:red; font-weight:bold; }
-.status-Cancelled { color:var(--status-cancelled); font-style:italic; font-weight:bold; }
+.status-Cancelled { color:var(--status-Cancelled); font-style:italic; font-weight:bold; }
 
 .accordion { background: var(--fedex-purple); color:white; cursor:pointer; padding:14px 18px; width:100%; border:none; border-radius:8px; text-align:left; font-size:0.95em; font-weight:bold; margin-bottom:10px; transition:0.3s; }
 .accordion:hover { background:#3a0f6f; }
@@ -51,22 +55,17 @@ th { background:var(--table-header-bg); color:white; }
 
 .calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
 .cal-header { background: var(--table-header-bg); color:white; padding:6px; text-align:center; font-weight:bold; border-radius:4px; }
-.cal-cell { border:1px solid #ddd; min-height:60px; padding:4px; font-size:12px; border-radius:6px; position:relative; }
+.cal-cell { border:1px solid #ddd; min-height:60px; padding:4px; font-size:12px; border-radius:6px; position:relative; overflow:hidden; }
 .cal-day { font-weight:bold; font-size:12px; margin-bottom:4px; }
 
-.cal-tag { position:absolute; bottom:2px; left:2px; right:2px; height:10px; border-radius:4px; }
-
-.tag-Pending { background:orange; }
-.tag-Approved { background:green; }
-.tag-Rejected { background:red; }
-.tag-Cancelled { background:#888; }
+.cal-tag { display:block; padding:1px 2px; border-radius:4px; font-size:10px; color:white; margin-top:2px; }
 
 .year-view { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
 .year-view .calendar { gap:2px; }
 .year-view .cal-header { padding:4px; font-size:10px; }
 .year-view .cal-cell { min-height:26px; padding:2px; font-size:9px; cursor:pointer; position:relative; }
 .year-view .cal-day { font-size:9px; }
-.year-view .cal-tag { display:block; width:100%; height:6px; border-radius:3px; position:absolute; bottom:1px; left:1px; }
+.year-view .cal-tag { width:100%; height:6px; border-radius:3px; position:absolute; bottom:1px; left:1px; display:block; }
 
 .year-box { border:1px solid #ddd; border-radius:8px; padding:10px; background:#fff; cursor:pointer; text-align:center; font-weight:bold; }
 
@@ -95,7 +94,6 @@ th { background:var(--table-header-bg); color:white; }
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-
 <header class="main-header">
   <div class="header-left">
     <div class="logo-circle"><i class="fas fa-plane"></i></div>
@@ -243,6 +241,7 @@ let viewMode="year", calMonth=new Date().getMonth(), calYear=new Date().getFullY
 
 function renderCalendar(){ viewMode==="month"?renderMonth():renderYear(); }
 
+// Month view: color + name
 function renderMonth(){
   const container=document.getElementById("calendarContainer"); 
   container.className="calendar"; 
@@ -265,7 +264,8 @@ function renderMonth(){
     managerLeaves.forEach(l=>{
       if(l.date===fullDate){
         const tag=document.createElement("div"); tag.className="cal-tag tag-"+l.status;
-        tag.title = `Manager: ${l.managerName}\nType: ${l.type}\nStatus: ${l.status}`;
+        tag.textContent = l.managerName + " ("+l.type+")";
+        if(l.managerName===currentUser.name) cell.style.border= "var(--my-leave-border)";
         cell.appendChild(tag);
       }
     });
@@ -273,51 +273,39 @@ function renderMonth(){
   }
 }
 
+// Year view: only color, tooltip shows info
 function renderYear(){
-  const container = document.getElementById("calendarContainer");
-  container.className = "year-view"; 
-  container.innerHTML = "";
+  const container=document.getElementById("calendarContainer");
+  container.className="year-view";
+  container.innerHTML="";
   document.getElementById("calendarLabel").textContent = calYear;
 
-  for(let m=0; m<12; m++){
-    const monthDiv = document.createElement("div");
-    monthDiv.className = "year-box";
-
-    const monthTitle = document.createElement("div");
-    monthTitle.innerHTML = `<strong>${new Date(calYear,m,1).toLocaleString('default',{month:'short'})}</strong>`;
+  for(let m=0;m<12;m++){
+    const monthDiv=document.createElement("div"); monthDiv.className="year-box";
+    const monthTitle=document.createElement("div"); monthTitle.innerHTML=`<strong>${new Date(calYear,m,1).toLocaleString('default',{month:'short'})}</strong>`; 
     monthDiv.appendChild(monthTitle);
 
-    const monthCalendar = document.createElement("div");
-    monthCalendar.className = "calendar";
-    monthCalendar.style.marginTop = "8px";
-
-    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(dayName=>{
-      const header = document.createElement("div");
-      header.className = "cal-header";
-      header.textContent = dayName;
-      monthCalendar.appendChild(header);
+    const monthCalendar=document.createElement("div"); monthCalendar.className="calendar"; monthCalendar.style.marginTop="8px";
+    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{
+      const h=document.createElement("div"); h.className="cal-header"; h.textContent=d; monthCalendar.appendChild(h);
     });
 
-    const first = new Date(calYear,m,1);
-    const daysInMonth = new Date(calYear,m+1,0).getDate();
-    const startDay = first.getDay();
-
+    const first=new Date(calYear,m,1); 
+    const daysInMonth=new Date(calYear,m+1,0).getDate(); 
+    const startDay=first.getDay();
     for(let i=0;i<startDay;i++) monthCalendar.appendChild(document.createElement("div"));
 
-    for(let d=1; d<=daysInMonth; d++){
-      const cell = document.createElement("div"); cell.className = "cal-cell";
-      const dayNumber = document.createElement("div"); dayNumber.className = "cal-day"; dayNumber.textContent = d; cell.appendChild(dayNumber);
-
-      const fullDate = calYear+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+    for(let d=1;d<=daysInMonth;d++){
+      const cell=document.createElement("div"); cell.className="cal-cell";
+      const dayNumber=document.createElement("div"); dayNumber.className="cal-day"; dayNumber.textContent=d; cell.appendChild(dayNumber);
+      const fullDate=calYear+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
       managerLeaves.forEach(l=>{
         if(l.date===fullDate){
-          const tag = document.createElement("div"); tag.className = "cal-tag tag-"+l.status;
+          const tag=document.createElement("div"); tag.className="cal-tag tag-"+l.status;
           tag.title = `Manager: ${l.managerName}\nType: ${l.type}\nStatus: ${l.status}`;
           cell.appendChild(tag);
         }
       });
-
-      cell.addEventListener("click",()=>{ calMonth=m; viewMode="month"; renderCalendar(); });
       monthCalendar.appendChild(cell);
     }
 
