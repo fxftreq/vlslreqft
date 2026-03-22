@@ -107,6 +107,7 @@ const db = firebase.firestore();
 const loginBtn = document.getElementById("loginBtn");
 const passwordInput = document.getElementById("password");
 const togglePassword = document.getElementById("togglePassword");
+const errorDiv = document.getElementById("error");
 
 // Show/hide password
 togglePassword.addEventListener("click", () => {
@@ -121,12 +122,13 @@ togglePassword.addEventListener("click", () => {
 
 // Login logic
 loginBtn.addEventListener("click", async () => {
+  errorDiv.textContent = "";
   const email = document.getElementById("email").value.trim().toLowerCase();
   const password = passwordInput.value.trim();
   const loginType = document.getElementById("loginType").value;
 
   if(!email || !password){
-    alert("Please enter email and password");
+    errorDiv.textContent = "Please enter email and password";
     return;
   }
 
@@ -137,89 +139,71 @@ loginBtn.addEventListener("click", async () => {
     const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
     const teamLeaderAdmins = ["Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com", ...superAdmins];
 
-    // Fetch role
+    // Fetch role by matching lowercase emails
     let role = null;
     let userData = null;
 
-    const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
-    const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
+    const snapM = await db.collection("manager_leave_user").get();
+    snapM.forEach(doc => {
+      if(doc.data().email.toLowerCase() === email){
+        role = "manager";
+        userData = doc.data();
+      }
+    });
 
-    if(!snapM.empty){
-      role = "manager";
-      userData = snapM.docs[0].data();
-    } else if(!snapTL.empty){
-      role = "team_leader";
-      userData = snapTL.docs[0].data();
-    } else {
-      alert("No access found.");
+    if(!role){
+      const snapTL = await db.collection("leave_users").get();
+      snapTL.forEach(doc => {
+        if(doc.data().email.toLowerCase() === email){
+          role = "team_leader";
+          userData = doc.data();
+        }
+      });
+    }
+
+    if(!role){
+      errorDiv.textContent = "No access found.";
       await auth.signOut();
       return;
     }
 
-    // SuperAdmin routing
+    // Save current user
+    localStorage.setItem("currentUser", JSON.stringify({
+      id: user.uid,
+      email: user.email,
+      name: userData.name,
+      role: role
+    }));
+
+    // Routing
     if(superAdmins.includes(email)){
-      localStorage.setItem("currentUser", JSON.stringify({
-        id: user.uid,
-        email: user.email,
-        name: userData.name,
-        role: role
-      }));
-      if(loginType==="team_leader") location.href = "admin.html";
-      else if(loginType==="manager") location.href = "manager-admin.html";
+      location.href = loginType === "team_leader" ? "admin.html" : "manager-admin.html";
       return;
     }
 
-    // Team Leader login
-    if(loginType==="team_leader"){
+    if(loginType === "team_leader"){
       if(teamLeaderAdmins.includes(email)){
-        localStorage.setItem("currentUser", JSON.stringify({
-          id: user.uid,
-          email: user.email,
-          name: userData.name,
-          role: role
-        }));
         location.href = "admin.html";
         return;
       }
       if(role !== "team_leader"){
-        alert("You are not allowed to login as Team Leader.");
+        errorDiv.textContent = "You are not allowed to login as Team Leader.";
         await auth.signOut();
         return;
       }
-      localStorage.setItem("currentUser", JSON.stringify({
-        id: user.uid,
-        email: user.email,
-        name: userData.name,
-        role: role
-      }));
       location.href = "employee.html";
-      return;
-    }
-
-    // Manager login
-    if(loginType==="manager"){
+    } else if(loginType === "manager"){
       if(role !== "manager"){
-        alert("You are not allowed to login as Manager.");
+        errorDiv.textContent = "You are not allowed to login as Manager.";
         await auth.signOut();
         return;
       }
-      localStorage.setItem("currentUser", JSON.stringify({
-        id: user.uid,
-        email: user.email,
-        name: userData.name,
-        role: role
-      }));
-      if(superAdmins.includes(email)){
-        location.href = "manager-admin.html";
-      } else {
-        location.href = "manager-employee.html";
-      }
-      return;
+      location.href = superAdmins.includes(email) ? "manager-admin.html" : "manager-employee.html";
     }
 
   } catch(err){
     console.error(err);
-    alert("Login failed: " + err.message);
+    errorDiv.textContent = "Login failed: " + err.message;
   }
 });
 
