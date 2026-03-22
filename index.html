@@ -137,27 +137,30 @@ loginBtn.addEventListener("click", async () => {
     const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
     const teamLeaderAdmins = ["Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com", ...superAdmins];
 
-    // Fetch role
+    // Fetch role (case-insensitive)
     let role = null;
     let userData = null;
 
-    const snapM = await db.collection("manager_leave_user").where("email","==",email).limit(1).get();
-    const snapTL = await db.collection("leave_users").where("email","==",email).limit(1).get();
+    const snapM = await db.collection("manager_leave_user").get();
+    const snapTL = await db.collection("leave_users").get();
 
-    if(!snapM.empty){
+    const managerDoc = snapM.docs.find(d => d.data().email.toLowerCase() === email.toLowerCase());
+    const tlDoc = snapTL.docs.find(d => d.data().email.toLowerCase() === email.toLowerCase());
+
+    if(managerDoc){
       role = "manager";
-      userData = snapM.docs[0].data();
-    } else if(!snapTL.empty){
+      userData = managerDoc.data();
+    } else if(tlDoc){
       role = "team_leader";
-      userData = snapTL.docs[0].data();
+      userData = tlDoc.data();
     } else {
       alert("No access found.");
       await auth.signOut();
       return;
     }
 
-    // SuperAdmin routing
-    if(superAdmins.includes(email)){
+    // SuperAdmin routing (case-insensitive)
+    if(superAdmins.some(a => a.toLowerCase() === email.toLowerCase())){
       localStorage.setItem("currentUser", JSON.stringify({
         id: user.uid,
         email: user.email,
@@ -171,7 +174,7 @@ loginBtn.addEventListener("click", async () => {
 
     // Team Leader login
     if(loginType==="team_leader"){
-      if(teamLeaderAdmins.includes(email)){
+      if(teamLeaderAdmins.some(a => a.toLowerCase() === email.toLowerCase())){
         localStorage.setItem("currentUser", JSON.stringify({
           id: user.uid,
           email: user.email,
@@ -209,7 +212,7 @@ loginBtn.addEventListener("click", async () => {
         name: userData.name,
         role: role
       }));
-      if(superAdmins.includes(email)){
+      if(superAdmins.some(a => a.toLowerCase() === email.toLowerCase())){
         location.href = "manager-admin.html";
       } else {
         location.href = "manager-employee.html";
@@ -223,7 +226,8 @@ loginBtn.addEventListener("click", async () => {
   }
 });
 </script>
-  <script>
+
+<script>
 // Forgot Password Modal Logic
 const forgotLink = document.getElementById("forgotLink");
 const forgotModal = document.getElementById("forgotModal");
@@ -264,7 +268,8 @@ resetBtn.addEventListener("click", async () => {
   }
 
   try {
-    await auth.sendPasswordResetEmail(email);
+    // Always lowercase email for auth to avoid mismatch
+    await auth.sendPasswordResetEmail(email.toLowerCase());
     resetSuccess.textContent = "Password reset email sent successfully!";
   } catch(err){
     console.error(err);
