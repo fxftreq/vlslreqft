@@ -119,7 +119,7 @@ togglePassword.addEventListener("click", () => {
   }
 });
 
-// Login logic (case-insensitive email)
+// LOGIN LOGIC (case-insensitive)
 loginBtn.addEventListener("click", async () => {
   let email = document.getElementById("email").value.trim().toLowerCase(); // lowercase
   const password = passwordInput.value.trim();
@@ -134,7 +134,7 @@ loginBtn.addEventListener("click", async () => {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
-    // lowercase emails for consistent comparison
+    // lowercase emails for superAdmins / teamLeaderAdmins
     const superAdmins = ["julanguinto@gmail.com","trevorbarry.imatong@iqor.com"];
     const teamLeaderAdmins = ["jenileemae.david@iqor.com","jonie.kabigting@iqor.com", ...superAdmins];
 
@@ -143,9 +143,9 @@ loginBtn.addEventListener("click", async () => {
     let userData = null;
 
     const snapM = await db.collection("manager_leave_user")
-                          .where("email_lower","==", email).limit(1).get();
+                          .where("email","==", email).limit(1).get();
     const snapTL = await db.collection("leave_users")
-                           .where("email_lower","==", email).limit(1).get();
+                           .where("email","==", email).limit(1).get();
 
     if(!snapM.empty){
       role = "manager";
@@ -228,7 +228,7 @@ loginBtn.addEventListener("click", async () => {
 </script>
 
 <script>
-// Forgot Password Modal Logic (case-insensitive)
+// FORGOT PASSWORD MODAL (case-insensitive)
 const forgotLink = document.getElementById("forgotLink");
 const forgotModal = document.getElementById("forgotModal");
 const closeModal = document.querySelector(".close");
@@ -256,7 +256,7 @@ window.addEventListener("click", (e) => {
   }
 });
 
-// Password Reset (case-insensitive)
+// Password Reset
 resetBtn.addEventListener("click", async () => {
   let email = resetEmail.value.trim().toLowerCase(); // lowercase
   resetError.textContent = "";
