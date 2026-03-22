@@ -283,25 +283,46 @@ function renderMonth(){
 
 function renderYear(){
   const container = document.getElementById("calendarContainer");
-  container.className="year-view"; 
-  container.innerHTML="";
+  container.className = "year-view"; 
+  container.innerHTML = "";
+
   for(let m=0; m<12; m++){
-    const monthDiv = document.createElement("div"); monthDiv.className="year-box";
+    const monthDiv = document.createElement("div");
+    monthDiv.className = "year-box";
+
     const monthTitle = document.createElement("div");
     monthTitle.innerHTML = `<strong>${new Date(calYear,m,1).toLocaleString('default',{month:'short'})} ${calYear}</strong>`;
     monthDiv.appendChild(monthTitle);
-    const monthCalendar = document.createElement("div"); monthCalendar.className="calendar"; monthCalendar.style.marginTop="8px";
+
+    const monthCalendar = document.createElement("div");
+    monthCalendar.className = "calendar";
+    monthCalendar.style.marginTop = "8px";
+
     ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(dayName=>{
-      const header = document.createElement("div"); header.className="cal-header"; header.textContent = dayName; monthCalendar.appendChild(header);
+      const header = document.createElement("div");
+      header.className = "cal-header";
+      header.textContent = dayName;
+      monthCalendar.appendChild(header);
     });
-    const first = new Date(calYear,m,1); 
-    const daysInMonth = new Date(calYear,m+1,0).getDate(); 
+
+    const first = new Date(calYear,m,1);
+    const daysInMonth = new Date(calYear,m+1,0).getDate();
     const startDay = first.getDay();
+
     for(let i=0;i<startDay;i++) monthCalendar.appendChild(document.createElement("div"));
+
     for(let d=1; d<=daysInMonth; d++){
-      const cell = document.createElement("div"); cell.className="cal-cell";
-      const dayNumber = document.createElement("div"); dayNumber.className="cal-day"; dayNumber.textContent=d; cell.appendChild(dayNumber);
+      const cell = document.createElement("div");
+      cell.className = "cal-cell";
+
+      const dayNumber = document.createElement("div");
+      dayNumber.className = "cal-day";
+      dayNumber.textContent = d;
+      cell.appendChild(dayNumber);
+
       const fullDate = calYear+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+
+      // Add ALL leaves for this date
       managerLeaves.forEach(l=>{
         if(l.date === fullDate){
           const tag = document.createElement("div");
@@ -311,14 +332,21 @@ function renderYear(){
           cell.appendChild(tag);
         }
       });
+
+      // Clicking mini month cell switches to month view
       cell.addEventListener("click", ()=>{
-        calMonth = m; viewMode="month"; renderCalendar();
+        calMonth = m;
+        viewMode = "month";
+        renderCalendar();
       });
+
       monthCalendar.appendChild(cell);
     }
+
     monthDiv.appendChild(monthCalendar);
     container.appendChild(monthDiv);
   }
+
   document.getElementById("calendarLabel").textContent = calYear;
 }
 
