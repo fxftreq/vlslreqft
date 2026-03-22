@@ -219,13 +219,11 @@ document.getElementById("submitBtn").addEventListener("click", async ()=>{
 const tableEl = document.getElementById("table");
 let managerLeaves = [];
 
+// Load manager leave tickets
 function loadLeaves() {
-  if (!currentUser) return; // safety check
-
-  // Query the collection
+  const tableEl = document.getElementById("table");
   db.collection("manager_single_day_leave")
-    .get() // get all records
-    .then(snapshot => {
+    .onSnapshot(snapshot => {
       tableEl.innerHTML = `
         <tr>
           <th>Leave Type</th>
@@ -234,15 +232,13 @@ function loadLeaves() {
           <th>Status</th>
           <th>Submitted Date</th>
         </tr>`;
+
       managerLeaves = [];
 
       snapshot.forEach(doc => {
         const l = doc.data();
+        if(l.managerId !== currentUser.id) return;  // Only current manager
 
-        // Filter for CURRENT manager only
-        if (l.managerId !== currentUser.id) return;
-
-        // Convert timestamp if needed
         const submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
         const submittedStr = submittedDate.toLocaleString("en-PH", {
           timeZone: "Asia/Manila",
@@ -264,17 +260,16 @@ function loadLeaves() {
         managerLeaves.push({...l, submittedAt: submittedDate});
       });
 
-      if(managerLeaves.length === 0) {
+      if(managerLeaves.length === 0){
         tableEl.innerHTML += `<tr><td colspan="5" style="text-align:center;">No leave records found</td></tr>`;
       }
-    })
-    .catch(err => {
-      console.error("Error loading leaves: ", err);
+
+      renderCalendar(); // update calendar after data loads
+    }, err => {
       alert("Error loading leaves: " + err.message);
     });
 }
 
-// Call the function
 loadLeaves();
 
 // Accordion
