@@ -222,6 +222,7 @@ let managerLeaves = [];
 function loadLeaves() {
   db.collection("manager_single_day_leave")
     .where("managerId", "==", currentUser.id)
+    .orderBy("date", "asc")
     .onSnapshot(snapshot => {
 
       tableEl.innerHTML = `
