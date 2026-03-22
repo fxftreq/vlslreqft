@@ -223,6 +223,61 @@ loginBtn.addEventListener("click", async () => {
   }
 });
 </script>
+  <script>
+// Forgot Password Modal Logic
+const forgotLink = document.getElementById("forgotLink");
+const forgotModal = document.getElementById("forgotModal");
+const closeModal = document.querySelector(".close");
+const resetBtn = document.getElementById("resetBtn");
+const resetEmail = document.getElementById("resetEmail");
+const resetError = document.getElementById("resetError");
+const resetSuccess = document.getElementById("resetSuccess");
+
+// Open modal
+forgotLink.addEventListener("click", (e) => {
+  e.preventDefault();
+  resetEmail.value = "";
+  resetError.textContent = "";
+  resetSuccess.textContent = "";
+  forgotModal.style.display = "block";
+});
+
+// Close modal
+closeModal.addEventListener("click", () => {
+  forgotModal.style.display = "none";
+});
+window.addEventListener("click", (e) => {
+  if(e.target === forgotModal){
+    forgotModal.style.display = "none";
+  }
+});
+
+// Password Reset
+resetBtn.addEventListener("click", async () => {
+  const email = resetEmail.value.trim();
+  resetError.textContent = "";
+  resetSuccess.textContent = "";
+
+  if(!email){
+    resetError.textContent = "Please enter your email.";
+    return;
+  }
+
+  try {
+    await auth.sendPasswordResetEmail(email);
+    resetSuccess.textContent = "Password reset email sent successfully!";
+  } catch(err){
+    console.error(err);
+    if(err.code === "auth/user-not-found"){
+      resetError.textContent = "No user found with this email.";
+    } else if(err.code === "auth/invalid-email"){
+      resetError.textContent = "Invalid email address.";
+    } else {
+      resetError.textContent = "Error sending reset email. Try again later.";
+    }
+  }
+});
+</script>
 
 </body>
 </html>
