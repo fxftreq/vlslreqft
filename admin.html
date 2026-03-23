@@ -523,11 +523,11 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 
       <div class="filter-item">
   <label>Region</label>
-  <select id="regionFilter" onchange="applyFilters()">
-    <option value="All">All</option>
-    <option value="PH">Philippines</option>
-    <option value="India">India</option>
-  </select>
+ <select id="regionFilter" onchange="applyFilters()">
+  <option value="All">All</option>
+  <option value="Philippines">Philippines</option>
+  <option value="India">India</option>
+</select>
 </div>
     </div>
 
@@ -790,9 +790,11 @@ function applyFilters() {
   let data = [...cachedRequests];
 
   // REGION FILTER (case-insensitive, trimmed)
-  if(region !== "All") {
-    data = data.filter(r => r.region && r.region.trim().toLowerCase() === region.toLowerCase());
-  }
+ if(region !== "All") {
+  data = data.filter(r => {
+    return r.region && r.region.toLowerCase() === region.toLowerCase();
+  });
+}
 
   // STATUS FILTER
   if(status !== "All") data = data.filter(r => r.status === status);
@@ -895,10 +897,7 @@ function sortList(field) {
 const region = document.getElementById("regionFilter")?.value || "All";
 
 if(region !== "All") {
-  data = data.filter(r => {
-    const reg = r.region || "PH"; // default PH
-    return region === reg;
-  });
+  data = data.filter(r => r.region && r.region.toLowerCase() === region.toLowerCase());
 }
 
   // Apply filters from dropdowns
