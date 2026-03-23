@@ -94,6 +94,12 @@ button{ width:100%; padding:12px; background:var(--fedex-purple); border:none; c
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+
+const indiaAdmins = [
+  "vicky@email.com",          // ✅ ONLY ADMIN
+  "trevorbarry.imatong@iqor.com" // ✅ override
+];
+  
 // Firebase config
 firebase.initializeApp({
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
@@ -212,16 +218,25 @@ loginBtn.addEventListener("click", async () => {
       return;
     }
 
-    // TEAM LEADER INDIA
-    if(loginType === "team_leader_india"){
-      if(role !== "team_leader_india"){
-        alert("You are not allowed to login as Team Leader (India).");
-        await auth.signOut();
-        return;
-      }
-      location.href = "india-admin.html";
-      return;
-    }
+// TEAM LEADER INDIA
+if(loginType === "team_leader_india"){
+
+  if(role !== "team_leader_india"){
+    alert("You are not allowed to login as Team Leader (India).");
+    await auth.signOut();
+    return;
+  }
+
+  // ✅ Check if ADMIN (Vicky / Trevor)
+  if(indiaAdmins.includes(email)){
+    location.href = "india-admin.html";
+  } else {
+    // ✅ All others go to employee page
+    location.href = "india-employee.html";
+  }
+
+  return;
+}
 
     // MANAGER
     if(loginType === "manager"){
