@@ -675,37 +675,48 @@ let calendarMode = "month";
 // ----------- LOAD REQUESTS -------------
 async function loadRequests() {
   try {
-    // Get all users first
     const usersSnapshot = await db.collection("leave_users").get();
     const usersMap = {};
+
     usersSnapshot.forEach(u => {
       const data = u.data();
-      usersMap[data.email.toLowerCase()] = {
-        ...data,
-        region: data.region ? data.region.trim() : ""
-      };
+      if (data.email) {
+        usersMap[data.email.toLowerCase()] = {
+          ...data,
+          region: data.region ? data.region.trim() : ""
+        };
+      }
     });
 
-    // Get all leave requests
     const leaveSnapshot = await db.collection("single_day_leave")
       .orderBy("submittedAt", "asc")
       .get();
 
     cachedRequests = leaveSnapshot.docs.map(d => {
       const leave = d.data();
+      let region = "";
 
-      // Try to match user by email
-      const user = leave.employeeEmail ? usersMap[leave.employeeEmail.toLowerCase()] : null;
+      if (leave.employeeEmail) {
+        const userData = usersMap[leave.employeeEmail.toLowerCase()];
+        if (userData) {
+          region = userData.region;
+        } else {
+          console.warn(`No matching user found for leave:`, leave);
+        }
+      } else {
+        console.warn(`Leave without employeeEmail:`, leave);
+      }
 
       return {
         id: d.id,
         ...leave,
-        region: user?.region || ""
+        region
       };
     });
 
-    render();
+    console.log("Loaded leave requests:", cachedRequests);
 
+    render();
   } catch (err) {
     console.error("Error loading requests:", err);
     alert("Failed to load leave requests. Check console.");
