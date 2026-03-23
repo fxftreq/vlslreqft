@@ -678,22 +678,23 @@ function loadRequests() {
 
   db.collection("single_day_leave").orderBy("submittedAt", "asc").get()
     .then(snapshot => {
-      // Map all docs
       let allRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
+      // Regex for PH: name.surname with optional numbers at end of surname
+      const phRegex = /^[a-z]+\.[a-z]+[0-9]*$/i;
+
       if (region === "All") {
-        // Assign region dynamically
         cachedRequests = allRequests.map(r => ({
           ...r,
-          region: /^[a-z]+\.[a-z]+$/i.test(r.employeeId) ? "Philippines" : "India"
+          region: phRegex.test(r.employeeId) ? "Philippines" : "India"
         }));
       } else if (region === "Philippines") {
         cachedRequests = allRequests
-          .filter(r => /^[a-z]+\.[a-z]+$/i.test(r.employeeId))
+          .filter(r => phRegex.test(r.employeeId))
           .map(r => ({ ...r, region: "Philippines" }));
       } else if (region === "India") {
         cachedRequests = allRequests
-          .filter(r => !/^[a-z]+\.[a-z]+$/i.test(r.employeeId))
+          .filter(r => !phRegex.test(r.employeeId))
           .map(r => ({ ...r, region: "India" }));
       }
 
