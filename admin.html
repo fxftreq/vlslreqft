@@ -899,51 +899,46 @@ async function updateStatus(id, status){
 function sortList(field) {
   let data = [...cachedRequests];
 
-  // REGION FILTER
-const region = document.getElementById("regionFilter").value;
-if(region !== "All") {
-  data = data.filter(r => r.region === region);
-}
+  // Apply region filter dynamically
+  const regionFilter = document.getElementById("regionFilter").value;
+  if (regionFilter !== "All") {
+    data = data.filter(r => getRegion(r.employeeId) === regionFilter);
+  }
 
-  // Apply filters from dropdowns
+  // Apply other filters
   const status = document.getElementById("filterStatus").value;
   const type = document.getElementById("filterType").value;
   const date = document.getElementById("filterDate").value;
-  
   const submitted = document.getElementById("filterSubmitted").value;
 
-  if(status !== "All") data = data.filter(r => r.status === status);
-  if(type !== "All") {
-    if(type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+  if (status !== "All") data = data.filter(r => r.status === status);
+  if (type !== "All") {
+    if (type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
     else data = data.filter(r => r.type === type);
   }
-  if(date) data = data.filter(r => r.date === date);
-  if(submitted) data = data.filter(r => {
-  let subDate = r.submittedAt && r.submittedAt.toDate 
-    ? r.submittedAt.toDate() 
-    : new Date(r.submittedAt);
-
-  return getPHDateString(subDate) === submitted;
-});
+  if (date) data = data.filter(r => r.date === date);
+  if (submitted) data = data.filter(r => {
+    const subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
+    return getPHDateString(subDate) === submitted;
+  });
 
   // Sort
-  data.sort((a,b)=>{
+  data.sort((a, b) => {
     let valA = a[field], valB = b[field];
 
-    // handle dates
-    if(field==='submittedAt') {
-      valA = a.submittedAt && a.submittedAt.toDate ? a.submittedAt.toDate().getTime() : new Date(a.submittedAt).getTime();
-      valB = b.submittedAt && b.submittedAt.toDate ? b.submittedAt.toDate().getTime() : new Date(b.submittedAt).getTime();
-    } else if(field==='date'){
+    if (field === 'submittedAt') {
+      valA = a.submittedAt?.toDate?.()?.getTime() || new Date(a.submittedAt).getTime();
+      valB = b.submittedAt?.toDate?.()?.getTime() || new Date(b.submittedAt).getTime();
+    } else if (field === 'date') {
       valA = new Date(a.date).getTime();
       valB = new Date(b.date).getTime();
     } else {
-      valA = valA ? valA.toString().toLowerCase() : '';
-      valB = valB ? valB.toString().toLowerCase() : '';
+      valA = valA?.toString().toLowerCase() || '';
+      valB = valB?.toString().toLowerCase() || '';
     }
 
-    if(valA < valB) return currentSort.ascending ? -1 : 1;
-    if(valA > valB) return currentSort.ascending ? 1 : -1;
+    if (valA < valB) return currentSort.ascending ? -1 : 1;
+    if (valA > valB) return currentSort.ascending ? 1 : -1;
     return 0;
   });
 
@@ -961,12 +956,11 @@ function exportCSV() {
     data = data.filter(r => getRegion(r.employeeId) === regionFilter);
   }
 
-  const csvRows = [];
-  const headers = ["Employee Name", "Employee ID", "TL Name", "Date", "Type", "Status", "Submitted At"];
-  csvRows.push(headers.join(","));
+  const headers = ["Employee Name","Employee ID","TL Name","Date","Type","Status","Submitted At","Notes"];
+  const csvRows = [headers.join(",")];
 
   data.forEach(row => {
-    const submitted = row.submittedAt?.toDate ? getPHDateString(row.submittedAt.toDate()) : row.submittedAt;
+    const submitted = row.submittedAt?.toDate?.() ? getPHDateString(row.submittedAt.toDate()) : row.submittedAt || "";
     const values = [
       row.employeeName || "",
       row.employeeId || "",
@@ -974,7 +968,8 @@ function exportCSV() {
       row.date || "",
       row.type || "",
       row.status || "",
-      submitted || ""
+      submitted,
+      row.notes || ""
     ];
     csvRows.push(values.map(v => `"${v}"`).join(","));
   });
@@ -983,10 +978,12 @@ function exportCSV() {
   const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.setAttribute("download", `leave_export_${new Date().getTime()}.csv`);
+  
+  const now = getPHDateString();
+  link.download = `FREE_TIME_REQUEST_${now}.csv`;
   link.click();
+  URL.revokeObjectURL(link.href);
 }
-
   // Escape helper
   function escapeCSV(value){
     if(value === null || value === undefined) return "";
