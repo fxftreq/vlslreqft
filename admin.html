@@ -790,14 +790,11 @@ function applyFilters() {
   let data = cachedRequests;
 
   // REGION FILTER (NEW)
- if(region !== "All"){
+// REGION FILTER
+if(region !== "All") {
   data = data.filter(r => {
-    const name = (r.employeeName || "").toLowerCase();
-
-    if(region === "India") return name.includes("@");
-    if(region === "PH") return !name.includes("@");
-
-    return true;
+    const reg = r.region || "PH"; // default PH
+    return region === reg;
   });
 }
 
@@ -895,14 +892,10 @@ function sortList(field) {
 // REGION FILTER (ADD THIS)
 const region = document.getElementById("regionFilter")?.value || "All";
 
-if(region !== "All"){
+if(region !== "All") {
   data = data.filter(r => {
-    const name = (r.employeeName || "").toLowerCase();
-
-    if(region === "India") return name.includes("@");
-    if(region === "PH") return !name.includes("@");
-
-    return true;
+    const reg = r.region || "PH"; // default PH
+    return region === reg;
   });
 }
 
@@ -1073,8 +1066,10 @@ function exportCSV(){
 
 // Table view
 function renderTableView(data){
-  const t = document.getElementById("table");
-  t.style.display = "table";
+  const region = document.getElementById("regionFilter")?.value || "All";
+  if(region !== "All"){
+    data = data.filter(r => (r.region || "PH") === region);
+  }
 
   const month = parseInt(document.getElementById("monthSelect").value); // selected month
 const phNow = getPHDateObject();
