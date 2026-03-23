@@ -665,45 +665,47 @@ function formatDateTime(ts){
 
 const phNow = getPHDateObject();
 
-let cachedRequests=[],
-    currentFilter="All",
-    currentView="list",
-    calendarMonth=phNow.getMonth(),
-    calendarYear=phNow.getFullYear(),
-    calendarMode="month";
+// ----------- GLOBALS -------------
+let cachedRequests = [];
+let currentView = "list";
+let calendarMonth = new Date().getMonth();
+let calendarYear = new Date().getFullYear();
+let calendarMode = "month";
 
-//this is for notif new added
+// ----------- LOAD REQUESTS -------------
+async function loadRequests() {
+  const regionFilter = document.getElementById("regionFilter").value.trim();
 
-function loadRequests() {
-  const region = document.getElementById("regionFilter").value;
-
-  if (region === "All") {
-    // Fetch both collections
-    Promise.all([
-      db.collection("single_day_leave").orderBy("submittedAt", "asc").get(),
-      db.collection("india_single_day_leave").orderBy("submittedAt", "asc").get()
-    ]).then(([phSnap, indiaSnap]) => {
-      cachedRequests = [
-        ...phSnap.docs.map(d => ({ id:d.id, ...d.data(), region:'Philippines' })),
-        ...indiaSnap.docs.map(d => ({ id:d.id, ...d.data(), region:'India' }))
-      ];
-      render();
-    });
-  } else {
-    // single region fetch
-    let collectionName = region === "India" ? "india_single_day_leave" : "single_day_leave";
-    db.collection(collectionName)
-      .orderBy("submittedAt", "asc")
-      .get()
-      .then(snapshot => {
-        cachedRequests = snapshot.docs.map(d => {
-          const data = d.data();
-          if(data.region) data.region = data.region.trim();
-          return { id:d.id, ...data };
-        });
-        render();
-      });
+  let collectionsToFetch = [];
+  if(regionFilter === "All") {
+    collectionsToFetch = ["single_day_leave", "india_single_day_leave"];
+  } else if(regionFilter === "Philippines") {
+    collectionsToFetch = ["single_day_leave"];
+  } else if(regionFilter === "India") {
+    collectionsToFetch = ["india_single_day_leave"];
   }
+
+  let allData = [];
+
+  for(const col of collectionsToFetch) {
+    const snapshot = await db.collection(col).orderBy("submittedAt","asc").get();
+    const colRegion = col.includes("india") ? "India" : "Philippines";
+
+    snapshot.docs.forEach(doc => {
+      const data = doc.data();
+      // Ensure region exists and normalize it
+      if(!data.region) data.region = colRegion;
+      allData.push({ id: doc.id, ...data });
+    });
+  }
+
+  // Normalize region for filtering (trim + lowercase)
+  cachedRequests = allData.map(r => {
+    if(r.region) r.region = r.region.trim();
+    return r;
+  });
+
+  applyFilters();
 }
 
 function showToast(leave){
@@ -785,45 +787,52 @@ function render(){
 }
 
 function applyFilters() {
-  const region = document.getElementById("regionFilter").value;
-
-  // Reload the collection if region changed
-  loadRequests();
-
   const status = document.getElementById("filterStatus").value;
   const type = document.getElementById("filterType").value;
   const date = document.getElementById("filterDate").value;
   const submitted = document.getElementById("filterSubmitted").value;
+  const region = document.getElementById("regionFilter").value.trim().toLowerCase();
 
   let data = [...cachedRequests];
 
-  // REGION FILTER (case-insensitive)
-  if (region !== "All") {
-    const regionLower = region.trim().toLowerCase();
-    data = data.filter(r => r.region && r.region.trim().toLowerCase() === regionLower);
+  // REGION FILTER
+  if(region !== "all") {
+    data = data.filter(r => r.region && r.region.trim().toLowerCase() === region);
   }
 
-  if (status !== "All") data = data.filter(r => r.status === status);
+  // STATUS FILTER
+  if(status !== "All") data = data.filter(r => r.status === status);
 
-  if (type !== "All") {
-    if (type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+  // TYPE FILTER
+  if(type !== "All") {
+    if(type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
     else data = data.filter(r => r.type === type);
   }
 
-  if (date) data = data.filter(r => r.date === date);
+  // LEAVE DATE FILTER
+  if(date) data = data.filter(r => r.date === date);
 
-  if (submitted) {
+  // SUBMITTED DATE FILTER
+  if(submitted) {
     data = data.filter(r => {
       const subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
       return getPHDateString(subDate) === submitted;
     });
   }
 
-  // Render current view
-  if (currentView === "list") renderList(data);
-  else if (currentView === "table") renderTableView(data);
-  else if (currentView === "calendar") calendarMode === "month" ? renderCalendar(data) : renderYearView(data);
+  // Render based on current view
+  if(currentView === "list") renderList(data);
+  else if(currentView === "table") renderTableView(data);
+  else if(currentView === "calendar") calendarMode === "month" ? renderCalendar(data) : renderYearView(data);
 }
+
+// ----------- REGION DROPDOWN CHANGE -------------
+document.getElementById("regionFilter").addEventListener("change", () => {
+  loadRequests(); // reloads appropriate collection(s) for selected region
+});
+
+// ----------- INITIAL LOAD -------------
+loadRequests();
   
 //show list 
 function renderList(data){
