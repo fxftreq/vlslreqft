@@ -674,33 +674,25 @@ let calendarMode = "month";
 
 // ----------- LOAD REQUESTS -------------
 async function loadRequests() {
-  const regionFilter = document.getElementById("regionFilter").value.trim();
+  const leaveSnapshot = await db.collection("single_day_leave")
+    .orderBy("submittedAt", "asc")
+    .get();
 
-  let collectionsToFetch = [];
-  if(regionFilter === "All") {
-    collectionsToFetch = ["single_day_leave", "india_single_day_leave"];
-  } else if(regionFilter === "Philippines") {
-    collectionsToFetch = ["single_day_leave"];
-  } else if(regionFilter === "India") {
-    collectionsToFetch = ["india_single_day_leave"];
-  }
+  const usersSnapshot = await db.collection("leave_users").get();
+  const usersMap = {};
+  usersSnapshot.forEach(u => {
+    const data = u.data();
+    usersMap[u.id] = { ...data, region: data.region ? data.region.trim() : "" };
+  });
 
-  let allData = [];
+  cachedRequests = leaveSnapshot.docs.map(d => {
+    const leave = d.data();
+    // Attach user info (like region) to leave
+    const user = usersMap[leave.userId]; // assuming each leave has a 'userId' field
+    return { id: d.id, ...leave, region: user?.region || "" };
+  });
 
-  for(const col of collectionsToFetch) {
-    const snapshot = await db.collection(col).orderBy("submittedAt","asc").get();
-    const colRegion = col.includes("india") ? "India" : "Philippines";
-
-    snapshot.docs.forEach(doc => {
-      const data = doc.data();
-      // Assign region if missing
-      data.region = colRegion;
-      allData.push({ id: doc.id, ...data });
-    });
-  }
-
-  cachedRequests = allData;
-  applyFilters();
+  render();
 }
 
   
