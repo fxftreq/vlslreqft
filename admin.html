@@ -788,11 +788,17 @@ function onRegionChange(){
   loadRequests(); // fetch correct dataset based on region
 }
   
+// PH regex: name.surname with optional numbers at the end
+const phRegex = /^[a-z]+\.[a-z]+[0-9]*$/i;
+
+// Get region dynamically based on employeeId
+function getRegion(employeeId) {
+  return phRegex.test(employeeId) ? "Philippines" : "India";
+}
+
+// Apply filters (list view / table / calendar)
 function applyFilters() {
-  const region = document.getElementById("regionFilter").value;
-
-  // Reload the collection if region changed
-
+  const regionFilter = document.getElementById("regionFilter").value;
   const status = document.getElementById("filterStatus").value;
   const type = document.getElementById("filterType").value;
   const date = document.getElementById("filterDate").value;
@@ -800,20 +806,25 @@ function applyFilters() {
 
   let data = [...cachedRequests];
 
-  // REGION FILTER (case-insensitive)
-if (region !== "All") {
-  data = data.filter(r => r.region === region);
-}
-
-  if (status !== "All") data = data.filter(r => r.status === status);
-
-  if (type !== "All") {
-    if (type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
-    else data = data.filter(r => r.type === type);
+  // REGION FILTER
+  if (regionFilter !== "All") {
+    data = data.filter(r => getRegion(r.employeeId) === regionFilter);
   }
 
+  // STATUS FILTER
+  if (status !== "All") data = data.filter(r => r.status === status);
+
+  // TYPE FILTER
+  if (type !== "All") {
+    if (type === "Others") {
+      data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+    } else data = data.filter(r => r.type === type);
+  }
+
+  // DATE FILTER
   if (date) data = data.filter(r => r.date === date);
 
+  // SUBMITTED DATE FILTER
   if (submitted) {
     data = data.filter(r => {
       const subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
@@ -821,10 +832,11 @@ if (region !== "All") {
     });
   }
 
-  // Render current view
+  // Render according to current view
   if (currentView === "list") renderList(data);
   else if (currentView === "table") renderTableView(data);
-  else if (currentView === "calendar") calendarMode === "month" ? renderCalendar(data) : renderYearView(data);
+  else if (currentView === "calendar")
+    calendarMode === "month" ? renderCalendar(data) : renderYearView(data);
 }
   
 //show list 
@@ -939,68 +951,41 @@ if(region !== "All") {
 }
 
 // Export CSV including Notes with dynamic filename
-function exportCSV(){
-
-  if(currentView !== "list"){
-    alert("Export is only available in List View.");
-    return;
-  }
-
-  const status = document.getElementById("filterStatus").value;
-  const type = document.getElementById("filterType").value;
-  const date = document.getElementById("filterDate").value;
-  const submitted = document.getElementById("filterSubmitted").value;
-
+// ===== EXPORT CSV =====
+function exportCSV() {
   let data = [...cachedRequests];
 
-  // Apply filters
-  if(status !== "All") {
-    data = data.filter(r => r.status === status);
+  // Apply region filter dynamically
+  const regionFilter = document.getElementById("regionFilter").value;
+  if (regionFilter !== "All") {
+    data = data.filter(r => getRegion(r.employeeId) === regionFilter);
   }
 
-  if(type !== "All") {
-    if(type === "Others") {
-      data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
-    } else {
-      data = data.filter(r => r.type === type);
-    }
-  }
+  const csvRows = [];
+  const headers = ["Employee Name", "Employee ID", "TL Name", "Date", "Type", "Status", "Submitted At"];
+  csvRows.push(headers.join(","));
 
-  if(date) {
-    data = data.filter(r => r.date === date);
-  }
+  data.forEach(row => {
+    const submitted = row.submittedAt?.toDate ? getPHDateString(row.submittedAt.toDate()) : row.submittedAt;
+    const values = [
+      row.employeeName || "",
+      row.employeeId || "",
+      row.tlName || "",
+      row.date || "",
+      row.type || "",
+      row.status || "",
+      submitted || ""
+    ];
+    csvRows.push(values.map(v => `"${v}"`).join(","));
+  });
 
-  if(submitted) {
-    data = data.filter(r => {
-      let subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
-      return getPHDateString(subDate) === submitted;
-    });
-  }
-
-  // Apply sorting
-  if(currentSort.field){
-    data.sort((a,b)=>{
-      let valA = a[currentSort.field];
-      let valB = b[currentSort.field];
-
-      if(currentSort.field === 'submittedAt'){
-        valA = a.submittedAt?.toDate?.()?.getTime() || new Date(a.submittedAt).getTime();
-        valB = b.submittedAt?.toDate?.()?.getTime() || new Date(b.submittedAt).getTime();
-      } 
-      else if(currentSort.field === 'date'){
-        valA = new Date(a.date).getTime();
-        valB = new Date(b.date).getTime();
-      } 
-      else {
-        valA = valA ? valA.toString().toLowerCase() : '';
-        valB = valB ? valB.toString().toLowerCase() : '';
-      }
-
-      if(valA < valB) return currentSort.ascending ? -1 : 1;
-      if(valA > valB) return currentSort.ascending ? 1 : -1;
-      return 0;
-    });
-  }
+  const csvString = csvRows.join("\n");
+  const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute("download", `leave_export_${new Date().getTime()}.csv`);
+  link.click();
+}
 
   // Escape helper
   function escapeCSV(value){
@@ -1060,10 +1045,11 @@ function exportCSV(){
 
 // Table view
 function renderTableView(data) {
-  const region = document.getElementById("regionFilter").value;
-if(region !== "All") {
-  data = data.filter(r => r.region === region);
-}
+  const regionFilter = document.getElementById("regionFilter").value;
+  if (regionFilter !== "All") {
+    data = data.filter(r => getRegion(r.employeeId) === regionFilter);
+  }
+
   const month = parseInt(document.getElementById("monthSelect").value);
   const phNow = getPHDateObject();
   const y = phNow.getFullYear();
@@ -1072,27 +1058,27 @@ if(region !== "All") {
 
   const t = document.getElementById("table");
   let html = `<tr><th>TL Name</th>`;
-  for(let d=1; d<=daysInMonth; d++) html += `<th>${d}</th>`;
+  for (let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
   html += `</tr>`;
 
   tlnames.forEach(tl => {
     html += `<tr><td>${tl}</td>`;
-    for(let d=1; d<=daysInMonth; d++){
+    for (let d = 1; d <= daysInMonth; d++) {
       const cellDate = new Date(y, month, d);
       const leavesForCell = data.filter(l => {
         const ld = new Date(l.date);
         return (l.tlName || l.employeeName) === tl &&
-               ld.getFullYear() === y &&
-               ld.getMonth() === month &&
-               ld.getDate() === d &&
-               l.status !== "Cancelled";
+          ld.getFullYear() === y &&
+          ld.getMonth() === month &&
+          ld.getDate() === d &&
+          l.status !== "Cancelled";
       });
 
-      if(leavesForCell.length){
+      if (leavesForCell.length) {
         let letter = "";
-        if(leavesForCell.some(l => l.status === "Approved")) letter="A";
-        else if(leavesForCell.some(l => l.status === "Pending")) letter="P";
-        else if(leavesForCell.some(l => l.status === "Rejected")) letter="R";
+        if (leavesForCell.some(l => l.status === "Approved")) letter = "A";
+        else if (leavesForCell.some(l => l.status === "Pending")) letter = "P";
+        else if (leavesForCell.some(l => l.status === "Rejected")) letter = "R";
 
         html += `<td><span class="table-indicator ${letter}" data-leaves='${JSON.stringify(leavesForCell)}'>${letter}</span></td>`;
       } else html += "<td></td>";
@@ -1102,6 +1088,7 @@ if(region !== "All") {
 
   t.innerHTML = html;
 
+  // Add hover tooltip for table indicators
   document.querySelectorAll(".table-indicator").forEach(span => {
     const leaves = JSON.parse(span.dataset.leaves);
     span.addEventListener("mouseenter", e => showLeaveTooltip(leaves, e));
@@ -1109,38 +1096,35 @@ if(region !== "All") {
     span.addEventListener("mouseleave", hideLeaveTooltip);
   });
 }
-
-
 // Render month calendar
 // Month Calendar (PH Time)
 function renderCalendar(data) {
-  const region = document.getElementById("regionFilter").value;
- if(region !== "All") {
-  data = data.filter(r => r.region === region);
-}
+  const regionFilter = document.getElementById("regionFilter").value;
+  if (regionFilter !== "All") {
+    data = data.filter(r => getRegion(r.employeeId) === regionFilter);
+  }
 
   const grid = document.getElementById("calendarGrid");
   grid.innerHTML = "";
   const y = calendarYear, m = calendarMonth;
   const phFirstDay = getPHDateObject(new Date(y, m, 1));
-  const phDaysInMonth = new Date(y, m+1, 0).getDate();
+  const phDaysInMonth = new Date(y, m + 1, 0).getDate();
   const startDay = phFirstDay.getDay();
 
-  // Weekday headers
-  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(day => {
+  ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(day => {
     const header = document.createElement("div");
     header.className = "cal-header";
     header.textContent = day;
     grid.appendChild(header);
   });
 
-  for(let i=0; i<startDay; i++){
+  for (let i = 0; i < startDay; i++) {
     const empty = document.createElement("div");
     empty.className = "cal-cell";
     grid.appendChild(empty);
   }
 
-  for(let d=1; d<=phDaysInMonth; d++){
+  for (let d = 1; d <= phDaysInMonth; d++) {
     const cell = document.createElement("div");
     cell.className = "cal-cell";
     const dayDiv = document.createElement("div");
@@ -1153,7 +1137,7 @@ function renderCalendar(data) {
 
     leavesToday.forEach(l => {
       const indicator = document.createElement("span");
-      indicator.className = "indicator " + (l.status==="Approved"?"A":l.status==="Rejected"?"R":"P");
+      indicator.className = "indicator " + (l.status === "Approved" ? "A" : l.status === "Rejected" ? "R" : "P");
       indicator.textContent = l.tlName || l.employeeName;
       cell.appendChild(indicator);
     });
@@ -1163,7 +1147,7 @@ function renderCalendar(data) {
   }
 
   document.getElementById("calendarMonthLabel").textContent =
-    `${phFirstDay.toLocaleString('default',{month:'long'})} ${y}`;
+    `${phFirstDay.toLocaleString('default', { month: 'long' })} ${y}`;
 }
 
 // Open modal showing all leaves for a specific day
