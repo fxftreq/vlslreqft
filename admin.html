@@ -674,25 +674,42 @@ let calendarMode = "month";
 
 // ----------- LOAD REQUESTS -------------
 async function loadRequests() {
-  const leaveSnapshot = await db.collection("single_day_leave")
-    .orderBy("submittedAt", "asc")
-    .get();
+  try {
+    // Get all users first
+    const usersSnapshot = await db.collection("leave_users").get();
+    const usersMap = {};
+    usersSnapshot.forEach(u => {
+      const data = u.data();
+      usersMap[data.email.toLowerCase()] = {
+        ...data,
+        region: data.region ? data.region.trim() : ""
+      };
+    });
 
-  const usersSnapshot = await db.collection("leave_users").get();
-  const usersMap = {};
-  usersSnapshot.forEach(u => {
-    const data = u.data();
-    usersMap[u.id] = { ...data, region: data.region ? data.region.trim() : "" };
-  });
+    // Get all leave requests
+    const leaveSnapshot = await db.collection("single_day_leave")
+      .orderBy("submittedAt", "asc")
+      .get();
 
-  cachedRequests = leaveSnapshot.docs.map(d => {
-    const leave = d.data();
-    // Attach user info (like region) to leave
-    const user = usersMap[leave.userId]; // assuming each leave has a 'userId' field
-    return { id: d.id, ...leave, region: user?.region || "" };
-  });
+    cachedRequests = leaveSnapshot.docs.map(d => {
+      const leave = d.data();
 
-  render();
+      // Try to match user by email
+      const user = leave.employeeEmail ? usersMap[leave.employeeEmail.toLowerCase()] : null;
+
+      return {
+        id: d.id,
+        ...leave,
+        region: user?.region || ""
+      };
+    });
+
+    render();
+
+  } catch (err) {
+    console.error("Error loading requests:", err);
+    alert("Failed to load leave requests. Check console.");
+  }
 }
 
   
