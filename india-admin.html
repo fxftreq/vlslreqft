@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FedEx Leave System - Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --fedex-purple: #4D148C;
+  --fedex-orange: #FF6600;
+  --bg-gray: #f4f4f6;
+}
+
+body { 
+  margin:0; font-family:Arial,sans-serif; background:var(--bg-gray); display:flex; flex-direction:column; min-height:100vh; 
+}
+header,footer { 
+  background:var(--fedex-purple); color:white; padding:15px 20px; font-size:1.2em; font-weight:bold; display:flex; justify-content:space-between; align-items:center; 
+}
+header button { 
+  background:var(--fedex-orange); color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; 
+}
+main { flex:1; padding:20px; }
+h2 { color:var(--fedex-purple); text-align:center; }
+.card { background:white; padding:25px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); overflow-x:auto; }
+
+button.approve { background:green;color:white;padding:5px 8px;border-radius:4px;border:none;margin:2px;cursor:pointer; }
+button.pend { background:orange;color:white;padding:5px 8px;border-radius:4px;border:none;margin:2px; cursor:pointer; }
+button.reject { background:red;color:white;padding:5px 8px;border-radius:4px;border:none;margin:2px; }
+button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;border:none;margin:2px;cursor:pointer}
+
+.status-Pending{ color:orange; font-weight:bold; }
+.status-Approved{ color:green; font-weight:bold; }
+.status-Rejected{ color:red; font-weight:bold; }
+.status-Cancelled{color:#555;font-weight:bold}
+
+/* Table */
+#table { width:100%; border-collapse:collapse; margin-top:10px; }
+#table th,#table td { border:1px solid #ddd; padding:8px; text-align:left; }
+#table th { background:var(--fedex-purple); color:white; }
+#table tr:nth-child(even){ background:#f9f9f9; }
+
+/* Calendar */
+.calendar-wrapper { display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:10px; }
+.calendar { display:grid; grid-template-columns: repeat(7,1fr); gap:2px; }
+.cal-header { font-weight:bold; background:var(--fedex-purple); color:white; padding:6px 0; border-radius:4px; }
+.cal-cell { background:white; border:1px solid #ddd; min-height:80px; display:flex; flex-direction:column; align-items:flex-start; padding:4px; position:relative; border-radius:4px; font-size:12px; overflow:hidden; }
+.cal-cell:hover { background:#f0f0f0; cursor:pointer; }
+.cal-day { font-weight:bold; margin-bottom:2px; }
+.indicator { display:block; padding:1px 3px; margin:1px 0; border-radius:3px; color:white; font-size:10px; font-weight:bold; overflow:hidden; text-overflow:ellipsis; }
+
+/* Table indicator */
+.table-indicator { display:inline-block; width:22px; height:22px; border-radius:50%; color:white; font-weight:bold; text-align:center; line-height:22px; margin:2px; font-size:12px; }
+.A{background:green;} .P{background:orange;} .R{background:red;}
+
+/* Year view mini calendars */
+.year-view { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; }
+.year-month { border:1px solid #ccc; border-radius:8px; padding:5px; background:#fff; cursor:pointer; display:flex; flex-direction:column; transition:transform 0.2s; }
+.year-month:hover{transform:scale(1.02); box-shadow:0 4px 8px rgba(0,0,0,0.2);}
+.year-month-label{ text-align:center; font-weight:bold; margin-bottom:4px; }
+.mini-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; font-size:8px; }
+.mini-grid .day-cell { height:20px; width:20px; border-radius:4px; text-align:center; line-height:20px; position:relative; border:1px solid #eee; font-size:8px; }
+.mini-grid .day-dots { position:absolute; bottom:1px; left:50%; transform:translateX(-50%); display:flex; gap:1px; }
+.dot { width:4px; height:4px; border-radius:50%; }
+.dot.approved{background:green;} .dot.pending{background:orange;} .dot.rejected{background:red;}
+
+/* Modal */
+.modal{
+  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:999;
+}
+.modal-content{
+  background:#fff;padding:20px;border-radius:10px;width:320px;text-align:center;
+}
+.modal-content h3{margin-top:0;color:#333}
+.modal-actions button{margin:8px;padding:6px 14px;border-radius:5px;border:none;cursor:pointer}
+.modal-confirm{background:red;color:white}
+.modal-cancel{background:#ccc}
+
+/* Top Controls - Modern Professional Style */
+.top-controls {
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+  background:#fff; padding:12px 20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom:20px;
+}
+
+/* View Selector */
+.view-select-wrapper { display:flex; align-items:center; gap:8px; margin-right:20px; }
+.view-select-wrapper label { font-weight:bold; color:var(--fedex-purple); }
+.view-select-wrapper select { padding:6px 10px; border-radius:6px; border:1px solid #ccc; cursor:pointer; font-weight:500; min-width:120px; }
+
+/* Filters + Export - inline */
+#listControls { display:flex; flex-wrap:wrap; align-items:center; gap:12px; flex:1; }
+.filter-item { display:flex; flex-direction:column; font-size:0.85em; }
+.filter-item label { font-weight:bold; color:#333; margin-bottom:4px; }
+.filter-item select, .filter-item input { padding:6px 10px; border-radius:6px; border:1px solid #ccc; cursor:pointer; min-width:120px; }
+
+#exportBtn { background:var(--fedex-purple); color:#fff; border:none; padding:10px 12px; border-radius:6px; cursor:pointer; font-size:1.2em; display:flex; align-items:center; justify-content:center; transition:background 0.2s; }
+#exportBtn:hover { background:var(--fedex-orange); }
+
+#monthSelectWrapper {
+  display: flex;
+  justify-content: center; /* center horizontally */
+  margin: 15px 0;
+}
+
+#monthSelect {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 1em;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  min-width: 150px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.2s ease;
+}
+
+#monthSelect:hover {
+  border-color: var(--fedex-purple);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+#monthSelect:focus {
+  outline: none;
+  border-color: var(--fedex-orange);
+  box-shadow: 0 0 0 3px rgba(255,102,0,0.2);
+}
+
+.year-month .mini-grid:first-of-type .day-cell {
+  font-size: 9px;
+  color: #555;
+  background: none;
+  height: auto;
+}
+/* ===== Improved Year View ===== */
+.year-month {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 10px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.year-month:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.year-month-label {
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--fedex-purple);
+  margin-bottom: 6px;
+}
+
+.year-month .mini-grid {
+  gap: 3px;
+}
+
+.year-month .day-cell {
+  background: #fafafa;
+}
+
+.year-month .day-cell:hover {
+  background: #f0f0f0;
+}
+
+.year-month .mini-grid:first-of-type .day-cell {
+  background: none;
+  font-size: 9px;
+  color: #666;
+  cursor: default;
+}
+
+/* Year navigation */
+.year-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.year-nav button {
+  background: var(--fedex-purple);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.year-nav span {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #333;
+}
+
+/* ===== Month View Leave Tooltip ===== */
+.leave-tooltip {
+  position: absolute;
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 240px;
+  max-width: 320px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  font-size: 12px;
+  z-index: 9999;
+  display: none;
+  pointer-events: none;
+}
+
+.leave-tooltip h4 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--fedex-purple);
+}
+
+.leave-tooltip .leave-item {
+  border-top: 1px solid #eee;
+  padding-top: 6px;
+  margin-top: 6px;
+}
+
+.leave-tooltip .Approved { color: green; font-weight: bold; }
+.leave-tooltip .Rejected { color: red; font-weight: bold; }
+.leave-tooltip .Pending  { color: orange; font-weight: bold; }
+.leave-tooltip .Cancelled{ color: #555; font-weight: bold; }
+.leave-tooltip {
+  pointer-events: none;
+}
+
+/*table*/
+.table-indicator {
+  position: relative;
+  display: inline-block;
+}
+
+
+/*notification*/
+#notifBtn {
+  position: relative;
+  background: var(--fedex-purple);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2em;
+}
+
+#notifBtn:hover {
+  background: var(--fedex-orange);
+}
+
+#notifBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7em;
+  font-weight: bold;
+  display: none;
+}
+
+/*notification dropdown*/
+.notif-dropdown {
+  position: absolute;
+  top: 85px;
+  right: 40px;
+  width: 300px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  padding: 10px;
+  z-index: 1000;
+}
+
+.notif-item {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9em;
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-item strong {
+  color: var(--fedex-purple);
+}
+
+.notif-item small {
+  color: #666;
+  font-size: 0.8em;
+}
+/*notification dropdown*/
+#toastContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2000;
+}
+
+
+.toast {
+  background: #fff;
+  border-left: 6px solid var(--fedex-purple);
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  animation: slideIn 0.4s ease;
+  min-width: 260px;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+#rejectModal {
+  z-index: 2000; /* higher than dayModal */
+}
+
+
+/*admin header styling*/
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--fedex-purple);
+  color: white;
+  padding: 10px 20px;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.admin-header .header-left img {
+  display: block;
+}
+
+.admin-header .header-center {
+  flex: 1;
+  text-align: center;
+  font-size: 1.2em;
+}
+
+.admin-header .header-right button {
+  background: var(--fedex-orange);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.admin-header .header-right button:hover {
+  background: #e65c00;
+}
+
+/*admin header styling*/
+/* ===== PROFESSIONAL HEADER (replace old admin-header) ===== */
+.admin-header {
+  background: linear-gradient(90deg, #4D148C, #3b0f70);
+  color: white;
+  padding: 14px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-circle {
+  background: var(--fedex-orange);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}
+
+.system-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.system-title {
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.system-subtitle {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.header-center {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-chip {
+  background: rgba(255,255,255,0.15);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.logout-btn {
+  background: var(--fedex-orange);
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.logout-btn:hover {
+  background: darkorange;
+  transform: translateY(-1px);
+}
+
+/* Mobile Responsive Header */
+@media(max-width:768px){
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+<header class="main-header">
+
+  <div class="header-left">
+    <div class="logo-circle">
+      <i class="fas fa-plane"></i>
+    </div>
+    <div class="system-info">
+      <div class="system-title">FedEx Leave Portal</div>
+      <div class="system-subtitle">Admin Management System</div>
+    </div>
+  </div>
+
+  <div class="header-center">
+    <span id="welcomeMsg">Welcome</span>
+  </div>
+
+  <div class="header-right">
+    <div class="user-chip">
+      <i class="fas fa-user"></i>
+      <span id="headerUserName"></span>
+    </div>
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i>
+      Logout
+    </button>
+  </div>
+
+</header>
+
+<main>
+  <!-- Top Controls -->
+  <div class="top-controls">
+    <!-- View Selector -->
+    <div class="view-select-wrapper">
+      <label for="viewSelect">View:</label>
+      <select id="viewSelect" onchange="setView(this.value)">
+        <option value="list">List View</option>
+        <option value="table">Table View</option>
+        <option value="calendar">Calendar View</option>
+      </select>
+    </div>
+
+    <!-- Filters + Export (Only List View) -->
+    <div id="listControls">
+      <div class="filter-item">
+        <label for="filterStatus">Status</label>
+        <select id="filterStatus" onchange="applyFilters()">
+          <option value="All">All Status</option>
+          <option value="Approved">Approved</option>
+          <option value="Pending">Pending</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <label for="filterType">Leave Type</label>
+        <select id="filterType" onchange="applyFilters()">
+          <option value="All">All Types</option>
+          <option value="Vacation">Vacation</option>
+          <option value="Sick">Sick</option>
+          <option value="Others">Others</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <label for="filterDate">Leave Date</label>
+        <input type="date" id="filterDate" onchange="applyFilters()">
+      </div>
+      <div class="filter-item">
+        <label for="filterSubmitted">Submitted Date</label>
+        <input type="date" id="filterSubmitted" onchange="applyFilters()">
+      </div>
+      <button id="exportBtn" title="Export" onclick="exportCSV()">
+        <i class="fas fa-file-export"></i>
+      </button>
+      <button id="notifBtn" title="Notifications" onclick="toggleNotifDropdown()">
+    <i class="fas fa-bell"></i>
+    <span id="notifBadge">0</span>
+  </button>
+    </div>
+  </div>
+
+<!-- Month selector for Table view -->
+<div id="monthSelectWrapper" style="display:none;">
+  <select id="monthSelect" onchange="render()">
+    <option value="0">January</option>
+    <option value="1">February</option>
+    <option value="2">March</option>
+    <option value="3">April</option>
+    <option value="4">May</option>
+    <option value="5">June</option>
+    <option value="6">July</option>
+    <option value="7">August</option>
+    <option value="8">September</option>
+    <option value="9">October</option>
+    <option value="10">November</option>
+    <option value="11">December</option>
+  </select>
+</div>
+
+  <div class="calendar-wrapper" id="calendarControls">
+    <button onclick="changeCalendarMonth(-1)">◀</button>
+    <span id="calendarMonthLabel"></span>
+    <button onclick="changeCalendarMonth(1)">▶</button>
+    <button onclick="setCalendarMode('month')">Month</button>
+    <button onclick="setCalendarMode('year')">Year</button>
+  </div>
+
+  <div class="card">
+   
+    <div id="calendarContainer"><div class="calendar" id="calendarGrid"></div></div>
+    <table id="table"></table>
+  </div>
+
+</main>
+<footer>© FedEx 2026</footer>
+<div id="leaveTooltip" class="leave-tooltip"></div>
+
+<script>
+let currentSort = { field: null, ascending: true };
+let lastSeenTimestamp = localStorage.getItem("lastSeenLeave") || 0;
+let unreadCount = 0;
+
+firebase.initializeApp({
+  apiKey:"AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+  authDomain:"fedex-attendance-system.firebaseapp.com",
+  projectId:"fedex-attendance-system"
+});
+const db=firebase.firestore();
+
+
+//this is for login.remembner
+const currentUser=JSON.parse(localStorage.getItem("currentUser"));
+if(!currentUser){ alert("Please login first"); location.href="index.html"; }
+document.getElementById("welcomeMsg").textContent =
+  "Admin Dashboard";
+
+document.getElementById("headerUserName").textContent =
+  currentUser.name;
+
+
+//for setting the date time to ph	
+function getPHDateObject(dateObj = new Date()) {
+  return new Date(
+    dateObj.toLocaleString("en-US", { timeZone: "Asia/Manila" })
+  );
+}
+
+function getPHDateString(dateObj = new Date()) {
+  const phDate = new Date(
+    dateObj.toLocaleString("en-US", { timeZone: "Asia/Manila" })
+  );
+
+  const year = phDate.getFullYear();
+  const month = String(phDate.getMonth() + 1).padStart(2, "0");
+  const day = String(phDate.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+
+//time for notif
+function formatDateTime(ts){
+  if(!ts) return "-";
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleString("en-PH", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+const phNow = getPHDateObject();
+
+let cachedRequests=[],
+    currentFilter="All",
+    currentView="list",
+    calendarMonth=phNow.getMonth(),
+    calendarYear=phNow.getFullYear(),
+    calendarMode="month";
+
+//this is for notif new added
+
+function loadRequests(){
+  db.collection("india_single_day_leave")
+    .orderBy("submittedAt", "asc")
+    .onSnapshot(snapshot => {
+
+      snapshot.docChanges().forEach(change => {
+        if (change.type === "added") {
+          const data = change.doc.data();
+          const submittedTime = data.submittedAt?.toMillis?.() || 0;
+
+          if (submittedTime > lastSeenTimestamp) {
+            showToast(data);
+            addNotification(data);
+            unreadCount++;
+          }
+        }
+      });
+
+      document.getElementById("notifBadge").style.display =
+        unreadCount > 0 ? "inline-block" : "none";
+      document.getElementById("notifBadge").textContent = unreadCount;
+
+      cachedRequests = [];
+      snapshot.forEach(d => cachedRequests.push({ id: d.id, ...d.data() }));
+      render();
+    });
+}
+
+function showToast(leave){
+  const toast = document.createElement("div");
+  toast.className = "toast";
+
+  toast.innerHTML = `
+    <strong>${leave.employeeName}</strong><br>
+    Filed leave for <b>${leave.date}</b><br>
+    <small>${formatDateTime(leave.submittedAt)}</small>
+  `;
+
+  document.getElementById("toastContainer").appendChild(toast);
+
+  setTimeout(() => toast.remove(), 5000);
+}
+function addNotification(leave){
+  const drop = document.getElementById("notifDropdown");
+  const div = document.createElement("div");
+  div.className = "notif-item";
+
+  div.innerHTML = `
+    <strong>${leave.employeeName}</strong><br>
+    Leave date: <b>${leave.date}</b><br>
+    <small>${formatDateTime(leave.submittedAt)}</small>
+  `;
+
+  drop.prepend(div);
+}
+
+function toggleNotifDropdown(){
+  const d = document.getElementById("notifDropdown");
+  d.style.display = d.style.display === "block" ? "none" : "block";
+
+  // Mark as read
+  unreadCount = 0;
+  document.getElementById("notifBadge").style.display = "none";
+  localStorage.setItem("lastSeenLeave", Date.now());
+}
+
+//this is for notif new added
+//until here
+
+
+function setView(v){
+  currentView = v;
+
+  // Show/hide list controls
+  document.getElementById("listControls").style.display = (v==='list')?'flex':'none';
+
+  toggleCalendarControls();
+
+  // Reset filters for non-list views
+  if(v!=='list'){
+    document.getElementById("filterStatus").value = "All";
+    document.getElementById("filterType").value = "All";
+    document.getElementById("filterDate").value = "";
+    document.getElementById("filterSubmitted").value = "";
+    document.getElementById("monthSelectWrapper").style.display = (currentView==='table')?'flex':'none';
+  }
+
+  render();
+}
+
+function toggleCalendarControls(){
+  document.getElementById("calendarControls").style.display=(currentView==='calendar')?'flex':'none';
+  document.getElementById("calendarContainer").style.display=(currentView==='calendar')?'block':'none';
+  document.getElementById("table").style.display=(currentView!=='calendar')?'table':'none';
+  document.getElementById("monthSelect").style.display=(currentView==='table')?'inline-block':'none';
+}
+
+function logout(){ if(confirm("Are you sure you want to logout?")){ localStorage.removeItem("currentUser"); location.href="index.html"; } }
+
+function render(){
+  const data = currentFilter==="All"?cachedRequests:cachedRequests.filter(r=>r.status===currentFilter);
+  if(currentView==='list') applyFilters(); // List view uses filters
+  else if(currentView==='table') renderTableView(data);
+  else if(currentView==='calendar') calendarMode==='month'?renderCalendar(data):renderYearView(data);
+}
+
+function applyFilters() {
+  const status = document.getElementById("filterStatus").value;
+  const type = document.getElementById("filterType").value;
+  const date = document.getElementById("filterDate").value;
+  const submitted = document.getElementById("filterSubmitted").value;
+
+  let data = cachedRequests;
+
+  if(status !== "All") data = data.filter(r => r.status === status);
+
+  if(type !== "All") {
+    if(type === "Others") {
+      // Match anything that is not Vacation or Sick
+      data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+    } else {
+      data = data.filter(r => r.type === type);
+    }
+  }
+
+  if(date) data = data.filter(r => r.date === date);
+
+  if(submitted) data = data.filter(r => {
+  let subDate = r.submittedAt && r.submittedAt.toDate 
+    ? r.submittedAt.toDate() 
+    : new Date(r.submittedAt);
+
+  const phSubmitted = getPHDateString(subDate);
+  return phSubmitted === submitted;
+});
+
+  renderList(data);
+}
+  
+//show list 
+function renderList(data){
+  const t = document.getElementById("table");
+  t.style.display = "table";
+
+  t.innerHTML = `<tr>
+    <th onclick="sortList('employeeName')">Employee &#8597;</th>
+    <th onclick="sortList('type')">Leave Type &#8597;</th>
+    <th onclick="sortList('date')">Leave Date &#8597;</th>
+    <th onclick="sortList('submittedAt')">Submitted Date &#8597;</th>
+    <th onclick="sortList('reason')">Reason &#8597;</th>
+    <th onclick="sortList('status')">Status &#8597;</th>
+    <th>Processed By</th>
+    <th>Notes</th>
+    <th>Action</th>
+  </tr>`;
+
+  data.forEach(l => {
+    let s = l.submittedAt && l.submittedAt.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt);
+    let str = s.toLocaleString("en-PH", {timeZone:"Asia/Manila", year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit"});
+
+    t.innerHTML += `<tr>
+      <td>${l.employeeName}</td>
+      <td>${l.type}</td>
+      <td>${l.date}</td>
+      <td>${str}</td>
+      <td>${l.reason}</td>
+      <td class="status-${l.status}">${l.status}</td>
+      <td>${l.actionBy || "-"}</td>
+      <td>${l.status === "Rejected" ? (l.notes || "-") : ""}</td>
+      <td>
+        <button class="approve" onclick="updateStatus('${l.id}','Approved')">Approve</button>
+        <button class="pend" onclick="updateStatus('${l.id}','Pending')">Pend</button>
+        <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
+        <button class="cancel" onclick="openCancelModal('${l.id}')">Cancel</button>
+      </td>
+    </tr>`;
+  });
+}
+
+async function updateStatus(id, status){
+  let updates = { 
+    status: status, 
+    actionBy: currentUser.name, 
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  // If rejecting, ask for a note
+  if(status === "Rejected"){
+    const note = prompt("Enter reason/note for rejection:");
+    updates.notes = note || "No note provided";
+  }
+
+  await db.collection("india_single_day_leave").doc(id).update(updates);
+}
+
+//for sorting
+function sortList(field) {
+  // Toggle ascending if same field clicked
+  if(currentSort.field === field){
+    currentSort.ascending = !currentSort.ascending;
+  } else {
+    currentSort.field = field;
+    currentSort.ascending = true;
+  }
+
+  // Copy cachedRequests and apply filters first
+  let data = currentFilter==="All"?cachedRequests:cachedRequests.filter(r=>r.status===currentFilter);
+
+  // Apply filters from dropdowns
+  const status = document.getElementById("filterStatus").value;
+  const type = document.getElementById("filterType").value;
+  const date = document.getElementById("filterDate").value;
+  
+  const submitted = document.getElementById("filterSubmitted").value;
+
+  if(status !== "All") data = data.filter(r => r.status === status);
+  if(type !== "All") {
+    if(type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+    else data = data.filter(r => r.type === type);
+  }
+  if(date) data = data.filter(r => r.date === date);
+  if(submitted) data = data.filter(r => {
+  let subDate = r.submittedAt && r.submittedAt.toDate 
+    ? r.submittedAt.toDate() 
+    : new Date(r.submittedAt);
+
+  return getPHDateString(subDate) === submitted;
+});
+
+  // Sort
+  data.sort((a,b)=>{
+    let valA = a[field], valB = b[field];
+
+    // handle dates
+    if(field==='submittedAt') {
+      valA = a.submittedAt && a.submittedAt.toDate ? a.submittedAt.toDate().getTime() : new Date(a.submittedAt).getTime();
+      valB = b.submittedAt && b.submittedAt.toDate ? b.submittedAt.toDate().getTime() : new Date(b.submittedAt).getTime();
+    } else if(field==='date'){
+      valA = new Date(a.date).getTime();
+      valB = new Date(b.date).getTime();
+    } else {
+      valA = valA ? valA.toString().toLowerCase() : '';
+      valB = valB ? valB.toString().toLowerCase() : '';
+    }
+
+    if(valA < valB) return currentSort.ascending ? -1 : 1;
+    if(valA > valB) return currentSort.ascending ? 1 : -1;
+    return 0;
+  });
+
+  renderList(data);
+}
+
+// Export CSV including Notes with dynamic filename
+function exportCSV(){
+
+  if(currentView !== "list"){
+    alert("Export is only available in List View.");
+    return;
+  }
+
+  const status = document.getElementById("filterStatus").value;
+  const type = document.getElementById("filterType").value;
+  const date = document.getElementById("filterDate").value;
+  const submitted = document.getElementById("filterSubmitted").value;
+
+  let data = [...cachedRequests];
+
+  // Apply filters
+  if(status !== "All") {
+    data = data.filter(r => r.status === status);
+  }
+
+  if(type !== "All") {
+    if(type === "Others") {
+      data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+    } else {
+      data = data.filter(r => r.type === type);
+    }
+  }
+
+  if(date) {
+    data = data.filter(r => r.date === date);
+  }
+
+  if(submitted) {
+    data = data.filter(r => {
+      let subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
+      return getPHDateString(subDate) === submitted;
+    });
+  }
+
+  // Apply sorting
+  if(currentSort.field){
+    data.sort((a,b)=>{
+      let valA = a[currentSort.field];
+      let valB = b[currentSort.field];
+
+      if(currentSort.field === 'submittedAt'){
+        valA = a.submittedAt?.toDate?.()?.getTime() || new Date(a.submittedAt).getTime();
+        valB = b.submittedAt?.toDate?.()?.getTime() || new Date(b.submittedAt).getTime();
+      } 
+      else if(currentSort.field === 'date'){
+        valA = new Date(a.date).getTime();
+        valB = new Date(b.date).getTime();
+      } 
+      else {
+        valA = valA ? valA.toString().toLowerCase() : '';
+        valB = valB ? valB.toString().toLowerCase() : '';
+      }
+
+      if(valA < valB) return currentSort.ascending ? -1 : 1;
+      if(valA > valB) return currentSort.ascending ? 1 : -1;
+      return 0;
+    });
+  }
+
+  // Escape helper
+  function escapeCSV(value){
+    if(value === null || value === undefined) return "";
+    value = value.toString().replace(/(\r\n|\n|\r)/gm, " ");
+    value = value.replace(/"/g, '""');
+    return `"${value}"`;
+  }
+
+  let csv = "Employee,Type,Date,Submitted Date,Reason,Status,Processed By,Notes\n";
+
+  data.forEach(l => {
+
+    const s = l.submittedAt?.toDate?.() || new Date(l.submittedAt);
+
+    const phTime = s.toLocaleString("en-PH", {
+      timeZone: "Asia/Manila",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    });
+
+    const processedBy =
+      typeof l.actionBy === "string"
+        ? l.actionBy
+        : l.actionBy?.name || "-";
+
+    csv += [
+      escapeCSV(l.employeeName),
+      escapeCSV(l.type),
+      escapeCSV(l.date),
+      escapeCSV(phTime),
+      escapeCSV(l.reason),
+      escapeCSV(l.status),
+      escapeCSV(processedBy),
+      escapeCSV(l.notes || "")
+    ].join(",") + "\n";
+  });
+
+  const now = new Date();
+  const phNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+  const dateStr = phNow.toISOString().split("T")[0];
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `FREE_TIME_REQUEST_${dateStr}.csv`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+// Table view
+function renderTableView(data){
+  const t = document.getElementById("table");
+  t.style.display = "table";
+
+  const month = parseInt(document.getElementById("monthSelect").value); // selected month
+const phNow = getPHDateObject();
+const y = phNow.getFullYear();
+
+  // Get unique TL names
+  const tlnames = [...new Set(data.map(l => l.tlName || l.employeeName))];
+  const daysInMonth = new Date(y, month + 1, 0).getDate();
+
+  // Table header
+  let html = `<tr><th>TL Name</th>`;
+  for(let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
+  html += `</tr>`;
+
+  tlnames.forEach(tl => {
+    html += `<tr><td>${tl}</td>`;
+
+    for(let d = 1; d <= daysInMonth; d++){
+      const cellDate = new Date(y, month, d);
+
+      // Filter leaves for this TL & day, ignoring Cancelled
+      const leavesForCell = data.filter(l => {
+        const ld = new Date(l.date);
+        return (l.tlName || l.employeeName) === tl &&
+               ld.getFullYear() === y &&
+               ld.getMonth() === month &&
+               ld.getDate() === d &&
+               l.status !== "Cancelled"; // ignore Cancelled
+      });
+
+      if(leavesForCell.length){
+        // Determine the letter by priority: Approved > Pending > Rejected
+        let letter = "";
+        if(leavesForCell.some(l => l.status === "Approved")) letter = "A";
+        else if(leavesForCell.some(l => l.status === "Pending")) letter = "P";
+        else if(leavesForCell.some(l => l.status === "Rejected")) letter = "R";
+
+        html += `<td>
+          <span class="table-indicator ${letter}" 
+                data-leaves='${JSON.stringify(leavesForCell)}'>
+            ${letter}
+          </span>
+        </td>`;
+      } else {
+        html += "<td></td>";
+      }
+    }
+
+    html += "</tr>";
+  });
+
+  t.innerHTML = html;
+
+  // Re-add hover tooltip listeners after table is rendered
+  document.querySelectorAll(".table-indicator").forEach(span => {
+    const leaves = JSON.parse(span.dataset.leaves);
+    span.addEventListener("mouseenter", e => showLeaveTooltip(leaves, e));
+    span.addEventListener("mousemove", moveLeaveTooltip);
+    span.addEventListener("mouseleave", hideLeaveTooltip);
+  });
+}
+
+
+// Render month calendar
+// Month Calendar (PH Time)
+function renderCalendar(data) {
+  const grid = document.getElementById("calendarGrid");
+  grid.innerHTML = "";
+  grid.style.gridTemplateColumns = "repeat(7,1fr)";
+  grid.className = "calendar";
+
+  const y = calendarYear, m = calendarMonth;
+  const phFirstDay = getPHDateObject(new Date(y, m, 1));
+  const phDaysInMonth = new Date(phFirstDay.getFullYear(), phFirstDay.getMonth() + 1, 0).getDate();
+  const startDay = phFirstDay.getDay();
+
+  // Weekday headers
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(day => {
+    const header = document.createElement("div");
+    header.className = "cal-header";
+    header.textContent = day;
+    grid.appendChild(header);
+  });
+
+  // Empty cells before first day
+  for(let i=0;i<startDay;i++){
+    const empty = document.createElement("div");
+    empty.className = "cal-cell";
+    grid.appendChild(empty);
+  }
+
+  // Day cells
+  for(let d=1; d<=phDaysInMonth; d++){
+    const cell = document.createElement("div");
+    cell.className = "cal-cell";
+
+    const dayDiv = document.createElement("div");
+    dayDiv.className = "cal-day";
+    dayDiv.textContent = d;
+    cell.appendChild(dayDiv);
+
+    const cellDate = getPHDateString(new Date(y, m, d));
+
+    // Add leave indicators (ignoring Cancelled)
+    const leavesToday = data.filter(l => getPHDateString(new Date(l.date)) === cellDate && l.status !== "Cancelled");
+    leavesToday.forEach(l => {
+      const indicator = document.createElement("span");
+      indicator.className = "indicator " + (l.status==="Approved"?"A":l.status==="Rejected"?"R":"P");
+      indicator.textContent = l.tlName || l.employeeName;
+      cell.appendChild(indicator);
+    });
+
+    // Click to open day modal
+    cell.addEventListener("click", () => openDayModal(cellDate));
+
+    grid.appendChild(cell);
+  }
+
+  // Update month label
+  document.getElementById("calendarMonthLabel").textContent =
+    `${phFirstDay.toLocaleString('default',{month:'long'})} ${y}`;
+}
+
+// Open modal showing all leaves for a specific day
+function openDayModal(dateStr) {
+  const modal = document.getElementById("dayModal");
+  const title = document.getElementById("dayModalTitle");
+  const body = document.getElementById("dayModalBody");
+
+  title.textContent = `Leaves on ${dateStr}`;
+
+  // Filter leaves for that date (timezone-safe)
+  const leaves = cachedRequests.filter(l => {
+    const leaveDateStr = getPHDateString(new Date(l.date));
+    return leaveDateStr === dateStr && l.status !== "Cancelled";
+  });
+
+  if (leaves.length === 0) {
+    body.innerHTML = "<p>No leave requests on this day.</p>";
+  } else {
+    body.innerHTML = leaves.map(l => `
+      <div style="border-bottom:1px solid #eee; padding:6px; margin-bottom:6px;">
+        <div><strong>${l.employeeName}</strong> (${l.type})</div>
+        <div>Status: <span class="${l.status}">${l.status}</span></div>
+        ${l.reason ? `<div>Reason: ${l.reason}</div>` : ""}
+        <div style="margin-top:4px;">
+          <button class="approve" onclick="handleStatus('${l.id}','Approved','${dateStr}')">Approve</button>
+          <button class="pend" onclick="handleStatus('${l.id}','Pending','${dateStr}')">Pend</button>
+          <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
+          <button class="cancel" onclick="handleCancel('${l.id}','${dateStr}')">Cancel</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  modal.style.display = "flex";
+}
+
+
+function closeDayModal() {
+  document.getElementById("dayModal").style.display = "none";
+}
+
+//to propery handle close modal
+async function handleStatus(id, status, dateStr){
+  await db.collection("india_single_day_leave").doc(id).update({
+    status: status,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  render();
+  openDayModal(dateStr); // Only reopen day modal for non-reject actions
+}
+
+function handleCancel(id, dateStr){
+  cancelTargetId = id;
+  confirmCancel();
+  openDayModal(dateStr);
+}
+
+// Reject modal stays as before
+function openRejectModal(id){
+  rejectTargetId = id;
+  document.getElementById("rejectNote").value = "";
+  document.getElementById("rejectModal").style.display = "flex";
+}
+
+async function confirmReject(){
+  if(!rejectTargetId) return;
+
+  const note = document.getElementById("rejectNote").value || "No note provided";
+
+  await db.collection("india_single_day_leave").doc(rejectTargetId).update({
+    status: "Rejected",
+    notes: note,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  closeRejectModal(); // Close reject modal
+
+  render(); // Refresh table/list/calendar
+
+  // Optional: close day modal after rejection
+  const dayModal = document.getElementById("dayModal");
+  if(dayModal.style.display === "flex"){
+    closeDayModal();
+  }
+}
+
+// Year View
+function renderYearView(data){
+  const grid = document.getElementById("calendarGrid");
+  grid.innerHTML = "";
+  grid.className = "year-view";
+  grid.style.gridTemplateColumns = "repeat(3,1fr)";
+
+  const year = calendarYear; // use calendarYear for consistency
+  const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  for(let m=0; m<12; m++){
+    const monthDiv = document.createElement("div");
+    monthDiv.className = "year-month";
+
+    // Month label
+    const label = document.createElement("div");
+    label.className = "year-month-label";
+    label.textContent = new Date(year, m).toLocaleString('default',{month:'short'});
+    monthDiv.appendChild(label);
+
+    // Weekday headers
+    const headerGrid = document.createElement("div");
+    headerGrid.className = "mini-grid";
+    weekdays.forEach(wd => {
+      const w = document.createElement("div");
+      w.className = "day-cell";
+      w.style.fontWeight = "bold";
+      w.style.border = "none";
+      w.textContent = wd;
+      headerGrid.appendChild(w);
+    });
+    monthDiv.appendChild(headerGrid);
+
+    // Days grid
+    const miniGrid = document.createElement("div");
+    miniGrid.className = "mini-grid";
+
+    const phFirstDay = getPHDateObject(new Date(year, m, 1));
+    const start = phFirstDay.getDay();
+    for(let i=0;i<start;i++) miniGrid.appendChild(document.createElement("div"));
+
+    const daysInMonth = new Date(phFirstDay.getFullYear(), phFirstDay.getMonth()+1, 0).getDate();
+
+    for(let d=1; d<=daysInMonth; d++){
+      const cell = document.createElement("div");
+      cell.className = "day-cell";
+      cell.textContent = d;
+
+      const cd = getPHDateObject(new Date(year, m, d));
+      const leavesToday = data.filter(l=>{
+        const ld = getPHDateObject(new Date(l.date));
+        return ld.getFullYear()===cd.getFullYear() && ld.getMonth()===cd.getMonth() && ld.getDate()===cd.getDate();
+      });
+
+      if(leavesToday.length){
+        const dotContainer = document.createElement("div");
+        dotContainer.className = "day-dots";
+        leavesToday.forEach(l=>{
+          const dot = document.createElement("div");
+          dot.className = "dot " + (l.status==="Approved"?"approved":l.status==="Rejected"?"rejected":"pending");
+          dot.title = `${l.employeeName} (${l.status})`;
+          dotContainer.appendChild(dot);
+        });
+        cell.appendChild(dotContainer);
+      }
+
+      miniGrid.appendChild(cell);
+    }
+
+    monthDiv.appendChild(miniGrid);
+
+    // Click month to switch to month view
+    monthDiv.addEventListener("click", ()=>{ 
+      calendarMonth = m; 
+      setCalendarMode("month"); 
+    });
+
+    grid.appendChild(monthDiv);
+  }
+}
+
+function setCalendarMode(mode){
+  calendarMode = mode;
+  render();
+}
+
+const leaveTooltip = document.getElementById("leaveTooltip");
+
+function showLeaveTooltip(leaves, e){
+  leaveTooltip.innerHTML = `
+    <h4>Leave Details</h4>
+    ${leaves.map(l => `
+      <div class="leave-item">
+        <div><strong>${l.employeeName}</strong></div>
+        <div>${l.type}</div>
+        <div class="${l.status}">${l.status}</div>
+        <div>Date: ${l.date}</div>
+        ${l.reason ? `<div><em>${l.reason}</em></div>` : ``}
+      </div>
+      ${l.actionBy ? `<div><strong>By:</strong> ${l.actionBy}</div>` : ``}
+    `).join("")}
+  `;
+
+  leaveTooltip.style.display = "block";
+  leaveTooltip.style.left = e.pageX + 12 + "px";
+  leaveTooltip.style.top  = e.pageY + 12 + "px";
+}
+
+
+function moveLeaveTooltip(e){
+  leaveTooltip.style.left = e.pageX + 12 + "px";
+  leaveTooltip.style.top  = e.pageY + 12 + "px";
+}
+
+function hideLeaveTooltip(){
+  leaveTooltip.style.display = "none";
+}
+
+//avoid overlapped
+function moveLeaveTooltip(e){
+  const w = leaveTooltip.offsetWidth;
+  const h = leaveTooltip.offsetHeight;
+  let x = e.pageX + 12;
+  let y = e.pageY + 12;
+  if(x + w > window.innerWidth) x = e.pageX - w - 12;
+  if(y + h > window.innerHeight) y = e.pageY - h - 12;
+  leaveTooltip.style.left = x + "px";
+  leaveTooltip.style.top = y + "px";
+}
+
+let cancelTargetId = null;
+function openCancelModal(id){ cancelTargetId = id; document.getElementById("cancelModal").style.display = "flex"; }
+function closeCancelModal(){ cancelTargetId = null; document.getElementById("cancelModal").style.display = "none"; }
+
+function confirmCancel(){
+  if(cancelTargetId){
+    db.collection("india_single_day_leave").doc(cancelTargetId).update({
+      status: "Cancelled",
+      actionBy: currentUser.name,
+      actionAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeCancelModal();
+  }
+}
+
+let rejectTargetId = null;
+
+function openRejectModal(id){
+  rejectTargetId = id;
+  document.getElementById("rejectNote").value = ""; // clear previous
+  document.getElementById("rejectModal").style.display = "flex";
+}
+
+function closeRejectModal(){
+  rejectTargetId = null;
+  document.getElementById("rejectModal").style.display = "none";
+}
+
+async function confirmReject(){
+  if(!rejectTargetId) return;
+
+  const note = document.getElementById("rejectNote").value || "No note provided";
+
+  await db.collection("india_single_day_leave").doc(rejectTargetId).update({
+    status: "Rejected",
+    notes: note,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  closeRejectModal(); // close reject modal
+
+  render(); // refresh table/list/calendar
+
+  // Close day modal if it's open
+  const dayModal = document.getElementById("dayModal");
+  if(dayModal.style.display === "flex"){
+    closeDayModal();
+  }
+
+  // reset target
+  rejectTargetId = null;
+  currentDayModalDate = null;
+}
+
+
+function changeCalendarMonth(diff){ calendarMonth+=diff; if(calendarMonth<0){calendarMonth=11; calendarYear--;} if(calendarMonth>11){calendarMonth=0; calendarYear++;} render(); }
+
+
+toggleCalendarControls(); render(); loadRequests();
+</script>
+
+<div class="modal" id="rejectModal">
+  <div class="modal-content">
+    <h3>Reject Leave Request</h3>
+    <p>Please provide a note for rejecting this leave:</p>
+    <textarea id="rejectNote" rows="4" style="width:100%; padding:6px; border-radius:6px; border:1px solid #ccc;"></textarea>
+    <div style="text-align:center; margin-top:10px;">
+      <button class="modal-confirm" onclick="confirmReject()">Reject</button>
+      <button class="modal-cancel" onclick="closeRejectModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="dayModal">
+  <div class="modal-content">
+    <h3 id="dayModalTitle">Leaves on DATE</h3>
+    <div id="dayModalBody" style="max-height:300px; overflow-y:auto;"></div>
+    <div style="text-align:center; margin-top:10px;">
+      <button onclick="closeDayModal()" class="modal-cancel">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="cancelModal">
+  <div class="modal-content">
+    <h3>Cancel Leave Request?</h3>
+    <p>Are you sure you want to cancel this leave?</p>
+    <div class="modal-actions">
+      <button class="modal-confirm" onclick="confirmCancel()">Yes, Cancel</button>
+      <button class="modal-cancel" onclick="closeCancelModal()">No</button>
+    </div>
+  </div>
+</div>
+
+<div id="notifDropdown" style="display:none;" class="notif-dropdown"></div>
+
+<div id="toastContainer"></div>
+</body>
+</html>
+
+
+
+
+
+
+
