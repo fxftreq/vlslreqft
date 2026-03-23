@@ -674,7 +674,7 @@ let cachedRequests=[],
 
 //this is for notif new added
 
-function loadRequests(){
+function loadRequests() {
   db.collection("single_day_leave")
     .orderBy("submittedAt", "asc")
     .onSnapshot(snapshot => {
@@ -696,8 +696,15 @@ function loadRequests(){
         unreadCount > 0 ? "inline-block" : "none";
       document.getElementById("notifBadge").textContent = unreadCount;
 
-      cachedRequests = [];
-      snapshot.forEach(d => cachedRequests.push({ id: d.id, ...d.data() }));
+      cachedRequests = snapshot.docs.map(d => {
+        const data = d.data();
+
+        // Normalize region field: trim and lowercase internally
+        if (data.region) data.region = data.region.trim();
+
+        return { id: d.id, ...data };
+      });
+
       render();
     });
 }
@@ -790,26 +797,25 @@ function applyFilters() {
   let data = [...cachedRequests];
 
   // REGION FILTER (case-insensitive, trimmed)
- if(region !== "All") {
-  data = data.filter(r => {
-    return r.region && r.region.toLowerCase() === region.toLowerCase();
-  });
-}
+  if (region !== "All") {
+    const regionLower = region.toLowerCase();
+    data = data.filter(r => r.region && r.region.trim().toLowerCase() === regionLower);
+  }
 
   // STATUS FILTER
-  if(status !== "All") data = data.filter(r => r.status === status);
+  if (status !== "All") data = data.filter(r => r.status === status);
 
   // TYPE FILTER
-  if(type !== "All") {
-    if(type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+  if (type !== "All") {
+    if (type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
     else data = data.filter(r => r.type === type);
   }
 
   // LEAVE DATE FILTER
-  if(date) data = data.filter(r => r.date === date);
+  if (date) data = data.filter(r => r.date === date);
 
   // SUBMITTED DATE FILTER
-  if(submitted) {
+  if (submitted) {
     data = data.filter(r => {
       const subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
       return getPHDateString(subDate) === submitted;
@@ -880,25 +886,14 @@ async function updateStatus(id, status){
 
 //for sorting
 function sortList(field) {
-  // Toggle ascending if same field clicked
-  if(currentSort.field === field){
-    currentSort.ascending = !currentSort.ascending;
-  } else {
-    currentSort.field = field;
-    currentSort.ascending = true;
+  let data = [...cachedRequests];
+
+  // REGION FILTER
+  const region = document.getElementById("regionFilter").value;
+  if(region !== "All") {
+    const regionLower = region.toLowerCase();
+    data = data.filter(r => r.region && r.region.trim().toLowerCase() === regionLower);
   }
-
-  // Copy cachedRequests and apply filters first
- let data = currentFilter==="All"
-  ? cachedRequests
-  : cachedRequests.filter(r=>r.status===currentFilter);
-
-// REGION FILTER (ADD THIS)
-const region = document.getElementById("regionFilter")?.value || "All";
-
-if(region !== "All") {
-  data = data.filter(r => r.region && r.region.toLowerCase() === region.toLowerCase());
-}
 
   // Apply filters from dropdowns
   const status = document.getElementById("filterStatus").value;
@@ -1069,7 +1064,8 @@ function exportCSV(){
 function renderTableView(data) {
   const region = document.getElementById("regionFilter").value;
   if(region !== "All") {
-    data = data.filter(r => r.region && r.region.trim().toLowerCase() === region.toLowerCase());
+    const regionLower = region.toLowerCase();
+    data = data.filter(r => r.region && r.region.trim().toLowerCase() === regionLower);
   }
 
   const month = parseInt(document.getElementById("monthSelect").value);
@@ -1124,7 +1120,8 @@ function renderTableView(data) {
 function renderCalendar(data) {
   const region = document.getElementById("regionFilter").value;
   if(region !== "All") {
-    data = data.filter(r => r.region && r.region.trim().toLowerCase() === region.toLowerCase());
+    const regionLower = region.toLowerCase();
+    data = data.filter(r => r.region && r.region.trim().toLowerCase() === regionLower);
   }
 
   const grid = document.getElementById("calendarGrid");
