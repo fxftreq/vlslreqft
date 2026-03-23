@@ -523,7 +523,7 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 
       <div class="filter-item">
   <label>Region</label>
-<select id="regionFilter" onchange="applyFilters()">
+<select id="regionFilter" onchange="onRegionChange()">
   <option value="All">All</option>
   <option value="Philippines">Philippines</option>
   <option value="India">India</option>
@@ -799,6 +799,10 @@ function render(){
   else if(currentView==='calendar') calendarMode==='month'?renderCalendar(data):renderYearView(data);
 }
 
+function onRegionChange(){
+  loadRequests(); // fetch correct dataset based on region
+}
+  
 function applyFilters() {
   const region = document.getElementById("regionFilter").value;
 
@@ -812,7 +816,7 @@ function applyFilters() {
   let data = [...cachedRequests];
 
   // REGION FILTER (case-insensitive)
- if (region !== "All") {
+if (region !== "All") {
   data = data.filter(r => r.region === region);
 }
 
