@@ -677,12 +677,6 @@ let cachedRequests=[],
 function loadRequests() {
   const region = document.getElementById("regionFilter").value;
 
-  // Map regions to employee IDs
-  const regionEmployeeIds = {
-    "Philippines": ["chrystelle.nabong"], // Add more PH IDs if needed
-    "India": ["5FygGIdeu2TxGmZaOwLtNwAqlkH2"] // Add more India IDs if needed
-  };
-
   if (region === "All") {
     Promise.all([
       db.collection("single_day_leave").orderBy("submittedAt", "asc").get(),
@@ -695,17 +689,25 @@ function loadRequests() {
       render();
     });
   } else {
-    // Filter by specific employee IDs for the selected region
-    const ids = regionEmployeeIds[region] || [];
-    const collectionName = region === "India" ? "india_single_day_leave" : "single_day_leave";
+    const isIndia = region === "India";
+    const collectionName = isIndia ? "india_single_day_leave" : "single_day_leave";
 
     db.collection(collectionName)
       .orderBy("submittedAt", "asc")
       .get()
       .then(snapshot => {
         cachedRequests = snapshot.docs
-          .map(d => ({ id: d.id, ...d.data(), region }))
-          .filter(r => ids.includes(r.employeeId)); // ✅ Filter by employeeId
+          .map(d => ({ id: d.id, ...d.data() }))
+          .filter(r => {
+            if (isIndia) {
+              // EmployeeId NOT in format name.surname => India
+              return !/^[a-z]+\.[a-z]+$/i.test(r.employeeId);
+            } else {
+              // EmployeeId in format name.surname => Philippines
+              return /^[a-z]+\.[a-z]+$/i.test(r.employeeId);
+            }
+          })
+          .map(r => ({ ...r, region: region }));
 
         render();
       });
