@@ -63,11 +63,10 @@ button{ width:100%; padding:12px; background:var(--fedex-purple); border:none; c
   </div>
 
   <label>Login As</label>
-<select id="loginType">
-  <option value="team_leader_ph">Team Leader (Philippines)</option>
-  <option value="team_leader_india">Team Leader (India)</option>
-  <option value="manager">Manager</option>
-</select>
+  <select id="loginType">
+    <option value="team_leader">Team Leader</option>
+    <option value="manager">Manager</option>
+  </select>
 
   <button id="loginBtn">Login</button>
   <div id="error"></div>
@@ -94,12 +93,6 @@ button{ width:100%; padding:12px; background:var(--fedex-purple); border:none; c
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-
-const indiaAdmins = [
-  "vicky@email.com",          // ✅ ONLY ADMIN
-  "trevorbarry.imatong@iqor.com" // ✅ override
-];
-  
 // Firebase config
 firebase.initializeApp({
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
@@ -128,7 +121,7 @@ togglePassword.addEventListener("click", () => {
 
 // Login logic
 loginBtn.addEventListener("click", async () => {
-  const email = document.getElementById("email").value.trim().toLowerCase();
+  const email = document.getElementById("email").value.trim();
   const password = passwordInput.value.trim();
   const loginType = document.getElementById("loginType").value;
 
@@ -141,111 +134,89 @@ loginBtn.addEventListener("click", async () => {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
-    const superAdmins = ["julanguinto@gmail.com","trevorbarry.imatong@iqor.com"];
+    const superAdmins = ["julanguinto@gmail.com","Trevorbarry.Imatong@iqor.com"];
+    const teamLeaderAdmins = ["Jenileemae.David@iqor.com","Jonie.Kabigting@iqor.com", ...superAdmins];
 
-    // PH Team Leaders
-    const teamLeaderPH = [
-      "jenileemae.david@iqor.com",
-      "jonie.kabigting@iqor.com"
-    ];
-
-    // INDIA Team Leaders (ADD YOUR INDIA EMAILS HERE)
-    const teamLeaderIndia = [
-      "vicky@email.com",
-      "user2@email.com"
-    ];
-
+    // Fetch role (case-insensitive)
     let role = null;
     let userData = null;
 
-    // Fetch collections
-    const snapManager = await db.collection("manager_leave_user").get();
-    const snapPH = await db.collection("leave_users").get();
-    const snapIndia = await db.collection("india_leave_users").get();
+    const snapM = await db.collection("manager_leave_user").get();
+    const snapTL = await db.collection("leave_users").get();
 
-    const managerDoc = snapManager.docs.find(d => d.data().email.toLowerCase() === email);
-    const phDoc = snapPH.docs.find(d => d.data().email.toLowerCase() === email);
-    const indiaDoc = snapIndia.docs.find(d => d.data().email.toLowerCase() === email);
+    const managerDoc = snapM.docs.find(d => d.data().email.toLowerCase() === email.toLowerCase());
+    const tlDoc = snapTL.docs.find(d => d.data().email.toLowerCase() === email.toLowerCase());
 
     if(managerDoc){
       role = "manager";
       userData = managerDoc.data();
-    } 
-    else if(phDoc){
-      role = "team_leader_ph";
-      userData = phDoc.data();
-    }
-    else if(indiaDoc){
-      role = "team_leader_india";
-      userData = indiaDoc.data();
-    }
-    else {
+    } else if(tlDoc){
+      role = "team_leader";
+      userData = tlDoc.data();
+    } else {
       alert("No access found.");
       await auth.signOut();
       return;
     }
 
-    // SAVE USER
-    const userObj = {
-      id: user.uid,
-      email: user.email,
-      name: userData.name,
-      role: role
-    };
-
-    localStorage.setItem("currentUser", JSON.stringify(userObj));
-
-    // =========================
-    // ROUTING
-    // =========================
-
-    // SUPER ADMIN
-    if(superAdmins.includes(email)){
-      if(loginType === "team_leader_ph") location.href = "admin.html";
-      else if(loginType === "team_leader_india") location.href = "india-admin.html";
-      else if(loginType === "manager") location.href = "manager-admin.html";
+    // SuperAdmin routing (case-insensitive)
+    if(superAdmins.some(a => a.toLowerCase() === email.toLowerCase())){
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role
+      }));
+      if(loginType==="team_leader") location.href = "admin.html";
+      else if(loginType==="manager") location.href = "manager-admin.html";
       return;
     }
 
-    // TEAM LEADER PH
-    if(loginType === "team_leader_ph"){
-      if(role !== "team_leader_ph"){
-        alert("You are not allowed to login as Team Leader (PH).");
+    // Team Leader login
+    if(loginType==="team_leader"){
+      if(teamLeaderAdmins.some(a => a.toLowerCase() === email.toLowerCase())){
+        localStorage.setItem("currentUser", JSON.stringify({
+          id: user.uid,
+          email: user.email,
+          name: userData.name,
+          role: role
+        }));
+        location.href = "admin.html";
+        return;
+      }
+      if(role !== "team_leader"){
+        alert("You are not allowed to login as Team Leader.");
         await auth.signOut();
         return;
       }
-      location.href = "admin.html";
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role
+      }));
+      location.href = "employee.html";
       return;
     }
 
-// TEAM LEADER INDIA
-if(loginType === "team_leader_india"){
-
-  if(role !== "team_leader_india"){
-    alert("You are not allowed to login as Team Leader (India).");
-    await auth.signOut();
-    return;
-  }
-
-  // ✅ Check if ADMIN (Vicky / Trevor)
-  if(indiaAdmins.includes(email)){
-    location.href = "india-admin.html";
-  } else {
-    // ✅ All others go to employee page
-    location.href = "india-employee.html";
-  }
-
-  return;
-}
-
-    // MANAGER
-    if(loginType === "manager"){
+    // Manager login
+    if(loginType==="manager"){
       if(role !== "manager"){
         alert("You are not allowed to login as Manager.");
         await auth.signOut();
         return;
       }
-      location.href = "manager-admin.html";
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role
+      }));
+      if(superAdmins.some(a => a.toLowerCase() === email.toLowerCase())){
+        location.href = "manager-admin.html";
+      } else {
+        location.href = "manager-employee.html";
+      }
       return;
     }
 
