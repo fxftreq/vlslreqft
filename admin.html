@@ -673,45 +673,36 @@ let cachedRequests=[],
     calendarMode="month";
 
 //this is for notif new added
-
 function loadRequests() {
   const region = document.getElementById("regionFilter").value;
 
-  if (region === "All") {
-    Promise.all([
-      db.collection("single_day_leave").orderBy("submittedAt", "asc").get(),
-      db.collection("india_single_day_leave").orderBy("submittedAt", "asc").get()
-    ]).then(([phSnap, indiaSnap]) => {
-      cachedRequests = [
-        ...phSnap.docs.map(d => ({ id: d.id, ...d.data(), region: "Philippines" })),
-        ...indiaSnap.docs.map(d => ({ id: d.id, ...d.data(), region: "India" }))
-      ];
+  db.collection("single_day_leave").orderBy("submittedAt", "asc").get()
+    .then(snapshot => {
+      // Map all docs
+      let allRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      if (region === "All") {
+        // Assign region dynamically
+        cachedRequests = allRequests.map(r => ({
+          ...r,
+          region: /^[a-z]+\.[a-z]+$/i.test(r.employeeId) ? "Philippines" : "India"
+        }));
+      } else if (region === "Philippines") {
+        cachedRequests = allRequests
+          .filter(r => /^[a-z]+\.[a-z]+$/i.test(r.employeeId))
+          .map(r => ({ ...r, region: "Philippines" }));
+      } else if (region === "India") {
+        cachedRequests = allRequests
+          .filter(r => !/^[a-z]+\.[a-z]+$/i.test(r.employeeId))
+          .map(r => ({ ...r, region: "India" }));
+      }
+
       render();
+    })
+    .catch(err => {
+      console.error("Failed to load leave requests:", err);
+      alert("Failed to load leave requests. Check console.");
     });
-  } else {
-    const isIndia = region === "India";
-    const collectionName = isIndia ? "india_single_day_leave" : "single_day_leave";
-
-    db.collection(collectionName)
-      .orderBy("submittedAt", "asc")
-      .get()
-      .then(snapshot => {
-        cachedRequests = snapshot.docs
-          .map(d => ({ id: d.id, ...d.data() }))
-          .filter(r => {
-            if (isIndia) {
-              // EmployeeId NOT in format name.surname => India
-              return !/^[a-z]+\.[a-z]+$/i.test(r.employeeId);
-            } else {
-              // EmployeeId in format name.surname => Philippines
-              return /^[a-z]+\.[a-z]+$/i.test(r.employeeId);
-            }
-          })
-          .map(r => ({ ...r, region: region }));
-
-        render();
-      });
-  }
 }
 
 function showToast(leave){
