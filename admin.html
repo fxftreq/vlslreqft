@@ -508,6 +508,8 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 </header>
 
 <main>
+
+  
   <!-- Top Controls -->
   <div class="top-controls">
     <!-- View Selector -->
@@ -518,6 +520,15 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
         <option value="table">Table View</option>
         <option value="calendar">Calendar View</option>
       </select>
+
+      <div class="filter-item">
+  <label>Region</label>
+  <select id="regionFilter" onchange="applyFilters()">
+    <option value="All">All</option>
+    <option value="PH">Philippines</option>
+    <option value="India">India</option>
+  </select>
+</div>
     </div>
 
     <!-- Filters + Export (Only List View) -->
@@ -774,14 +785,26 @@ function applyFilters() {
   const type = document.getElementById("filterType").value;
   const date = document.getElementById("filterDate").value;
   const submitted = document.getElementById("filterSubmitted").value;
+  const region = document.getElementById("regionFilter").value;
 
   let data = cachedRequests;
+
+  // REGION FILTER (NEW)
+ if(region !== "All"){
+  data = data.filter(r => {
+    const name = (r.employeeName || "").toLowerCase();
+
+    if(region === "India") return name.includes("@");
+    if(region === "PH") return !name.includes("@");
+
+    return true;
+  });
+}
 
   if(status !== "All") data = data.filter(r => r.status === status);
 
   if(type !== "All") {
     if(type === "Others") {
-      // Match anything that is not Vacation or Sick
       data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
     } else {
       data = data.filter(r => r.type === type);
@@ -791,13 +814,9 @@ function applyFilters() {
   if(date) data = data.filter(r => r.date === date);
 
   if(submitted) data = data.filter(r => {
-  let subDate = r.submittedAt && r.submittedAt.toDate 
-    ? r.submittedAt.toDate() 
-    : new Date(r.submittedAt);
-
-  const phSubmitted = getPHDateString(subDate);
-  return phSubmitted === submitted;
-});
+    let subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
+    return getPHDateString(subDate) === submitted;
+  });
 
   renderList(data);
 }
@@ -869,7 +888,23 @@ function sortList(field) {
   }
 
   // Copy cachedRequests and apply filters first
-  let data = currentFilter==="All"?cachedRequests:cachedRequests.filter(r=>r.status===currentFilter);
+ let data = currentFilter==="All"
+  ? cachedRequests
+  : cachedRequests.filter(r=>r.status===currentFilter);
+
+// REGION FILTER (ADD THIS)
+const region = document.getElementById("regionFilter")?.value || "All";
+
+if(region !== "All"){
+  data = data.filter(r => {
+    const name = (r.employeeName || "").toLowerCase();
+
+    if(region === "India") return name.includes("@");
+    if(region === "PH") return !name.includes("@");
+
+    return true;
+  });
+}
 
   // Apply filters from dropdowns
   const status = document.getElementById("filterStatus").value;
