@@ -787,33 +787,35 @@ function applyFilters() {
   const submitted = document.getElementById("filterSubmitted").value;
   const region = document.getElementById("regionFilter").value;
 
-  let data = cachedRequests;
+  let data = [...cachedRequests];
 
-  // REGION FILTER (NEW)
-// REGION FILTER
-if(region !== "All") {
-  data = data.filter(r => {
-    const reg = r.region || "PH"; // default PH
-    return region === reg;
-  });
-}
+  // REGION FILTER
+  if (region !== "All") {
+    data = data.filter(r => r.region && r.region.toLowerCase() === region.toLowerCase());
+  }
 
-  if(status !== "All") data = data.filter(r => r.status === status);
+  // STATUS FILTER
+  if (status !== "All") data = data.filter(r => r.status === status);
 
-  if(type !== "All") {
-    if(type === "Others") {
+  // TYPE FILTER
+  if (type !== "All") {
+    if (type === "Others") {
       data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
     } else {
       data = data.filter(r => r.type === type);
     }
   }
 
-  if(date) data = data.filter(r => r.date === date);
+  // LEAVE DATE FILTER
+  if (date) data = data.filter(r => r.date === date);
 
-  if(submitted) data = data.filter(r => {
-    let subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
-    return getPHDateString(subDate) === submitted;
-  });
+  // SUBMITTED DATE FILTER
+  if (submitted) {
+    data = data.filter(r => {
+      const subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
+      return getPHDateString(subDate) === submitted;
+    });
+  }
 
   renderList(data);
 }
@@ -1065,51 +1067,49 @@ function exportCSV(){
 }
 
 // Table view
-function renderTableView(data){
-  const region = document.getElementById("regionFilter")?.value || "All";
-  if(region !== "All"){
-    data = data.filter(r => (r.region || "PH") === region);
+function renderTableView(data) {
+  const region = document.getElementById("regionFilter").value;
+
+  if (region !== "All") {
+    data = data.filter(r => r.region && r.region.toLowerCase() === region.toLowerCase());
   }
 
-  const month = parseInt(document.getElementById("monthSelect").value); // selected month
-const phNow = getPHDateObject();
-const y = phNow.getFullYear();
+  const month = parseInt(document.getElementById("monthSelect").value);
+  const phNow = getPHDateObject();
+  const y = phNow.getFullYear();
 
   // Get unique TL names
   const tlnames = [...new Set(data.map(l => l.tlName || l.employeeName))];
   const daysInMonth = new Date(y, month + 1, 0).getDate();
 
-  // Table header
+  const t = document.getElementById("table");
   let html = `<tr><th>TL Name</th>`;
-  for(let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
+  for (let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
   html += `</tr>`;
 
   tlnames.forEach(tl => {
     html += `<tr><td>${tl}</td>`;
 
-    for(let d = 1; d <= daysInMonth; d++){
+    for (let d = 1; d <= daysInMonth; d++) {
       const cellDate = new Date(y, month, d);
 
-      // Filter leaves for this TL & day, ignoring Cancelled
       const leavesForCell = data.filter(l => {
         const ld = new Date(l.date);
         return (l.tlName || l.employeeName) === tl &&
                ld.getFullYear() === y &&
                ld.getMonth() === month &&
                ld.getDate() === d &&
-               l.status !== "Cancelled"; // ignore Cancelled
+               l.status !== "Cancelled";
       });
 
-      if(leavesForCell.length){
-        // Determine the letter by priority: Approved > Pending > Rejected
+      if (leavesForCell.length) {
         let letter = "";
-        if(leavesForCell.some(l => l.status === "Approved")) letter = "A";
-        else if(leavesForCell.some(l => l.status === "Pending")) letter = "P";
-        else if(leavesForCell.some(l => l.status === "Rejected")) letter = "R";
+        if (leavesForCell.some(l => l.status === "Approved")) letter = "A";
+        else if (leavesForCell.some(l => l.status === "Pending")) letter = "P";
+        else if (leavesForCell.some(l => l.status === "Rejected")) letter = "R";
 
         html += `<td>
-          <span class="table-indicator ${letter}" 
-                data-leaves='${JSON.stringify(leavesForCell)}'>
+          <span class="table-indicator ${letter}" data-leaves='${JSON.stringify(leavesForCell)}'>
             ${letter}
           </span>
         </td>`;
@@ -1123,7 +1123,7 @@ const y = phNow.getFullYear();
 
   t.innerHTML = html;
 
-  // Re-add hover tooltip listeners after table is rendered
+  // Add hover tooltips
   document.querySelectorAll(".table-indicator").forEach(span => {
     const leaves = JSON.parse(span.dataset.leaves);
     span.addEventListener("mouseenter", e => showLeaveTooltip(leaves, e));
@@ -1132,18 +1132,20 @@ const y = phNow.getFullYear();
   });
 }
 
-
 // Render month calendar
 // Month Calendar (PH Time)
 function renderCalendar(data) {
+  const region = document.getElementById("regionFilter").value;
+
+  if (region !== "All") {
+    data = data.filter(r => r.region && r.region.toLowerCase() === region.toLowerCase());
+  }
+
   const grid = document.getElementById("calendarGrid");
   grid.innerHTML = "";
-  grid.style.gridTemplateColumns = "repeat(7,1fr)";
-  grid.className = "calendar";
-
   const y = calendarYear, m = calendarMonth;
   const phFirstDay = getPHDateObject(new Date(y, m, 1));
-  const phDaysInMonth = new Date(phFirstDay.getFullYear(), phFirstDay.getMonth() + 1, 0).getDate();
+  const phDaysInMonth = new Date(y, m + 1, 0).getDate();
   const startDay = phFirstDay.getDay();
 
   // Weekday headers
@@ -1154,18 +1156,15 @@ function renderCalendar(data) {
     grid.appendChild(header);
   });
 
-  // Empty cells before first day
   for(let i=0;i<startDay;i++){
     const empty = document.createElement("div");
     empty.className = "cal-cell";
     grid.appendChild(empty);
   }
 
-  // Day cells
   for(let d=1; d<=phDaysInMonth; d++){
     const cell = document.createElement("div");
     cell.className = "cal-cell";
-
     const dayDiv = document.createElement("div");
     dayDiv.className = "cal-day";
     dayDiv.textContent = d;
@@ -1173,7 +1172,6 @@ function renderCalendar(data) {
 
     const cellDate = getPHDateString(new Date(y, m, d));
 
-    // Add leave indicators (ignoring Cancelled)
     const leavesToday = data.filter(l => getPHDateString(new Date(l.date)) === cellDate && l.status !== "Cancelled");
     leavesToday.forEach(l => {
       const indicator = document.createElement("span");
@@ -1182,13 +1180,10 @@ function renderCalendar(data) {
       cell.appendChild(indicator);
     });
 
-    // Click to open day modal
     cell.addEventListener("click", () => openDayModal(cellDate));
-
     grid.appendChild(cell);
   }
 
-  // Update month label
   document.getElementById("calendarMonthLabel").textContent =
     `${phFirstDay.toLocaleString('default',{month:'long'})} ${y}`;
 }
