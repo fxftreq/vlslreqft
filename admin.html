@@ -677,22 +677,22 @@ function loadRequests() {
 
   db.collection("single_day_leave").orderBy("submittedAt", "asc").get()
     .then(snapshot => {
-      const allRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      let allRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      // Robust PH ID regex: name.surname with optional numbers at the end
-      const phRegex = /^[a-z]+\.[a-z]+[0-9]*$/i;
+      // Hard-coded list of PH employees (add all PH users here)
+      const phUsers = [
+        "wynardel.contreras1",
+        "ianjonald.perez1",
+        "maeann.reyes1",
+        // add the rest of PH employeeIds here
+      ];
 
-      let requestsWithRegion = allRequests.map(r => {
-        const empId = (r.employeeId || "").trim().toLowerCase();
-        const isPH = phRegex.test(empId);
+      // Assign region based on hard-coded PH list
+      const requestsWithRegion = allRequests.map(r => ({
+        ...r,
+        region: phUsers.includes(r.employeeId.toLowerCase()) ? "Philippines" : "India"
+      }));
 
-        return {
-          ...r,
-          region: isPH ? "Philippines" : "India"
-        };
-      });
-
-      // Filter based on selected region
       if (region === "All") {
         cachedRequests = requestsWithRegion;
       } else {
