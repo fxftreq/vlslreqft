@@ -679,19 +679,10 @@ function loadRequests() {
     .then(snapshot => {
       let allRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      // Lowercase hard-coded PH employee IDs
-      const phUsers = [
-        "wynardel.contreras1",
-        "ianjonald.perez1",
-        "maeann.reyes1",
-        // add other PH users here
-      ].map(id => id.toLowerCase());
-
       const requestsWithRegion = allRequests.map(r => {
-        const empIdLower = r.employeeId.toLowerCase();
         return {
           ...r,
-          region: phUsers.includes(empIdLower) ? "Philippines" : "India"
+          region: r.employeeId.includes("@") ? "India" : "Philippines"
         };
       });
 
