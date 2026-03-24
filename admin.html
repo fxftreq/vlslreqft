@@ -679,19 +679,21 @@ function loadRequests() {
     .then(snapshot => {
       let allRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      // Hard-coded list of PH employees (add all PH users here)
+      // Lowercase hard-coded PH employee IDs
       const phUsers = [
         "wynardel.contreras1",
         "ianjonald.perez1",
         "maeann.reyes1",
-        // add the rest of PH employeeIds here
-      ];
+        // add other PH users here
+      ].map(id => id.toLowerCase());
 
-      // Assign region based on hard-coded PH list
-      const requestsWithRegion = allRequests.map(r => ({
-        ...r,
-        region: phUsers.includes(r.employeeId.toLowerCase()) ? "Philippines" : "India"
-      }));
+      const requestsWithRegion = allRequests.map(r => {
+        const empIdLower = r.employeeId.toLowerCase();
+        return {
+          ...r,
+          region: phUsers.includes(empIdLower) ? "Philippines" : "India"
+        };
+      });
 
       if (region === "All") {
         cachedRequests = requestsWithRegion;
