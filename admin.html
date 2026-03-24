@@ -464,12 +464,130 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
     align-items: flex-start;
     gap: 10px;
   }
-  .header-right {
-    width: 100%;
-    justify-content: space-between;
-  }
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: var(--fedex-purple);
+  color: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.logo {
+  height: 40px;
+}
+
+.profile-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.profile-btn:hover {
+  transform: scale(1.05);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+}
+
+.admin-name {
+  font-weight: 500;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #fff;
+  color: #333;
+  min-width: 220px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+  z-index: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  transform: translateY(10px);
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.dropdown-content.show {
+  display: block;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  gap: 10px;
+  background-color: #f9f9f9;
+}
+
+.avatar-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.name {
+  font-weight: 600;
+  margin: 0;
+  font-size: 14px;
+}
+
+.role {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.dropdown-content a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dropdown-content a:hover {
+  background-color: var(--fedex-purple);
+  color: white;
+}
+
+hr {
+  margin: 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
 
 </style>
 
@@ -478,33 +596,30 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 </head>
 
 <body>
-<header class="main-header">
-
+<header class="header">
   <div class="header-left">
-    <div class="logo-circle">
-      <i class="fas fa-plane"></i>
-    </div>
-    <div class="system-info">
-      <div class="system-title">FedEx Leave Portal</div>
-      <div class="system-subtitle">Admin Management System</div>
-    </div>
+    <img src="fedex.logo.png" alt="FedEx Logo" class="logo">
   </div>
-
-  <div class="header-center">
-    <span id="welcomeMsg">Welcome</span>
-  </div>
-
   <div class="header-right">
-    <div class="user-chip">
-      <i class="fas fa-user"></i>
-      <span id="headerUserName"></span>
+    <div class="profile-dropdown">
+      <button class="profile-btn">
+        <img src="avatar.png" alt="Admin Avatar" class="avatar">
+        <span class="admin-name">Admin Name</span>
+        <i class="fas fa-caret-down"></i>
+      </button>
+      <div class="dropdown-content">
+        <div class="dropdown-header">
+          <img src="avatar.png" alt="Admin Avatar" class="avatar-small">
+          <div>
+            <p class="name">Admin Name</p>
+            <p class="role">Administrator</p>
+          </div>
+        </div>
+        <hr>
+        <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
     </div>
-    <button class="logout-btn" onclick="logout()">
-      <i class="fas fa-sign-out-alt"></i>
-      Logout
-    </button>
   </div>
-
 </header>
 
 <main>
@@ -627,6 +742,7 @@ document.getElementById("welcomeMsg").textContent =
 
 document.getElementById("headerUserName").textContent =
   currentUser.name;
+
 
 
 //for setting the date time to ph	
@@ -1443,6 +1559,19 @@ function changeCalendarMonth(diff){ calendarMonth+=diff; if(calendarMonth<0){cal
 
 
 toggleCalendarControls(); render(); loadRequests();
+
+const profileBtn = document.querySelector('.profile-btn');
+const dropdownContent = document.querySelector('.dropdown-content');
+
+profileBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  dropdownContent.classList.toggle('show');
+});
+
+window.addEventListener('click', () => {
+  dropdownContent.classList.remove('show');
+});
+
 </script>
 
 <div class="modal" id="rejectModal">
