@@ -679,19 +679,20 @@ function loadRequests() {
     .then(snapshot => {
       const allRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      // PH IDs: name.surname optionally followed by numbers
+      // Robust PH ID regex: name.surname with optional numbers at the end
       const phRegex = /^[a-z]+\.[a-z]+[0-9]*$/i;
 
-      // Assign region properly
       let requestsWithRegion = allRequests.map(r => {
-        const id = (r.employeeId || "").trim(); // remove extra spaces
+        const empId = (r.employeeId || "").trim().toLowerCase();
+        const isPH = phRegex.test(empId);
+
         return {
           ...r,
-          region: phRegex.test(id) ? "Philippines" : "India"
+          region: isPH ? "Philippines" : "India"
         };
       });
 
-      // Apply region filter
+      // Filter based on selected region
       if (region === "All") {
         cachedRequests = requestsWithRegion;
       } else {
@@ -705,7 +706,7 @@ function loadRequests() {
       alert("Failed to load leave requests. Check console.");
     });
 }
-
+  
 function showToast(leave){
   const toast = document.createElement("div");
   toast.className = "toast";
