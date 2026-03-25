@@ -101,22 +101,16 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 
 /* Calendar */
 .calendar-wrapper {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  margin-bottom:10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
   flex-wrap: wrap;
-
-  position: sticky;
-  top: 160px;
-  z-index: 940;
-
-  background: rgba(244,244,246,0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 10px 12px;
-  border-radius: 10px;
+  margin: 0 0 16px 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f8f5fc, #ffffff);
+  border: 1px solid #ece7f5;
 }
 
 .calendar-wrapper button {
@@ -138,8 +132,13 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 #calendarMonthLabel {
   font-weight: 700;
   color: var(--fedex-purple);
-  min-width: 150px;
+  min-width: 180px;
   text-align: center;
+  font-size: 15px;
+  background: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #ece7f5;
 }
   
 .calendar {
@@ -347,37 +346,55 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 #monthSelectWrapper {
   display: flex;
   justify-content: center;
-  margin: 15px 0;
-  position: sticky;
-  top: 160px;
-  z-index: 940;
-  padding: 8px 0;
-  background: transparent;
+  align-items: center;
+  margin: 0 0 16px 0;
+  padding: 0;
 }
 
 #monthSelect {
+  background: var(--fedex-purple);
+  color: #fff;
+  border: none;
   padding: 8px 14px;
   border-radius: 8px;
-  border: 1px solid #ccc;
-  background: #fff;
-  font-size: 1em;
-  font-weight: 500;
-  color: #333;
   cursor: pointer;
-  min-width: 150px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  font-weight: 600;
+  min-width: 170px;
   transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(77,20,140,0.22);
 }
 
 #monthSelect:hover {
-  border-color: var(--fedex-purple);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  background: var(--fedex-orange);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(255,102,0,0.22);
 }
 
 #monthSelect:focus {
   outline: none;
-  border-color: var(--fedex-orange);
-  box-shadow: 0 0 0 3px rgba(255,102,0,0.2);
+  box-shadow: 0 0 0 3px rgba(255,102,0,0.22);
+}
+
+  .view-subbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 16px 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f8f5fc, #ffffff);
+  border: 1px solid #ece7f5;
+}
+
+.subbar-label {
+  font-weight: 700;
+  color: var(--fedex-purple);
 }
 
 /* Year navigation */
@@ -674,19 +691,6 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
     height: 42px;
   }
 
-  #monthSelectWrapper {
-    top: 275px;
-    z-index: 940;
-  }
-
-  .calendar-wrapper {
-    top: 275px;
-    z-index: 940;
-    justify-content: center;
-    gap: 8px;
-    padding: 8px 10px;
-  }
-
   .calendar-wrapper button {
     padding: 7px 10px;
     font-size: 13px;
@@ -723,13 +727,6 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
     justify-content: center;
   }
 
-  #monthSelectWrapper {
-    top: 390px;
-  }
-
-  .calendar-wrapper {
-    top: 390px;
-  }
 
   .fedex-logo {
     height: 36px;
@@ -985,32 +982,33 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
     </div>
   </div>
 
-  <div id="monthSelectWrapper" style="display:none;">
-    <select id="monthSelect" onchange="calendarMonth=parseInt(this.value,10); render()">
-      <option value="0">January</option>
-      <option value="1">February</option>
-      <option value="2">March</option>
-      <option value="3">April</option>
-      <option value="4">May</option>
-      <option value="5">June</option>
-      <option value="6">July</option>
-      <option value="7">August</option>
-      <option value="8">September</option>
-      <option value="9">October</option>
-      <option value="10">November</option>
-      <option value="11">December</option>
-    </select>
-  </div>
+   <div class="card">
+    <div id="monthSelectWrapper" class="view-subbar" style="display:none;">
+      <span class="subbar-label">Month</span>
+      <select id="monthSelect" onchange="calendarMonth=parseInt(this.value,10); render()">
+        <option value="0">January</option>
+        <option value="1">February</option>
+        <option value="2">March</option>
+        <option value="3">April</option>
+        <option value="4">May</option>
+        <option value="5">June</option>
+        <option value="6">July</option>
+        <option value="7">August</option>
+        <option value="8">September</option>
+        <option value="9">October</option>
+        <option value="10">November</option>
+        <option value="11">December</option>
+      </select>
+    </div>
 
-  <div class="calendar-wrapper" id="calendarControls">
-    <button onclick="changeCalendarMonth(-1)">◀</button>
-    <span id="calendarMonthLabel"></span>
-    <button onclick="changeCalendarMonth(1)">▶</button>
-    <button onclick="setCalendarMode('month')">Month</button>
-    <button onclick="setCalendarMode('year')">Year</button>
-  </div>
+    <div class="calendar-wrapper view-subbar" id="calendarControls">
+      <button onclick="changeCalendarMonth(-1)">◀</button>
+      <span id="calendarMonthLabel"></span>
+      <button onclick="changeCalendarMonth(1)">▶</button>
+      <button onclick="setCalendarMode('month')">Month</button>
+      <button onclick="setCalendarMode('year')">Year</button>
+    </div>
 
-  <div class="card">
     <div id="calendarContainer">
       <div class="calendar" id="calendarGrid"></div>
     </div>
