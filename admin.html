@@ -108,13 +108,19 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   margin-bottom:20px;
 
   position: sticky;
-  top: 78px;
+  top: 85px;
   z-index: 900;
 
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(0,0,0,0.06);
 }
+
+.top-controls,
+#monthSelectWrapper {
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+  
 .card {
   scroll-margin-top: 170px;
 }  
@@ -136,7 +142,7 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   justify-content: center;
   margin: 15px 0;
   position: sticky;
-  top: 150px;
+  top: 158px;
   z-index: 850;
   background: transparent;
   padding: 6px 0;
@@ -370,11 +376,19 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   background: darkorange;
   transform: translateY(-1px);
 }
+  
 .fedex-logo {
   height: 50px;
-  width: 225px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
   display: block;
+  transition: transform 0.25s ease;
 }
+
+.fedex-logo:hover {
+  transform: scale(1.03);
+}  
 
 @media(max-width:768px){
   .admin-header {
