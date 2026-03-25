@@ -17,8 +17,14 @@ body {
 header,footer { 
   background:var(--fedex-purple); color:white; padding:15px 20px; font-size:1.2em; font-weight:bold; display:flex; justify-content:space-between; align-items:center; 
 }
-header button { 
-  background:var(--fedex-orange); color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; 
+.logout-btn { 
+  background:var(--fedex-orange);
+  color:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
 }
 main { flex:1; padding:20px; }
 h2 { color:var(--fedex-purple); text-align:center; }
@@ -26,7 +32,7 @@ h2 { color:var(--fedex-purple); text-align:center; }
 
 button.approve { background:green;color:white;padding:5px 8px;border-radius:4px;border:none;margin:2px;cursor:pointer; }
 button.pend { background:orange;color:white;padding:5px 8px;border-radius:4px;border:none;margin:2px; cursor:pointer; }
-button.reject { background:red;color:white;padding:5px 8px;border-radius:4px;border:none;margin:2px; }
+button.reject { background:red;color:white;padding:5px 8px;border-radius:4px;border:none;margin:2px; cursor:pointer; }
 button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;border:none;margin:2px;cursor:pointer}
 
 .status-Pending{ color:orange; font-weight:bold; }
@@ -37,17 +43,20 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 /* Table */
 #table { width:100%; border-collapse:collapse; margin-top:10px; }
 #table th,#table td { border:1px solid #ddd; padding:8px; text-align:left; }
-#table th { background:var(--fedex-purple); color:white; }
+#table th { background:var(--fedex-purple); color:white; cursor:pointer; }
 #table tr:nth-child(even){ background:#f9f9f9; }
 
 /* Calendar */
 .calendar-wrapper { display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:10px; }
 .calendar { display:grid; grid-template-columns: repeat(7,1fr); gap:2px; }
-.cal-header { font-weight:bold; background:var(--fedex-purple); color:white; padding:6px 0; border-radius:4px; }
+.cal-header { font-weight:bold; background:var(--fedex-purple); color:white; padding:6px 0; border-radius:4px; text-align:center; }
 .cal-cell { background:white; border:1px solid #ddd; min-height:80px; display:flex; flex-direction:column; align-items:flex-start; padding:4px; position:relative; border-radius:4px; font-size:12px; overflow:hidden; }
 .cal-cell:hover { background:#f0f0f0; cursor:pointer; }
 .cal-day { font-weight:bold; margin-bottom:2px; }
-.indicator { display:block; padding:1px 3px; margin:1px 0; border-radius:3px; color:white; font-size:10px; font-weight:bold; overflow:hidden; text-overflow:ellipsis; }
+.indicator { display:block; padding:1px 3px; margin:1px 0; border-radius:3px; color:white; font-size:10px; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
+.indicator.A { background:green; }
+.indicator.P { background:orange; }
+.indicator.R { background:red; }
 
 /* Table indicator */
 .table-indicator { display:inline-block; width:22px; height:22px; border-radius:50%; color:white; font-weight:bold; text-align:center; line-height:22px; margin:2px; font-size:12px; }
@@ -55,14 +64,23 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 
 /* Year view mini calendars */
 .year-view { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; }
-.year-month { border:1px solid #ccc; border-radius:8px; padding:5px; background:#fff; cursor:pointer; display:flex; flex-direction:column; transition:transform 0.2s; }
-.year-month:hover{transform:scale(1.02); box-shadow:0 4px 8px rgba(0,0,0,0.2);}
-.year-month-label{ text-align:center; font-weight:bold; margin-bottom:4px; }
+.year-month { border:1px solid #ccc; border-radius:12px; padding:10px; background:#fff; cursor:pointer; display:flex; flex-direction:column; transition:transform 0.2s, box-shadow 0.2s; }
+.year-month:hover{transform:translateY(-2px); box-shadow:0 4px 8px rgba(0,0,0,0.2);}
+.year-month-label{ text-align:center; font-weight:bold; margin-bottom:6px; color:var(--fedex-purple); }
 .mini-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; font-size:8px; }
-.mini-grid .day-cell { height:20px; width:20px; border-radius:4px; text-align:center; line-height:20px; position:relative; border:1px solid #eee; font-size:8px; }
+.mini-grid .day-cell { height:20px; width:20px; border-radius:4px; text-align:center; line-height:20px; position:relative; border:1px solid #eee; font-size:8px; background:#fafafa; }
 .mini-grid .day-dots { position:absolute; bottom:1px; left:50%; transform:translateX(-50%); display:flex; gap:1px; }
 .dot { width:4px; height:4px; border-radius:50%; }
 .dot.approved{background:green;} .dot.pending{background:orange;} .dot.rejected{background:red;}
+
+.year-month .mini-grid:first-of-type .day-cell {
+  font-size: 9px;
+  color: #555;
+  background: none;
+  height: auto;
+  border:none;
+  line-height:normal;
+}
 
 /* Modal */
 .modal{
@@ -77,19 +95,17 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 .modal-confirm{background:red;color:white}
 .modal-cancel{background:#ccc}
 
-/* Top Controls - Modern Professional Style */
+/* Top Controls */
 .top-controls {
   display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
   background:#fff; padding:12px 20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.08);
   margin-bottom:20px;
 }
 
-/* View Selector */
-.view-select-wrapper { display:flex; align-items:center; gap:8px; margin-right:20px; }
+.view-select-wrapper { display:flex; align-items:center; gap:8px; margin-right:20px; flex-wrap:wrap; }
 .view-select-wrapper label { font-weight:bold; color:var(--fedex-purple); }
 .view-select-wrapper select { padding:6px 10px; border-radius:6px; border:1px solid #ccc; cursor:pointer; font-weight:500; min-width:120px; }
 
-/* Filters + Export - inline */
 #listControls { display:flex; flex-wrap:wrap; align-items:center; gap:12px; flex:1; }
 .filter-item { display:flex; flex-direction:column; font-size:0.85em; }
 .filter-item label { font-weight:bold; color:#333; margin-bottom:4px; }
@@ -100,7 +116,7 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 
 #monthSelectWrapper {
   display: flex;
-  justify-content: center; /* center horizontally */
+  justify-content: center;
   margin: 15px 0;
 }
 
@@ -129,52 +145,6 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   box-shadow: 0 0 0 3px rgba(255,102,0,0.2);
 }
 
-.year-month .mini-grid:first-of-type .day-cell {
-  font-size: 9px;
-  color: #555;
-  background: none;
-  height: auto;
-}
-/* ===== Improved Year View ===== */
-.year-month {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 10px;
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-
-.year-month:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-}
-
-.year-month-label {
-  font-size: 0.95em;
-  font-weight: 700;
-  color: var(--fedex-purple);
-  margin-bottom: 6px;
-}
-
-.year-month .mini-grid {
-  gap: 3px;
-}
-
-.year-month .day-cell {
-  background: #fafafa;
-}
-
-.year-month .day-cell:hover {
-  background: #f0f0f0;
-}
-
-.year-month .mini-grid:first-of-type .day-cell {
-  background: none;
-  font-size: 9px;
-  color: #666;
-  cursor: default;
-}
-
 /* Year navigation */
 .year-nav {
   display: flex;
@@ -200,7 +170,7 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   color: #333;
 }
 
-/* ===== Month View Leave Tooltip ===== */
+/* Tooltip */
 .leave-tooltip {
   position: absolute;
   background: #fff;
@@ -214,35 +184,22 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   display: none;
   pointer-events: none;
 }
-
 .leave-tooltip h4 {
   margin: 0 0 6px;
   font-size: 13px;
   color: var(--fedex-purple);
 }
-
 .leave-tooltip .leave-item {
   border-top: 1px solid #eee;
   padding-top: 6px;
   margin-top: 6px;
 }
-
 .leave-tooltip .Approved { color: green; font-weight: bold; }
 .leave-tooltip .Rejected { color: red; font-weight: bold; }
 .leave-tooltip .Pending  { color: orange; font-weight: bold; }
 .leave-tooltip .Cancelled{ color: #555; font-weight: bold; }
-.leave-tooltip {
-  pointer-events: none;
-}
 
-/*table*/
-.table-indicator {
-  position: relative;
-  display: inline-block;
-}
-
-
-/*notification*/
+/* Notifications */
 #notifBtn {
   position: relative;
   background: var(--fedex-purple);
@@ -253,11 +210,9 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   cursor: pointer;
   font-size: 1.2em;
 }
-
 #notifBtn:hover {
   background: var(--fedex-orange);
 }
-
 #notifBadge {
   position: absolute;
   top: -6px;
@@ -270,8 +225,6 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   font-weight: bold;
   display: none;
 }
-
-/*notification dropdown*/
 .notif-dropdown {
   position: absolute;
   top: 85px;
@@ -282,35 +235,32 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);
   padding: 10px;
   z-index: 1000;
+  max-height: 350px;
+  overflow-y: auto;
 }
-
 .notif-item {
   padding: 8px;
   border-bottom: 1px solid #eee;
   font-size: 0.9em;
 }
-
 .notif-item:last-child {
   border-bottom: none;
 }
-
 .notif-item strong {
   color: var(--fedex-purple);
 }
-
 .notif-item small {
   color: #666;
   font-size: 0.8em;
 }
-/*notification dropdown*/
+
+/* Toast */
 #toastContainer {
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 2000;
 }
-
-
 .toast {
   background: #fff;
   border-left: 6px solid var(--fedex-purple);
@@ -321,57 +271,16 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   animation: slideIn 0.4s ease;
   min-width: 260px;
 }
-
 @keyframes slideIn {
   from { transform: translateX(120%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 
 #rejectModal {
-  z-index: 2000; /* higher than dayModal */
+  z-index: 2000;
 }
 
-
-/*admin header styling*/
-.admin-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--fedex-purple);
-  color: white;
-  padding: 10px 20px;
-  font-weight: bold;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.admin-header .header-left img {
-  display: block;
-}
-
-.admin-header .header-center {
-  flex: 1;
-  text-align: center;
-  font-size: 1.2em;
-}
-
-.admin-header .header-right button {
-  background: var(--fedex-orange);
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.admin-header .header-right button:hover {
-  background: #e65c00;
-}
-
-/*admin header styling*/
-/* ===== PROFESSIONAL HEADER (replace old admin-header) ===== */
+/* Header */
 .admin-header {
   background: linear-gradient(90deg, #4D148C, #3b0f70);
   color: white;
@@ -384,53 +293,21 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   top: 0;
   z-index: 1000;
 }
-
 .header-left {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
-.logo-circle {
-  background: var(--fedex-orange);
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-}
-
-.system-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.system-title {
-  font-weight: bold;
-  font-size: 16px;
-  letter-spacing: 0.5px;
-}
-
-.system-subtitle {
-  font-size: 11px;
-  opacity: 0.8;
-}
-
 .header-center {
   font-size: 14px;
   font-weight: 500;
   opacity: 0.9;
 }
-
 .header-right {
   display: flex;
   align-items: center;
   gap: 15px;
 }
-
 .user-chip {
   background: rgba(255,255,255,0.15);
   padding: 6px 12px;
@@ -440,7 +317,6 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   align-items: center;
   gap: 6px;
 }
-
 .logout-btn {
   background: var(--fedex-orange);
   color: white;
@@ -451,13 +327,16 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   font-weight: bold;
   transition: 0.2s;
 }
-
 .logout-btn:hover {
   background: darkorange;
   transform: translateY(-1px);
 }
+.fedex-logo {
+  height: 50px;
+  width: 225px;
+  display: block;
+}
 
-/* Mobile Responsive Header */
 @media(max-width:768px){
   .admin-header {
     flex-direction: column;
@@ -470,10 +349,140 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   }
 }
 
-  .fedex-logo {
-  height: 50px;    /* slightly larger than before */
-  width: 225px;     /* maintain aspect ratio */
-  display: block;
+/* ===== Profile Dropdown ===== */
+.profile-menu {
+  position: relative;
+}
+
+.profile-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.profile-btn .user-chip {
+  transition: all 0.25s ease;
+}
+
+.profile-btn:hover .user-chip {
+  background: rgba(255,255,255,0.22);
+  transform: translateY(-1px);
+}
+
+.profile-arrow {
+  font-size: 12px;
+  transition: transform 0.28s ease;
+}
+
+.profile-arrow.rotate {
+  transform: rotate(180deg);
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 240px;
+  background: #fff;
+  color: #333;
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-10px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  transform-origin: top right;
+  z-index: 2000;
+}
+
+.profile-dropdown.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.profile-dropdown-header {
+  padding: 14px 16px 12px;
+  background: linear-gradient(135deg, #f7f3fc, #ffffff);
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.profile-name {
+  font-weight: 700;
+  color: var(--fedex-purple);
+  font-size: 14px;
+}
+
+.profile-role {
+  font-size: 12px;
+  color: #777;
+  margin-top: 3px;
+}
+
+.profile-dropdown-item {
+  width: 100%;
+  border: none;
+  background: #fff;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s ease, padding-left 0.2s ease;
+}
+
+.profile-dropdown-item:hover {
+  background: #f8f8fb;
+  padding-left: 20px;
+}
+
+.logout-item {
+  color: #d62828;
+  font-weight: 600;
+}
+
+.logout-item i {
+  width: 16px;
+}
+
+.admin-header {
+  animation: headerSlideDown 0.45s ease;
+}
+
+@keyframes headerSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fedex-logo {
+  transition: transform 0.25s ease;
+}
+
+.fedex-logo:hover {
+  transform: scale(1.02);
+}
+
+.header-center {
+  animation: fadeInSoft 0.6s ease;
+}
+
+@keyframes fadeInSoft {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.9;
+  }
 }
 
 </style>
@@ -483,35 +492,43 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 </head>
 
 <body>
-<header class="main-header">
-
-<div class="header-left">
-  <img src="fedex-logo.png" alt="FedEx Logo" class="fedex-logo">
-</div>
+<header class="admin-header">
+  <div class="header-left">
+    <img src="fedex-logo.png" alt="FedEx Logo" class="fedex-logo">
+  </div>
 
   <div class="header-center">
     <span id="welcomeMsg">Welcome</span>
   </div>
 
   <div class="header-right">
+<div class="profile-menu">
+  <button class="profile-btn" id="profileBtn" onclick="toggleProfileMenu()">
     <div class="user-chip">
-      <i class="fas fa-user"></i>
+      <i class="fas fa-user-circle"></i>
       <span id="headerUserName"></span>
+      <i class="fas fa-chevron-down profile-arrow" id="profileArrow"></i>
     </div>
-    <button class="logout-btn" onclick="logout()">
+  </button>
+
+  <div class="profile-dropdown" id="profileDropdown">
+    <div class="profile-dropdown-header">
+      <div class="profile-name" id="profileDropdownName"></div>
+      <div class="profile-role">Administrator</div>
+    </div>
+
+    <button class="profile-dropdown-item logout-item" onclick="logout()">
       <i class="fas fa-sign-out-alt"></i>
-      Logout
+      <span>Logout</span>
     </button>
   </div>
-
+</div>
+ 
+  </div>
 </header>
 
 <main>
-
-  
-  <!-- Top Controls -->
   <div class="top-controls">
-    <!-- View Selector -->
     <div class="view-select-wrapper">
       <label for="viewSelect">View:</label>
       <select id="viewSelect" onchange="setView(this.value)">
@@ -521,16 +538,15 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
       </select>
 
       <div class="filter-item">
-  <label>Region</label>
-<select id="regionFilter" onchange="onRegionChange()">
-  <option value="All">All</option>
-  <option value="Philippines">Philippines</option>
-  <option value="India">India</option>
-</select>
-</div>
+        <label>Region</label>
+        <select id="regionFilter" onchange="onRegionChange()">
+          <option value="All">All</option>
+          <option value="Philippines">Philippines</option>
+          <option value="India">India</option>
+        </select>
+      </div>
     </div>
 
-    <!-- Filters + Export (Only List View) -->
     <div id="listControls">
       <div class="filter-item">
         <label for="filterStatus">Status</label>
@@ -563,29 +579,28 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
         <i class="fas fa-file-export"></i>
       </button>
       <button id="notifBtn" title="Notifications" onclick="toggleNotifDropdown()">
-    <i class="fas fa-bell"></i>
-    <span id="notifBadge">0</span>
-  </button>
+        <i class="fas fa-bell"></i>
+        <span id="notifBadge">0</span>
+      </button>
     </div>
   </div>
 
-<!-- Month selector for Table view -->
-<div id="monthSelectWrapper" style="display:none;">
-  <select id="monthSelect" onchange="render()">
-    <option value="0">January</option>
-    <option value="1">February</option>
-    <option value="2">March</option>
-    <option value="3">April</option>
-    <option value="4">May</option>
-    <option value="5">June</option>
-    <option value="6">July</option>
-    <option value="7">August</option>
-    <option value="8">September</option>
-    <option value="9">October</option>
-    <option value="10">November</option>
-    <option value="11">December</option>
-  </select>
-</div>
+  <div id="monthSelectWrapper" style="display:none;">
+    <select id="monthSelect" onchange="render()">
+      <option value="0">January</option>
+      <option value="1">February</option>
+      <option value="2">March</option>
+      <option value="3">April</option>
+      <option value="4">May</option>
+      <option value="5">June</option>
+      <option value="6">July</option>
+      <option value="7">August</option>
+      <option value="8">September</option>
+      <option value="9">October</option>
+      <option value="10">November</option>
+      <option value="11">December</option>
+    </select>
+  </div>
 
   <div class="calendar-wrapper" id="calendarControls">
     <button onclick="changeCalendarMonth(-1)">◀</button>
@@ -596,848 +611,15 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   </div>
 
   <div class="card">
-   
-    <div id="calendarContainer"><div class="calendar" id="calendarGrid"></div></div>
+    <div id="calendarContainer">
+      <div class="calendar" id="calendarGrid"></div>
+    </div>
     <table id="table"></table>
   </div>
-
 </main>
+
 <footer>© FedEx 2026</footer>
 <div id="leaveTooltip" class="leave-tooltip"></div>
-
-<script>
-let currentSort = { field: null, ascending: true };
-let lastSeenTimestamp = localStorage.getItem("lastSeenLeave") || 0;
-let unreadCount = 0;
-
-firebase.initializeApp({
-  apiKey:"AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
-  authDomain:"fedex-attendance-system.firebaseapp.com",
-  projectId:"fedex-attendance-system"
-});
-const db=firebase.firestore();
-
-
-//this is for login.remembner
-const currentUser=JSON.parse(localStorage.getItem("currentUser"));
-if(!currentUser){ alert("Please login first"); location.href="index.html"; }
-document.getElementById("welcomeMsg").textContent =
-  "Admin Dashboard";
-
-document.getElementById("headerUserName").textContent =
-  currentUser.name;
-
-
-//for setting the date time to ph	
-function getPHDateObject(dateObj = new Date()) {
-  return new Date(
-    dateObj.toLocaleString("en-US", { timeZone: "Asia/Manila" })
-  );
-}
-
-function getPHDateString(dateObj = new Date()) {
-  const phDate = new Date(
-    dateObj.toLocaleString("en-US", { timeZone: "Asia/Manila" })
-  );
-
-  const year = phDate.getFullYear();
-  const month = String(phDate.getMonth() + 1).padStart(2, "0");
-  const day = String(phDate.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-
-//time for notif
-function formatDateTime(ts){
-  if(!ts) return "-";
-  const d = ts.toDate ? ts.toDate() : new Date(ts);
-  return d.toLocaleString("en-PH", {
-    timeZone: "Asia/Manila",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
-
-const phNow = getPHDateObject();
-
-let cachedRequests=[],
-    currentFilter="All",
-    currentView="list",
-    calendarMonth=phNow.getMonth(),
-    calendarYear=phNow.getFullYear(),
-    calendarMode="month";
-
-//this is for notif new added
-function loadRequests() {
-  const region = document.getElementById("regionFilter").value;
-
-  db.collection("single_day_leave").orderBy("submittedAt", "asc").get()
-    .then(snapshot => {
-      let allRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-
-      const requestsWithRegion = allRequests.map(r => {
-        return {
-          ...r,
-          region: r.employeeId.includes("@") ? "India" : "Philippines"
-        };
-      });
-
-      if (region === "All") {
-        cachedRequests = requestsWithRegion;
-      } else {
-        cachedRequests = requestsWithRegion.filter(r => r.region === region);
-      }
-
-      render();
-    })
-    .catch(err => {
-      console.error("Failed to load leave requests:", err);
-      alert("Failed to load leave requests. Check console.");
-    });
-}
-  
-function showToast(leave){
-  const toast = document.createElement("div");
-  toast.className = "toast";
-
-  toast.innerHTML = `
-    <strong>${leave.employeeName}</strong><br>
-    Filed leave for <b>${leave.date}</b><br>
-    <small>${formatDateTime(leave.submittedAt)}</small>
-  `;
-
-  document.getElementById("toastContainer").appendChild(toast);
-
-  setTimeout(() => toast.remove(), 5000);
-}
-function addNotification(leave){
-  const drop = document.getElementById("notifDropdown");
-  const div = document.createElement("div");
-  div.className = "notif-item";
-
-  div.innerHTML = `
-    <strong>${leave.employeeName}</strong><br>
-    Leave date: <b>${leave.date}</b><br>
-    <small>${formatDateTime(leave.submittedAt)}</small>
-  `;
-
-  drop.prepend(div);
-}
-
-function toggleNotifDropdown(){
-  const d = document.getElementById("notifDropdown");
-  d.style.display = d.style.display === "block" ? "none" : "block";
-
-  // Mark as read
-  unreadCount = 0;
-  document.getElementById("notifBadge").style.display = "none";
-  localStorage.setItem("lastSeenLeave", Date.now());
-}
-
-//this is for notif new added
-//until here
-
-
-function setView(v){
-  currentView = v;
-
-  // Show/hide list controls
-  document.getElementById("listControls").style.display = (v==='list')?'flex':'none';
-
-  toggleCalendarControls();
-
-  // Reset filters for non-list views
-  if(v!=='list'){
-    document.getElementById("filterStatus").value = "All";
-    document.getElementById("filterType").value = "All";
-    document.getElementById("filterDate").value = "";
-    document.getElementById("filterSubmitted").value = "";
-    document.getElementById("monthSelectWrapper").style.display = (currentView==='table')?'flex':'none';
-  }
-
-  render();
-}
-
-function toggleCalendarControls(){
-  document.getElementById("calendarControls").style.display=(currentView==='calendar')?'flex':'none';
-  document.getElementById("calendarContainer").style.display=(currentView==='calendar')?'block':'none';
-  document.getElementById("table").style.display=(currentView!=='calendar')?'table':'none';
-  document.getElementById("monthSelect").style.display=(currentView==='table')?'inline-block':'none';
-}
-
-function logout(){ if(confirm("Are you sure you want to logout?")){ localStorage.removeItem("currentUser"); location.href="index.html"; } }
-
-function render(){
-  const data = currentFilter==="All"?cachedRequests:cachedRequests.filter(r=>r.status===currentFilter);
-  if(currentView==='list') applyFilters(); // List view uses filters
-  else if(currentView==='table') renderTableView(data);
-  else if(currentView==='calendar') calendarMode==='month'?renderCalendar(data):renderYearView(data);
-}
-
-function onRegionChange(){
-  loadRequests(); // fetch correct dataset based on region
-}
-  
-function applyFilters() {
-  const region = document.getElementById("regionFilter").value;
-
-  // Reload the collection if region changed
-
-  const status = document.getElementById("filterStatus").value;
-  const type = document.getElementById("filterType").value;
-  const date = document.getElementById("filterDate").value;
-  const submitted = document.getElementById("filterSubmitted").value;
-
-  let data = [...cachedRequests];
-
-  // REGION FILTER (case-insensitive)
-if (region !== "All") {
-  data = data.filter(r => r.region === region);
-}
-
-  if (status !== "All") data = data.filter(r => r.status === status);
-
-  if (type !== "All") {
-    if (type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
-    else data = data.filter(r => r.type === type);
-  }
-
-  if (date) data = data.filter(r => r.date === date);
-
-  if (submitted) {
-    data = data.filter(r => {
-      const subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
-      return getPHDateString(subDate) === submitted;
-    });
-  }
-
-  // Render current view
-  if (currentView === "list") renderList(data);
-  else if (currentView === "table") renderTableView(data);
-  else if (currentView === "calendar") calendarMode === "month" ? renderCalendar(data) : renderYearView(data);
-}
-  
-//show list 
-function renderList(data){
-  const t = document.getElementById("table");
-  t.style.display = "table";
-
-  t.innerHTML = `<tr>
-    <th onclick="sortList('employeeName')">Employee &#8597;</th>
-    <th onclick="sortList('type')">Leave Type &#8597;</th>
-    <th onclick="sortList('date')">Leave Date &#8597;</th>
-    <th onclick="sortList('submittedAt')">Submitted Date &#8597;</th>
-    <th onclick="sortList('reason')">Reason &#8597;</th>
-    <th onclick="sortList('status')">Status &#8597;</th>
-    <th>Processed By</th>
-    <th>Notes</th>
-    <th>Action</th>
-  </tr>`;
-
-  data.forEach(l => {
-    let s = l.submittedAt && l.submittedAt.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt);
-    let str = s.toLocaleString("en-PH", {timeZone:"Asia/Manila", year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit"});
-
-    t.innerHTML += `<tr>
-      <td>${l.employeeName}</td>
-      <td>${l.type}</td>
-      <td>${l.date}</td>
-      <td>${str}</td>
-      <td>${l.reason}</td>
-      <td class="status-${l.status}">${l.status}</td>
-      <td>${l.actionBy || "-"}</td>
-      <td>${l.status === "Rejected" ? (l.notes || "-") : ""}</td>
-      <td>
-        <button class="approve" onclick="updateStatus('${l.id}','Approved')">Approve</button>
-        <button class="pend" onclick="updateStatus('${l.id}','Pending')">Pend</button>
-        <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
-        <button class="cancel" onclick="openCancelModal('${l.id}')">Cancel</button>
-      </td>
-    </tr>`;
-  });
-}
-
-async function updateStatus(id, status){
-  let updates = { 
-    status: status, 
-    actionBy: currentUser.name, 
-    actionAt: firebase.firestore.FieldValue.serverTimestamp()
-  };
-
-  // If rejecting, ask for a note
-  if(status === "Rejected"){
-    const note = prompt("Enter reason/note for rejection:");
-    updates.notes = note || "No note provided";
-  }
-
-  await db.collection("single_day_leave").doc(id).update(updates);
-}
-
-//for sorting
-function sortList(field) {
-  let data = [...cachedRequests];
-
-  // REGION FILTER
-const region = document.getElementById("regionFilter").value;
-if(region !== "All") {
-  data = data.filter(r => r.region === region);
-}
-
-  // Apply filters from dropdowns
-  const status = document.getElementById("filterStatus").value;
-  const type = document.getElementById("filterType").value;
-  const date = document.getElementById("filterDate").value;
-  
-  const submitted = document.getElementById("filterSubmitted").value;
-
-  if(status !== "All") data = data.filter(r => r.status === status);
-  if(type !== "All") {
-    if(type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
-    else data = data.filter(r => r.type === type);
-  }
-  if(date) data = data.filter(r => r.date === date);
-  if(submitted) data = data.filter(r => {
-  let subDate = r.submittedAt && r.submittedAt.toDate 
-    ? r.submittedAt.toDate() 
-    : new Date(r.submittedAt);
-
-  return getPHDateString(subDate) === submitted;
-});
-
-  // Sort
-  data.sort((a,b)=>{
-    let valA = a[field], valB = b[field];
-
-    // handle dates
-    if(field==='submittedAt') {
-      valA = a.submittedAt && a.submittedAt.toDate ? a.submittedAt.toDate().getTime() : new Date(a.submittedAt).getTime();
-      valB = b.submittedAt && b.submittedAt.toDate ? b.submittedAt.toDate().getTime() : new Date(b.submittedAt).getTime();
-    } else if(field==='date'){
-      valA = new Date(a.date).getTime();
-      valB = new Date(b.date).getTime();
-    } else {
-      valA = valA ? valA.toString().toLowerCase() : '';
-      valB = valB ? valB.toString().toLowerCase() : '';
-    }
-
-    if(valA < valB) return currentSort.ascending ? -1 : 1;
-    if(valA > valB) return currentSort.ascending ? 1 : -1;
-    return 0;
-  });
-
-  renderList(data);
-}
-
-// Export CSV including Notes with dynamic filename
-function exportCSV(){
-
-  if(currentView !== "list"){
-    alert("Export is only available in List View.");
-    return;
-  }
-
-  const status = document.getElementById("filterStatus").value;
-  const type = document.getElementById("filterType").value;
-  const date = document.getElementById("filterDate").value;
-  const submitted = document.getElementById("filterSubmitted").value;
-
-  let data = [...cachedRequests];
-
-  // Apply filters
-  if(status !== "All") {
-    data = data.filter(r => r.status === status);
-  }
-
-  if(type !== "All") {
-    if(type === "Others") {
-      data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
-    } else {
-      data = data.filter(r => r.type === type);
-    }
-  }
-
-  if(date) {
-    data = data.filter(r => r.date === date);
-  }
-
-  if(submitted) {
-    data = data.filter(r => {
-      let subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
-      return getPHDateString(subDate) === submitted;
-    });
-  }
-
-  // Apply sorting
-  if(currentSort.field){
-    data.sort((a,b)=>{
-      let valA = a[currentSort.field];
-      let valB = b[currentSort.field];
-
-      if(currentSort.field === 'submittedAt'){
-        valA = a.submittedAt?.toDate?.()?.getTime() || new Date(a.submittedAt).getTime();
-        valB = b.submittedAt?.toDate?.()?.getTime() || new Date(b.submittedAt).getTime();
-      } 
-      else if(currentSort.field === 'date'){
-        valA = new Date(a.date).getTime();
-        valB = new Date(b.date).getTime();
-      } 
-      else {
-        valA = valA ? valA.toString().toLowerCase() : '';
-        valB = valB ? valB.toString().toLowerCase() : '';
-      }
-
-      if(valA < valB) return currentSort.ascending ? -1 : 1;
-      if(valA > valB) return currentSort.ascending ? 1 : -1;
-      return 0;
-    });
-  }
-
-  // Escape helper
-  function escapeCSV(value){
-    if(value === null || value === undefined) return "";
-    value = value.toString().replace(/(\r\n|\n|\r)/gm, " ");
-    value = value.replace(/"/g, '""');
-    return `"${value}"`;
-  }
-
-  let csv = "Employee,Type,Date,Submitted Date,Reason,Status,Processed By,Notes\n";
-
-  data.forEach(l => {
-
-    const s = l.submittedAt?.toDate?.() || new Date(l.submittedAt);
-
-    const phTime = s.toLocaleString("en-PH", {
-      timeZone: "Asia/Manila",
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit"
-    });
-
-    const processedBy =
-      typeof l.actionBy === "string"
-        ? l.actionBy
-        : l.actionBy?.name || "-";
-
-    csv += [
-      escapeCSV(l.employeeName),
-      escapeCSV(l.type),
-      escapeCSV(l.date),
-      escapeCSV(phTime),
-      escapeCSV(l.reason),
-      escapeCSV(l.status),
-      escapeCSV(processedBy),
-      escapeCSV(l.notes || "")
-    ].join(",") + "\n";
-  });
-
-  const now = new Date();
-  const phNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
-  const dateStr = phNow.toISOString().split("T")[0];
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `FREE_TIME_REQUEST_${dateStr}.csv`;
-  a.click();
-
-  URL.revokeObjectURL(url);
-}
-
-// Table view
-function renderTableView(data) {
-  const region = document.getElementById("regionFilter").value;
-if(region !== "All") {
-  data = data.filter(r => r.region === region);
-}
-  const month = parseInt(document.getElementById("monthSelect").value);
-  const phNow = getPHDateObject();
-  const y = phNow.getFullYear();
-  const tlnames = [...new Set(data.map(l => l.tlName || l.employeeName))];
-  const daysInMonth = new Date(y, month + 1, 0).getDate();
-
-  const t = document.getElementById("table");
-  let html = `<tr><th>TL Name</th>`;
-  for(let d=1; d<=daysInMonth; d++) html += `<th>${d}</th>`;
-  html += `</tr>`;
-
-  tlnames.forEach(tl => {
-    html += `<tr><td>${tl}</td>`;
-    for(let d=1; d<=daysInMonth; d++){
-      const cellDate = new Date(y, month, d);
-      const leavesForCell = data.filter(l => {
-        const ld = new Date(l.date);
-        return (l.tlName || l.employeeName) === tl &&
-               ld.getFullYear() === y &&
-               ld.getMonth() === month &&
-               ld.getDate() === d &&
-               l.status !== "Cancelled";
-      });
-
-      if(leavesForCell.length){
-        let letter = "";
-        if(leavesForCell.some(l => l.status === "Approved")) letter="A";
-        else if(leavesForCell.some(l => l.status === "Pending")) letter="P";
-        else if(leavesForCell.some(l => l.status === "Rejected")) letter="R";
-
-        html += `<td><span class="table-indicator ${letter}" data-leaves='${JSON.stringify(leavesForCell)}'>${letter}</span></td>`;
-      } else html += "<td></td>";
-    }
-    html += "</tr>";
-  });
-
-  t.innerHTML = html;
-
-  document.querySelectorAll(".table-indicator").forEach(span => {
-    const leaves = JSON.parse(span.dataset.leaves);
-    span.addEventListener("mouseenter", e => showLeaveTooltip(leaves, e));
-    span.addEventListener("mousemove", moveLeaveTooltip);
-    span.addEventListener("mouseleave", hideLeaveTooltip);
-  });
-}
-
-
-// Render month calendar
-// Month Calendar (PH Time)
-function renderCalendar(data) {
-  const region = document.getElementById("regionFilter").value;
- if(region !== "All") {
-  data = data.filter(r => r.region === region);
-}
-
-  const grid = document.getElementById("calendarGrid");
-  grid.innerHTML = "";
-  const y = calendarYear, m = calendarMonth;
-  const phFirstDay = getPHDateObject(new Date(y, m, 1));
-  const phDaysInMonth = new Date(y, m+1, 0).getDate();
-  const startDay = phFirstDay.getDay();
-
-  // Weekday headers
-  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(day => {
-    const header = document.createElement("div");
-    header.className = "cal-header";
-    header.textContent = day;
-    grid.appendChild(header);
-  });
-
-  for(let i=0; i<startDay; i++){
-    const empty = document.createElement("div");
-    empty.className = "cal-cell";
-    grid.appendChild(empty);
-  }
-
-  for(let d=1; d<=phDaysInMonth; d++){
-    const cell = document.createElement("div");
-    cell.className = "cal-cell";
-    const dayDiv = document.createElement("div");
-    dayDiv.className = "cal-day";
-    dayDiv.textContent = d;
-    cell.appendChild(dayDiv);
-
-    const cellDate = getPHDateString(new Date(y, m, d));
-    const leavesToday = data.filter(l => getPHDateString(new Date(l.date)) === cellDate && l.status !== "Cancelled");
-
-    leavesToday.forEach(l => {
-      const indicator = document.createElement("span");
-      indicator.className = "indicator " + (l.status==="Approved"?"A":l.status==="Rejected"?"R":"P");
-      indicator.textContent = l.tlName || l.employeeName;
-      cell.appendChild(indicator);
-    });
-
-    cell.addEventListener("click", () => openDayModal(cellDate));
-    grid.appendChild(cell);
-  }
-
-  document.getElementById("calendarMonthLabel").textContent =
-    `${phFirstDay.toLocaleString('default',{month:'long'})} ${y}`;
-}
-
-// Open modal showing all leaves for a specific day
-function openDayModal(dateStr) {
-  const modal = document.getElementById("dayModal");
-  const title = document.getElementById("dayModalTitle");
-  const body = document.getElementById("dayModalBody");
-
-  title.textContent = `Leaves on ${dateStr}`;
-
-  // Filter leaves for that date (timezone-safe)
-  const leaves = cachedRequests.filter(l => {
-    const leaveDateStr = getPHDateString(new Date(l.date));
-    return leaveDateStr === dateStr && l.status !== "Cancelled";
-  });
-
-  if (leaves.length === 0) {
-    body.innerHTML = "<p>No leave requests on this day.</p>";
-  } else {
-    body.innerHTML = leaves.map(l => `
-      <div style="border-bottom:1px solid #eee; padding:6px; margin-bottom:6px;">
-        <div><strong>${l.employeeName}</strong> (${l.type})</div>
-        <div>Status: <span class="${l.status}">${l.status}</span></div>
-        ${l.reason ? `<div>Reason: ${l.reason}</div>` : ""}
-        <div style="margin-top:4px;">
-          <button class="approve" onclick="handleStatus('${l.id}','Approved','${dateStr}')">Approve</button>
-          <button class="pend" onclick="handleStatus('${l.id}','Pending','${dateStr}')">Pend</button>
-          <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
-          <button class="cancel" onclick="handleCancel('${l.id}','${dateStr}')">Cancel</button>
-        </div>
-      </div>
-    `).join("");
-  }
-
-  modal.style.display = "flex";
-}
-
-
-function closeDayModal() {
-  document.getElementById("dayModal").style.display = "none";
-}
-
-//to propery handle close modal
-async function handleStatus(id, status, dateStr){
-  await db.collection("single_day_leave").doc(id).update({
-    status: status,
-    actionBy: currentUser.name,
-    actionAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  render();
-  openDayModal(dateStr); // Only reopen day modal for non-reject actions
-}
-
-function handleCancel(id, dateStr){
-  cancelTargetId = id;
-  confirmCancel();
-  openDayModal(dateStr);
-}
-
-// Reject modal stays as before
-function openRejectModal(id){
-  rejectTargetId = id;
-  document.getElementById("rejectNote").value = "";
-  document.getElementById("rejectModal").style.display = "flex";
-}
-
-async function confirmReject(){
-  if(!rejectTargetId) return;
-
-  const note = document.getElementById("rejectNote").value || "No note provided";
-
-  await db.collection("single_day_leave").doc(rejectTargetId).update({
-    status: "Rejected",
-    notes: note,
-    actionBy: currentUser.name,
-    actionAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  closeRejectModal(); // Close reject modal
-
-  render(); // Refresh table/list/calendar
-
-  // Optional: close day modal after rejection
-  const dayModal = document.getElementById("dayModal");
-  if(dayModal.style.display === "flex"){
-    closeDayModal();
-  }
-}
-
-// Year View
-function renderYearView(data){
-  const grid = document.getElementById("calendarGrid");
-  grid.innerHTML = "";
-  grid.className = "year-view";
-  grid.style.gridTemplateColumns = "repeat(3,1fr)";
-
-  const year = calendarYear; // use calendarYear for consistency
-  const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-
-  for(let m=0; m<12; m++){
-    const monthDiv = document.createElement("div");
-    monthDiv.className = "year-month";
-
-    // Month label
-    const label = document.createElement("div");
-    label.className = "year-month-label";
-    label.textContent = new Date(year, m).toLocaleString('default',{month:'short'});
-    monthDiv.appendChild(label);
-
-    // Weekday headers
-    const headerGrid = document.createElement("div");
-    headerGrid.className = "mini-grid";
-    weekdays.forEach(wd => {
-      const w = document.createElement("div");
-      w.className = "day-cell";
-      w.style.fontWeight = "bold";
-      w.style.border = "none";
-      w.textContent = wd;
-      headerGrid.appendChild(w);
-    });
-    monthDiv.appendChild(headerGrid);
-
-    // Days grid
-    const miniGrid = document.createElement("div");
-    miniGrid.className = "mini-grid";
-
-    const phFirstDay = getPHDateObject(new Date(year, m, 1));
-    const start = phFirstDay.getDay();
-    for(let i=0;i<start;i++) miniGrid.appendChild(document.createElement("div"));
-
-    const daysInMonth = new Date(phFirstDay.getFullYear(), phFirstDay.getMonth()+1, 0).getDate();
-
-    for(let d=1; d<=daysInMonth; d++){
-      const cell = document.createElement("div");
-      cell.className = "day-cell";
-      cell.textContent = d;
-
-      const cd = getPHDateObject(new Date(year, m, d));
-      const leavesToday = data.filter(l=>{
-        const ld = getPHDateObject(new Date(l.date));
-        return ld.getFullYear()===cd.getFullYear() && ld.getMonth()===cd.getMonth() && ld.getDate()===cd.getDate();
-      });
-
-      if(leavesToday.length){
-        const dotContainer = document.createElement("div");
-        dotContainer.className = "day-dots";
-        leavesToday.forEach(l=>{
-          const dot = document.createElement("div");
-          dot.className = "dot " + (l.status==="Approved"?"approved":l.status==="Rejected"?"rejected":"pending");
-          dot.title = `${l.employeeName} (${l.status})`;
-          dotContainer.appendChild(dot);
-        });
-        cell.appendChild(dotContainer);
-      }
-
-      miniGrid.appendChild(cell);
-    }
-
-    monthDiv.appendChild(miniGrid);
-
-    // Click month to switch to month view
-    monthDiv.addEventListener("click", ()=>{ 
-      calendarMonth = m; 
-      setCalendarMode("month"); 
-    });
-
-    grid.appendChild(monthDiv);
-  }
-}
-
-function setCalendarMode(mode){
-  calendarMode = mode;
-  render();
-}
-
-const leaveTooltip = document.getElementById("leaveTooltip");
-
-function showLeaveTooltip(leaves, e){
-  leaveTooltip.innerHTML = `
-    <h4>Leave Details</h4>
-    ${leaves.map(l => `
-      <div class="leave-item">
-        <div><strong>${l.employeeName}</strong></div>
-        <div>${l.type}</div>
-        <div class="${l.status}">${l.status}</div>
-        <div>Date: ${l.date}</div>
-        ${l.reason ? `<div><em>${l.reason}</em></div>` : ``}
-      </div>
-      ${l.actionBy ? `<div><strong>By:</strong> ${l.actionBy}</div>` : ``}
-    `).join("")}
-  `;
-
-  leaveTooltip.style.display = "block";
-  leaveTooltip.style.left = e.pageX + 12 + "px";
-  leaveTooltip.style.top  = e.pageY + 12 + "px";
-}
-
-
-function moveLeaveTooltip(e){
-  leaveTooltip.style.left = e.pageX + 12 + "px";
-  leaveTooltip.style.top  = e.pageY + 12 + "px";
-}
-
-function hideLeaveTooltip(){
-  leaveTooltip.style.display = "none";
-}
-
-//avoid overlapped
-function moveLeaveTooltip(e){
-  const w = leaveTooltip.offsetWidth;
-  const h = leaveTooltip.offsetHeight;
-  let x = e.pageX + 12;
-  let y = e.pageY + 12;
-  if(x + w > window.innerWidth) x = e.pageX - w - 12;
-  if(y + h > window.innerHeight) y = e.pageY - h - 12;
-  leaveTooltip.style.left = x + "px";
-  leaveTooltip.style.top = y + "px";
-}
-
-let cancelTargetId = null;
-function openCancelModal(id){ cancelTargetId = id; document.getElementById("cancelModal").style.display = "flex"; }
-function closeCancelModal(){ cancelTargetId = null; document.getElementById("cancelModal").style.display = "none"; }
-
-function confirmCancel(){
-  if(cancelTargetId){
-    db.collection("single_day_leave").doc(cancelTargetId).update({
-      status: "Cancelled",
-      actionBy: currentUser.name,
-      actionAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    closeCancelModal();
-  }
-}
-
-let rejectTargetId = null;
-
-function openRejectModal(id){
-  rejectTargetId = id;
-  document.getElementById("rejectNote").value = ""; // clear previous
-  document.getElementById("rejectModal").style.display = "flex";
-}
-
-function closeRejectModal(){
-  rejectTargetId = null;
-  document.getElementById("rejectModal").style.display = "none";
-}
-
-async function confirmReject(){
-  if(!rejectTargetId) return;
-
-  const note = document.getElementById("rejectNote").value || "No note provided";
-
-  await db.collection("single_day_leave").doc(rejectTargetId).update({
-    status: "Rejected",
-    notes: note,
-    actionBy: currentUser.name,
-    actionAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  closeRejectModal(); // close reject modal
-
-  render(); // refresh table/list/calendar
-
-  // Close day modal if it's open
-  const dayModal = document.getElementById("dayModal");
-  if(dayModal.style.display === "flex"){
-    closeDayModal();
-  }
-
-  // reset target
-  rejectTargetId = null;
-  currentDayModalDate = null;
-}
-
-
-function changeCalendarMonth(diff){ calendarMonth+=diff; if(calendarMonth<0){calendarMonth=11; calendarYear--;} if(calendarMonth>11){calendarMonth=0; calendarYear++;} render(); }
-
-
-toggleCalendarControls(); render(); loadRequests();
-</script>
 
 <div class="modal" id="rejectModal">
   <div class="modal-content">
@@ -1473,7 +655,767 @@ toggleCalendarControls(); render(); loadRequests();
 </div>
 
 <div id="notifDropdown" style="display:none;" class="notif-dropdown"></div>
-
 <div id="toastContainer"></div>
+
+<script>
+let currentSort = { field: null, ascending: true };
+let lastSeenTimestamp = Number(localStorage.getItem("lastSeenLeave") || 0);
+let unreadCount = 0;
+let cachedRequests = [];
+let currentView = "list";
+let currentDayModalDate = null;
+let cancelTargetId = null;
+let rejectTargetId = null;
+
+firebase.initializeApp({
+  apiKey:"AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+  authDomain:"fedex-attendance-system.firebaseapp.com",
+  projectId:"fedex-attendance-system"
+});
+
+const db = firebase.firestore();
+
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+if(!currentUser){
+  alert("Please login first");
+  location.href = "index.html";
+}
+
+document.getElementById("welcomeMsg").textContent = "Admin Dashboard";
+document.getElementById("headerUserName").textContent = currentUser.name || "Admin";
+document.getElementById("profileDropdownName").textContent = currentUser.name;
+
+function getPHDateObject(dateObj = new Date()) {
+  return new Date(dateObj.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+}
+
+function getPHDateString(dateObj = new Date()) {
+  const phDate = getPHDateObject(dateObj);
+  const year = phDate.getFullYear();
+  const month = String(phDate.getMonth() + 1).padStart(2, "0");
+  const day = String(phDate.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatDateTime(ts){
+  if(!ts) return "-";
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleString("en-PH", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+const phNow = getPHDateObject();
+let calendarMonth = phNow.getMonth();
+let calendarYear = phNow.getFullYear();
+let calendarMode = "month";
+
+function normalizeRegion(employeeId){
+  return String(employeeId || "").includes("@") ? "India" : "Philippines";
+}
+
+function getFilteredData() {
+  const region = document.getElementById("regionFilter").value;
+  const status = document.getElementById("filterStatus").value;
+  const type = document.getElementById("filterType").value;
+  const date = document.getElementById("filterDate").value;
+  const submitted = document.getElementById("filterSubmitted").value;
+
+  let data = [...cachedRequests];
+
+  if (region !== "All") {
+    data = data.filter(r => r.region === region);
+  }
+
+  if (currentView === "list") {
+    if (status !== "All") data = data.filter(r => r.status === status);
+
+    if (type !== "All") {
+      if (type === "Others") data = data.filter(r => r.type !== "Vacation" && r.type !== "Sick");
+      else data = data.filter(r => r.type === type);
+    }
+
+    if (date) data = data.filter(r => r.date === date);
+
+    if (submitted) {
+      data = data.filter(r => {
+        const subDate = r.submittedAt?.toDate?.() || new Date(r.submittedAt);
+        return getPHDateString(subDate) === submitted;
+      });
+    }
+  }
+
+  return data;
+}
+
+async function loadRequests() {
+  try {
+    const snapshot = await db.collection("single_day_leave").orderBy("submittedAt", "asc").get();
+
+    cachedRequests = snapshot.docs.map(d => ({
+      id: d.id,
+      ...d.data(),
+      region: normalizeRegion(d.data().employeeId)
+    }));
+
+    renderNotifications();
+    render();
+  } catch (err) {
+    console.error("Failed to load leave requests:", err);
+    alert("Failed to load leave requests. Check console.");
+  }
+}
+
+function renderNotifications() {
+  const dropdown = document.getElementById("notifDropdown");
+  dropdown.innerHTML = "";
+
+  const sorted = [...cachedRequests].sort((a, b) => {
+    const at = a.submittedAt?.toDate?.()?.getTime?.() || new Date(a.submittedAt || 0).getTime();
+    const bt = b.submittedAt?.toDate?.()?.getTime?.() || new Date(b.submittedAt || 0).getTime();
+    return bt - at;
+  });
+
+  unreadCount = 0;
+
+  sorted.slice(0, 20).forEach(leave => {
+    const ts = leave.submittedAt?.toDate?.()?.getTime?.() || new Date(leave.submittedAt || 0).getTime();
+    if (ts > lastSeenTimestamp) unreadCount++;
+
+    const div = document.createElement("div");
+    div.className = "notif-item";
+    div.innerHTML = `
+      <strong>${leave.employeeName || "-"}</strong><br>
+      Leave date: <b>${leave.date || "-"}</b><br>
+      <small>${formatDateTime(leave.submittedAt)}</small>
+    `;
+    dropdown.appendChild(div);
+  });
+
+  const badge = document.getElementById("notifBadge");
+  if (unreadCount > 0) {
+    badge.textContent = unreadCount;
+    badge.style.display = "inline-block";
+  } else {
+    badge.style.display = "none";
+  }
+}
+
+function toggleNotifDropdown(){
+  const d = document.getElementById("notifDropdown");
+  d.style.display = d.style.display === "block" ? "none" : "block";
+
+  unreadCount = 0;
+  document.getElementById("notifBadge").style.display = "none";
+  localStorage.setItem("lastSeenLeave", Date.now());
+}
+
+function showToast(leave){
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerHTML = `
+    <strong>${leave.employeeName}</strong><br>
+    Filed leave for <b>${leave.date}</b><br>
+    <small>${formatDateTime(leave.submittedAt)}</small>
+  `;
+  document.getElementById("toastContainer").appendChild(toast);
+  setTimeout(() => toast.remove(), 5000);
+}
+
+function setView(v){
+  currentView = v;
+
+  document.getElementById("listControls").style.display = (v === "list") ? "flex" : "none";
+  document.getElementById("monthSelectWrapper").style.display = (v === "table") ? "flex" : "none";
+
+  if(v !== "list"){
+    document.getElementById("filterStatus").value = "All";
+    document.getElementById("filterType").value = "All";
+    document.getElementById("filterDate").value = "";
+    document.getElementById("filterSubmitted").value = "";
+  }
+
+  toggleCalendarControls();
+  render();
+}
+
+function toggleCalendarControls(){
+  document.getElementById("calendarControls").style.display = (currentView === "calendar") ? "flex" : "none";
+  document.getElementById("calendarContainer").style.display = (currentView === "calendar") ? "block" : "none";
+  document.getElementById("table").style.display = (currentView !== "calendar") ? "table" : "none";
+}
+
+function logout(){
+  if(confirm("Are you sure you want to logout?")){
+    localStorage.removeItem("currentUser");
+    location.href = "index.html";
+  }
+}
+
+function render(){
+  const data = getFilteredData();
+
+  if(currentView === "list") renderList(data);
+  else if(currentView === "table") renderTableView(data);
+  else if(currentView === "calendar") {
+    if(calendarMode === "month") renderCalendar(data);
+    else renderYearView(data);
+  }
+}
+
+function onRegionChange(){
+  render();
+}
+
+function applyFilters() {
+  render();
+}
+
+function renderList(data){
+  const t = document.getElementById("table");
+  t.style.display = "table";
+
+  t.innerHTML = `<tr>
+    <th onclick="sortList('employeeName')">Employee &#8597;</th>
+    <th onclick="sortList('type')">Leave Type &#8597;</th>
+    <th onclick="sortList('date')">Leave Date &#8597;</th>
+    <th onclick="sortList('submittedAt')">Submitted Date &#8597;</th>
+    <th onclick="sortList('reason')">Reason &#8597;</th>
+    <th onclick="sortList('status')">Status &#8597;</th>
+    <th>Processed By</th>
+    <th>Notes</th>
+    <th>Action</th>
+  </tr>`;
+
+  data.forEach(l => {
+    const s = l.submittedAt?.toDate?.() || new Date(l.submittedAt);
+    const str = s.toLocaleString("en-PH", {
+      timeZone:"Asia/Manila",
+      year:"numeric",
+      month:"short",
+      day:"numeric",
+      hour:"2-digit",
+      minute:"2-digit",
+      second:"2-digit"
+    });
+
+    t.innerHTML += `<tr>
+      <td>${l.employeeName || "-"}</td>
+      <td>${l.type || "-"}</td>
+      <td>${l.date || "-"}</td>
+      <td>${str}</td>
+      <td>${l.reason || "-"}</td>
+      <td class="status-${l.status}">${l.status || "-"}</td>
+      <td>${l.actionBy || "-"}</td>
+      <td>${l.status === "Rejected" ? (l.notes || "-") : (l.notes || "-")}</td>
+      <td>
+        <button class="approve" onclick="updateStatus('${l.id}','Approved')">Approve</button>
+        <button class="pend" onclick="updateStatus('${l.id}','Pending')">Pend</button>
+        <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
+        <button class="cancel" onclick="openCancelModal('${l.id}')">Cancel</button>
+      </td>
+    </tr>`;
+  });
+}
+
+async function updateStatus(id, status){
+  const updates = { 
+    status: status, 
+    actionBy: currentUser.name, 
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  await db.collection("single_day_leave").doc(id).update(updates);
+  await loadRequests();
+}
+
+function sortList(field) {
+  if (currentSort.field === field) {
+    currentSort.ascending = !currentSort.ascending;
+  } else {
+    currentSort.field = field;
+    currentSort.ascending = true;
+  }
+
+  let data = getFilteredData();
+
+  data.sort((a,b)=>{
+    let valA = a[field], valB = b[field];
+
+    if(field === "submittedAt") {
+      valA = a.submittedAt?.toDate?.()?.getTime?.() || new Date(a.submittedAt).getTime();
+      valB = b.submittedAt?.toDate?.()?.getTime?.() || new Date(b.submittedAt).getTime();
+    } else if(field === "date"){
+      valA = new Date(a.date).getTime();
+      valB = new Date(b.date).getTime();
+    } else {
+      valA = valA ? valA.toString().toLowerCase() : "";
+      valB = valB ? valB.toString().toLowerCase() : "";
+    }
+
+    if(valA < valB) return currentSort.ascending ? -1 : 1;
+    if(valA > valB) return currentSort.ascending ? 1 : -1;
+    return 0;
+  });
+
+  renderList(data);
+}
+
+function exportCSV(){
+  if(currentView !== "list"){
+    alert("Export is only available in List View.");
+    return;
+  }
+
+  let data = getFilteredData();
+
+  if(currentSort.field){
+    data.sort((a,b)=>{
+      let valA = a[currentSort.field];
+      let valB = b[currentSort.field];
+
+      if(currentSort.field === "submittedAt"){
+        valA = a.submittedAt?.toDate?.()?.getTime?.() || new Date(a.submittedAt).getTime();
+        valB = b.submittedAt?.toDate?.()?.getTime?.() || new Date(b.submittedAt).getTime();
+      } else if(currentSort.field === "date"){
+        valA = new Date(a.date).getTime();
+        valB = new Date(b.date).getTime();
+      } else {
+        valA = valA ? valA.toString().toLowerCase() : "";
+        valB = valB ? valB.toString().toLowerCase() : "";
+      }
+
+      if(valA < valB) return currentSort.ascending ? -1 : 1;
+      if(valA > valB) return currentSort.ascending ? 1 : -1;
+      return 0;
+    });
+  }
+
+  function escapeCSV(value){
+    if(value === null || value === undefined) return "";
+    value = value.toString().replace(/(\r\n|\n|\r)/gm, " ");
+    value = value.replace(/"/g, '""');
+    return `"${value}"`;
+  }
+
+  let csv = "Employee,Type,Date,Submitted Date,Reason,Status,Processed By,Notes,Region\n";
+
+  data.forEach(l => {
+    const s = l.submittedAt?.toDate?.() || new Date(l.submittedAt);
+    const phTime = s.toLocaleString("en-PH", {
+      timeZone: "Asia/Manila",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    });
+
+    csv += [
+      escapeCSV(l.employeeName),
+      escapeCSV(l.type),
+      escapeCSV(l.date),
+      escapeCSV(phTime),
+      escapeCSV(l.reason),
+      escapeCSV(l.status),
+      escapeCSV(l.actionBy || "-"),
+      escapeCSV(l.notes || ""),
+      escapeCSV(l.region || "")
+    ].join(",") + "\n";
+  });
+
+  const now = getPHDateObject();
+  const dateStr = getPHDateString(now);
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `FREE_TIME_REQUEST_${dateStr}.csv`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+function renderTableView(data) {
+  const month = parseInt(document.getElementById("monthSelect").value, 10);
+  const y = getPHDateObject().getFullYear();
+  const tlnames = [...new Set(data.map(l => l.tlName || l.employeeName).filter(Boolean))];
+  const daysInMonth = new Date(y, month + 1, 0).getDate();
+
+  const t = document.getElementById("table");
+  let html = `<tr><th>TL Name</th>`;
+  for(let d=1; d<=daysInMonth; d++) html += `<th>${d}</th>`;
+  html += `</tr>`;
+
+  tlnames.forEach(tl => {
+    html += `<tr><td>${tl}</td>`;
+    for(let d=1; d<=daysInMonth; d++){
+      const leavesForCell = data.filter(l => {
+        const ld = new Date(l.date);
+        return (l.tlName || l.employeeName) === tl &&
+               ld.getFullYear() === y &&
+               ld.getMonth() === month &&
+               ld.getDate() === d &&
+               l.status !== "Cancelled";
+      });
+
+      if(leavesForCell.length){
+        let letter = "";
+        if(leavesForCell.some(l => l.status === "Approved")) letter = "A";
+        else if(leavesForCell.some(l => l.status === "Pending")) letter = "P";
+        else if(leavesForCell.some(l => l.status === "Rejected")) letter = "R";
+
+        html += `<td><span class="table-indicator ${letter}" data-leaves='${encodeURIComponent(JSON.stringify(leavesForCell))}'>${letter}</span></td>`;
+      } else {
+        html += "<td></td>";
+      }
+    }
+    html += "</tr>";
+  });
+
+  t.innerHTML = html;
+
+  document.querySelectorAll(".table-indicator").forEach(span => {
+    const leaves = JSON.parse(decodeURIComponent(span.dataset.leaves));
+    span.addEventListener("mouseenter", e => showLeaveTooltip(leaves, e));
+    span.addEventListener("mousemove", moveLeaveTooltip);
+    span.addEventListener("mouseleave", hideLeaveTooltip);
+  });
+}
+
+function renderCalendar(data) {
+  const grid = document.getElementById("calendarGrid");
+  grid.className = "calendar";
+  grid.style.gridTemplateColumns = "repeat(7,1fr)";
+  grid.innerHTML = "";
+
+  const y = calendarYear;
+  const m = calendarMonth;
+  const phFirstDay = getPHDateObject(new Date(y, m, 1));
+  const phDaysInMonth = new Date(y, m + 1, 0).getDate();
+  const startDay = phFirstDay.getDay();
+
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(day => {
+    const header = document.createElement("div");
+    header.className = "cal-header";
+    header.textContent = day;
+    grid.appendChild(header);
+  });
+
+  for(let i = 0; i < startDay; i++){
+    const empty = document.createElement("div");
+    empty.className = "cal-cell";
+    grid.appendChild(empty);
+  }
+
+  for(let d = 1; d <= phDaysInMonth; d++){
+    const cell = document.createElement("div");
+    cell.className = "cal-cell";
+
+    const dayDiv = document.createElement("div");
+    dayDiv.className = "cal-day";
+    dayDiv.textContent = d;
+    cell.appendChild(dayDiv);
+
+    const cellDate = getPHDateString(new Date(y, m, d));
+    const leavesToday = data.filter(l => getPHDateString(new Date(l.date)) === cellDate && l.status !== "Cancelled");
+
+    leavesToday.forEach(l => {
+      const indicator = document.createElement("span");
+      indicator.className = "indicator " + (l.status === "Approved" ? "A" : l.status === "Rejected" ? "R" : "P");
+      indicator.textContent = l.tlName || l.employeeName;
+      cell.appendChild(indicator);
+    });
+
+    cell.addEventListener("click", () => openDayModal(cellDate));
+    grid.appendChild(cell);
+  }
+
+  document.getElementById("calendarMonthLabel").textContent =
+    `${new Date(y, m, 1).toLocaleString("default",{month:"long"})} ${y}`;
+}
+
+function openDayModal(dateStr) {
+  currentDayModalDate = dateStr;
+
+  const modal = document.getElementById("dayModal");
+  const title = document.getElementById("dayModalTitle");
+  const body = document.getElementById("dayModalBody");
+
+  title.textContent = `Leaves on ${dateStr}`;
+
+  const region = document.getElementById("regionFilter").value;
+
+  const leaves = cachedRequests.filter(l => {
+    const leaveDateStr = getPHDateString(new Date(l.date));
+    const regionMatch = region === "All" ? true : l.region === region;
+    return leaveDateStr === dateStr && l.status !== "Cancelled" && regionMatch;
+  });
+
+  if (leaves.length === 0) {
+    body.innerHTML = "<p>No leave requests on this day.</p>";
+  } else {
+    body.innerHTML = leaves.map(l => `
+      <div style="border-bottom:1px solid #eee; padding:6px; margin-bottom:6px;">
+        <div><strong>${l.employeeName}</strong> (${l.type})</div>
+        <div>Status: <span class="status-${l.status}">${l.status}</span></div>
+        ${l.reason ? `<div>Reason: ${l.reason}</div>` : ""}
+        <div style="margin-top:4px;">
+          <button class="approve" onclick="handleStatus('${l.id}','Approved','${dateStr}')">Approve</button>
+          <button class="pend" onclick="handleStatus('${l.id}','Pending','${dateStr}')">Pend</button>
+          <button class="reject" onclick="openRejectModal('${l.id}')">Reject</button>
+          <button class="cancel" onclick="handleCancel('${l.id}')">Cancel</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  modal.style.display = "flex";
+}
+
+function closeDayModal() {
+  document.getElementById("dayModal").style.display = "none";
+  currentDayModalDate = null;
+}
+
+async function handleStatus(id, status, dateStr){
+  await db.collection("single_day_leave").doc(id).update({
+    status: status,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  await loadRequests();
+
+  if (dateStr) openDayModal(dateStr);
+}
+
+function handleCancel(id){
+  cancelTargetId = id;
+  document.getElementById("cancelModal").style.display = "flex";
+}
+
+function renderYearView(data){
+  const grid = document.getElementById("calendarGrid");
+  grid.innerHTML = "";
+  grid.className = "year-view";
+  grid.style.gridTemplateColumns = "repeat(3,1fr)";
+
+  const year = calendarYear;
+  const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  for(let m = 0; m < 12; m++){
+    const monthDiv = document.createElement("div");
+    monthDiv.className = "year-month";
+
+    const label = document.createElement("div");
+    label.className = "year-month-label";
+    label.textContent = new Date(year, m).toLocaleString("default",{month:"short"});
+    monthDiv.appendChild(label);
+
+    const headerGrid = document.createElement("div");
+    headerGrid.className = "mini-grid";
+    weekdays.forEach(wd => {
+      const w = document.createElement("div");
+      w.className = "day-cell";
+      w.textContent = wd;
+      w.style.fontWeight = "bold";
+      headerGrid.appendChild(w);
+    });
+    monthDiv.appendChild(headerGrid);
+
+    const miniGrid = document.createElement("div");
+    miniGrid.className = "mini-grid";
+
+    const firstDay = new Date(year, m, 1).getDay();
+    for(let i = 0; i < firstDay; i++) {
+      const blank = document.createElement("div");
+      miniGrid.appendChild(blank);
+    }
+
+    const daysInMonth = new Date(year, m + 1, 0).getDate();
+
+    for(let d = 1; d <= daysInMonth; d++){
+      const cell = document.createElement("div");
+      cell.className = "day-cell";
+      cell.textContent = d;
+
+      const dayStr = getPHDateString(new Date(year, m, d));
+      const leavesToday = data.filter(l => getPHDateString(new Date(l.date)) === dayStr && l.status !== "Cancelled");
+
+      if(leavesToday.length){
+        const dotContainer = document.createElement("div");
+        dotContainer.className = "day-dots";
+
+        leavesToday.slice(0, 3).forEach(l => {
+          const dot = document.createElement("div");
+          dot.className = "dot " + (l.status === "Approved" ? "approved" : l.status === "Rejected" ? "rejected" : "pending");
+          dot.title = `${l.employeeName} (${l.status})`;
+          dotContainer.appendChild(dot);
+        });
+
+        cell.appendChild(dotContainer);
+      }
+
+      miniGrid.appendChild(cell);
+    }
+
+    monthDiv.appendChild(miniGrid);
+
+    monthDiv.addEventListener("click", () => { 
+      calendarMonth = m; 
+      setCalendarMode("month"); 
+    });
+
+    grid.appendChild(monthDiv);
+  }
+
+  document.getElementById("calendarMonthLabel").textContent = `${year}`;
+}
+
+function setCalendarMode(mode){
+  calendarMode = mode;
+  render();
+}
+
+const leaveTooltip = document.getElementById("leaveTooltip");
+
+function showLeaveTooltip(leaves, e){
+  leaveTooltip.innerHTML = `
+    <h4>Leave Details</h4>
+    ${leaves.map(l => `
+      <div class="leave-item">
+        <div><strong>${l.employeeName}</strong></div>
+        <div>${l.type}</div>
+        <div class="${l.status}">${l.status}</div>
+        <div>Date: ${l.date}</div>
+        ${l.reason ? `<div><em>${l.reason}</em></div>` : ``}
+        ${l.actionBy ? `<div><strong>By:</strong> ${l.actionBy}</div>` : ``}
+      </div>
+    `).join("")}
+  `;
+  leaveTooltip.style.display = "block";
+  moveLeaveTooltip(e);
+}
+
+function moveLeaveTooltip(e){
+  const w = leaveTooltip.offsetWidth;
+  const h = leaveTooltip.offsetHeight;
+  let x = e.pageX + 12;
+  let y = e.pageY + 12;
+
+  if(x + w > window.innerWidth) x = e.pageX - w - 12;
+  if(y + h > window.innerHeight) y = e.pageY - h - 12;
+
+  leaveTooltip.style.left = x + "px";
+  leaveTooltip.style.top = y + "px";
+}
+
+function hideLeaveTooltip(){
+  leaveTooltip.style.display = "none";
+}
+
+function openCancelModal(id){
+  cancelTargetId = id;
+  document.getElementById("cancelModal").style.display = "flex";
+}
+
+function closeCancelModal(){
+  cancelTargetId = null;
+  document.getElementById("cancelModal").style.display = "none";
+}
+
+async function confirmCancel(){
+  if(!cancelTargetId) return;
+
+  await db.collection("single_day_leave").doc(cancelTargetId).update({
+    status: "Cancelled",
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  closeCancelModal();
+  await loadRequests();
+
+  if(currentDayModalDate){
+    openDayModal(currentDayModalDate);
+  }
+}
+
+function openRejectModal(id){
+  rejectTargetId = id;
+  document.getElementById("rejectNote").value = "";
+  document.getElementById("rejectModal").style.display = "flex";
+}
+
+function closeRejectModal(){
+  rejectTargetId = null;
+  document.getElementById("rejectModal").style.display = "none";
+}
+
+async function confirmReject(){
+  if(!rejectTargetId) return;
+
+  const note = document.getElementById("rejectNote").value || "No note provided";
+
+  await db.collection("single_day_leave").doc(rejectTargetId).update({
+    status: "Rejected",
+    notes: note,
+    actionBy: currentUser.name,
+    actionAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  closeRejectModal();
+  await loadRequests();
+
+  if(currentDayModalDate){
+    openDayModal(currentDayModalDate);
+  }
+}
+
+function changeCalendarMonth(diff){
+  calendarMonth += diff;
+  if(calendarMonth < 0){
+    calendarMonth = 11;
+    calendarYear--;
+  }
+  if(calendarMonth > 11){
+    calendarMonth = 0;
+    calendarYear++;
+  }
+  render();
+}
+
+toggleCalendarControls();
+document.getElementById("monthSelect").value = String(phNow.getMonth());
+loadRequests();
+
+function toggleProfileMenu() {
+  const dropdown = document.getElementById("profileDropdown");
+  const arrow = document.getElementById("profileArrow");
+
+  dropdown.classList.toggle("show");
+  arrow.classList.toggle("rotate");
+}
+
+document.addEventListener("click", function(e) {
+  const menu = document.querySelector(".profile-menu");
+  const dropdown = document.getElementById("profileDropdown");
+  const arrow = document.getElementById("profileArrow");
+
+  if (!menu.contains(e.target)) {
+    dropdown.classList.remove("show");
+    arrow.classList.remove("rotate");
+  }
+});
+
+</script>
 </body>
 </html>
