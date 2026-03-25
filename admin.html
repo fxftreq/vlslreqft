@@ -301,7 +301,7 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 .header-center {
   font-size: 14px;
   font-weight: 500;
-  opacity: 0.9;
+  opacity: 0.78;
 }
 .header-right {
   display: flex;
@@ -309,14 +309,31 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   gap: 15px;
 }
 .user-chip {
-  background: rgba(255,255,255,0.15);
-  padding: 6px 12px;
-  border-radius: 20px;
+  background: linear-gradient(135deg, #FF6600, #ff944d);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 999px;
   font-size: 13px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.22);
 }
+
+.user-chip i {
+  color: #fff;
+}
+
+#headerUserName {
+  color: #fff;
+}
+
+.profile-arrow {
+  color: #fff;
+}
+  
 .logout-btn {
   background: var(--fedex-orange);
   color: white;
@@ -366,8 +383,9 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 }
 
 .profile-btn:hover .user-chip {
-  background: rgba(255,255,255,0.22);
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.28);
+  filter: brightness(1.03);
 }
 
 .profile-arrow {
