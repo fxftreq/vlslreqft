@@ -97,10 +97,27 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
 
 /* Top Controls */
 .top-controls {
-  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
-  background:#fff; padding:12px 20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  background: rgba(255,255,255,0.96);
+  padding:12px 20px;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
   margin-bottom:20px;
+
+  position: sticky;
+  top: 78px;
+  z-index: 900;
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0,0,0,0.06);
 }
+.card {
+  scroll-margin-top: 170px;
+}  
 
 .view-select-wrapper { display:flex; align-items:center; gap:8px; margin-right:20px; flex-wrap:wrap; }
 .view-select-wrapper label { font-weight:bold; color:var(--fedex-purple); }
@@ -118,6 +135,11 @@ button.cancel{background:#555;color:white;padding:5px 8px;border-radius:4px;bord
   display: flex;
   justify-content: center;
   margin: 15px 0;
+  position: sticky;
+  top: 150px;
+  z-index: 850;
+  background: transparent;
+  padding: 6px 0;
 }
 
 #monthSelect {
