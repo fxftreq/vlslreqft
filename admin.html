@@ -896,6 +896,29 @@ button.cancel{background:#6b7280}
   .notif-dropdown{right:12px;width:calc(100% - 24px)}
   .year-view{grid-template-columns:1fr}
 }
+
+/* Logo fedex */
+  .logo-only-head{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px 16px;
+  border-bottom:1px solid var(--border);
+  background:#fff;
+}
+
+.sidebar-fedex-logo{
+  display:block;
+  width:100%;
+  max-width:180px;
+  height:auto;
+  object-fit:contain;
+}
+.brand
+.brand-logo-wrap
+.brand-name
+.brand-sub
+  
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -905,17 +928,9 @@ button.cancel{background:#6b7280}
 
 <div class="shell">
   <aside class="sidebar">
-    <div class="sidebar-head">
-      <div class="brand">
-        <div class="brand-logo-wrap">
-          <img src="fedex-logo.png" alt="FedEx">
-        </div>
-        <div>
-          <div class="brand-name">Leave Admin</div>
-          <div class="brand-sub">FedEx Leave Dashboard</div>
-        </div>
-      </div>
-    </div>
+<div class="sidebar-head logo-only-head">
+  <img src="fedex-logo.png" alt="FedEx Logo" class="sidebar-fedex-logo">
+</div>
 
     <div class="nav">
       <button class="nav-btn active"><i class="fa-solid fa-house"></i> Dashboard</button>
