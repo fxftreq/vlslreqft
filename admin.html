@@ -187,31 +187,61 @@ body{
   font-weight:700;
 }
 
-.profile-menu{position:relative}
+.profile-menu{
+  position:relative;
+}
+
 .profile-btn{
   background:transparent;
   border:none;
   padding:0;
   cursor:pointer;
 }
-.user-chip{
-  background:linear-gradient(135deg,var(--accent),#ff944d);
-  color:#fff;
-  padding:8px 14px;
-  border-radius:999px;
-  font-size:13px;
+
+.avatar-trigger{
   display:flex;
   align-items:center;
-  gap:8px;
-  font-weight:700;
-  border:1px solid rgba(255,255,255,.22);
-  box-shadow:0 8px 18px rgba(0,0,0,.14);
+  gap:10px;
 }
+
+#profileArrow{
+  color:var(--primary);
+  font-size:12px;
+  transition:transform .25s ease;
+}
+
+#profileArrow.rotate{
+  transform:rotate(180deg);
+}
+
+.header-avatar{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  overflow:hidden;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  font-size:14px;
+  box-shadow:0 8px 18px rgba(77,20,140,.18);
+  border:2px solid #fff;
+}
+
+.header-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
 .profile-dropdown{
   position:absolute;
   top:calc(100% + 10px);
   right:0;
-  min-width:240px;
+  min-width:260px;
   background:#fff;
   color:#333;
   border-radius:18px;
@@ -224,19 +254,66 @@ body{
   transform-origin:top right;
   z-index:100;
 }
+
 .profile-dropdown.show{
   opacity:1;
   transform:translateY(0) scale(1);
   pointer-events:auto;
 }
+
 .profile-dropdown-header{
-  padding:14px 16px 12px;
+  padding:18px 16px 16px;
   background:linear-gradient(135deg,#f7f3fc,#ffffff);
   border-bottom:1px solid #eee;
+}
+
+.profile-dropdown-header-avatar{
+  display:flex;
+  align-items:center;
+  gap:14px;
   text-align:left;
 }
-.profile-name{font-weight:700;color:var(--primary);font-size:14px}
-.profile-role{font-size:12px;color:#777;margin-top:3px}
+
+.profile-avatar-large{
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  overflow:hidden;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  font-size:22px;
+  flex:0 0 auto;
+  box-shadow:0 10px 24px rgba(77,20,140,.18);
+}
+
+.profile-avatar-large img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.profile-header-info{
+  min-width:0;
+}
+
+.profile-name{
+  font-weight:700;
+  color:var(--primary);
+  font-size:15px;
+  line-height:1.3;
+}
+
+.profile-role{
+  font-size:12px;
+  color:#777;
+  margin-top:4px;
+}
+
 .profile-dropdown-item{
   width:100%;
   border:none;
@@ -247,13 +324,18 @@ body{
   gap:10px;
   cursor:pointer;
   font-size:14px;
-  transition:background .2s ease,padding-left .2s ease;
+  transition:background .2s ease, padding-left .2s ease;
 }
+
 .profile-dropdown-item:hover{
   background:#f8f8fb;
   padding-left:20px;
 }
-.logout-item{color:var(--danger);font-weight:600}
+
+.logout-item{
+  color:#d62828;
+  font-weight:600;
+}
 
 /* Content */
 .content{padding:24px}
@@ -1171,26 +1253,34 @@ button.cancel{background:#6b7280}
             <span id="notifBadge">0</span>
           </button>
 
-          <div class="profile-menu">
-            <button class="profile-btn" id="profileBtn" onclick="toggleProfileMenu()">
-              <div class="user-chip">
-                <i class="fas fa-user-circle"></i>
-                <span id="headerUserName"></span>
-                <i class="fas fa-chevron-down" id="profileArrow"></i>
-              </div>
-            </button>
+<div class="profile-menu">
+  <button class="profile-btn avatar-trigger" id="profileBtn" onclick="toggleProfileMenu()">
+    <div class="header-avatar" id="headerAvatar">
+      <img id="headerAvatarImg" alt="Profile" style="display:none;">
+      <span id="headerAvatarInitials">A</span>
+    </div>
+    <i class="fas fa-chevron-down" id="profileArrow"></i>
+  </button>
 
-            <div class="profile-dropdown" id="profileDropdown">
-              <div class="profile-dropdown-header">
-                <div class="profile-name" id="profileDropdownName"></div>
-                <div class="profile-role">Administrator</div>
-              </div>
-              <button class="profile-dropdown-item logout-item" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-              </button>
-            </div>
-          </div>
+  <div class="profile-dropdown" id="profileDropdown">
+    <div class="profile-dropdown-header profile-dropdown-header-avatar">
+      <div class="profile-avatar-large" id="profileAvatarLarge">
+        <img id="profileAvatarLargeImg" alt="Profile" style="display:none;">
+        <span id="profileAvatarLargeInitials">A</span>
+      </div>
+
+      <div class="profile-header-info">
+        <div class="profile-name" id="profileDropdownName"></div>
+        <div class="profile-role">Administrator</div>
+      </div>
+    </div>
+
+    <button class="profile-dropdown-item logout-item" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </button>
+  </div>
+</div>
         </div>
       </div>
     </header>
@@ -1502,9 +1592,90 @@ if(!currentUser){
   location.href = "index.html";
 }
 
-document.getElementById("headerUserName").textContent = currentUser.name || "Admin";
-document.getElementById("profileDropdownName").textContent = currentUser.name || "Admin";
+setupProfileAvatar();
 
+function getInitials(name){
+  const clean = String(name || "Admin").trim();
+  if(!clean) return "A";
+
+  const parts = clean.split(/\s+/).filter(Boolean);
+
+  if(parts.length === 1){
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function sanitizeProfileFileName(name){
+  return String(name || "")
+    .trim()
+    .replace(/[\\/:*?"<>|]/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function setupProfileAvatar(){
+  const name = currentUser?.name || "Admin";
+  const initials = getInitials(name);
+
+  const headerInitials = document.getElementById("headerAvatarInitials");
+  const headerImg = document.getElementById("headerAvatarImg");
+
+  const largeInitials = document.getElementById("profileAvatarLargeInitials");
+  const largeImg = document.getElementById("profileAvatarLargeImg");
+
+  document.getElementById("profileDropdownName").textContent = name;
+
+  headerInitials.textContent = initials;
+  largeInitials.textContent = initials;
+
+  const fileName = sanitizeProfileFileName(name);
+  const extensions = ["png", "jpg", "jpeg"];
+  let currentIndex = 0;
+
+  function showInitials(){
+    headerImg.style.display = "none";
+    largeImg.style.display = "none";
+
+    headerInitials.style.display = "flex";
+    largeInitials.style.display = "flex";
+  }
+
+  function showImage(path){
+    headerImg.src = path;
+    largeImg.src = path;
+
+    headerImg.style.display = "block";
+    largeImg.style.display = "block";
+
+    headerInitials.style.display = "none";
+    largeInitials.style.display = "none";
+  }
+
+  function tryNextImage(){
+    if(currentIndex >= extensions.length){
+      showInitials();
+      return;
+    }
+
+    const path = `Profile Pictures/${fileName}.${extensions[currentIndex]}`;
+    const testImg = new Image();
+
+    testImg.onload = function(){
+      showImage(path);
+    };
+
+    testImg.onerror = function(){
+      currentIndex++;
+      tryNextImage();
+    };
+
+    testImg.src = path;
+  }
+
+  tryNextImage();
+}
+  
 function getPHDateObject(dateObj = new Date()) {
   return new Date(dateObj.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
 }
@@ -2426,7 +2597,10 @@ function changeCalendarMonth(diff){
 
 function toggleProfileMenu() {
   const dropdown = document.getElementById("profileDropdown");
+  const arrow = document.getElementById("profileArrow");
+
   dropdown.classList.toggle("show");
+  arrow.classList.toggle("rotate");
 }
 
 document.addEventListener("click", function(e) {
@@ -2434,9 +2608,11 @@ document.addEventListener("click", function(e) {
   const dropdown = document.getElementById("profileDropdown");
   const notif = document.getElementById("notifDropdown");
   const notifBtn = document.getElementById("notifBtn");
+  const arrow = document.getElementById("profileArrow");
 
   if (menu && !menu.contains(e.target)) {
     dropdown.classList.remove("show");
+    arrow.classList.remove("rotate");
   }
 
   if (notif && notifBtn && !notif.contains(e.target) && !notifBtn.contains(e.target)) {
