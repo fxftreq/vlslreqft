@@ -518,6 +518,71 @@ button.cancel{background:#6b7280}
   font-size:13px;
   line-height:1.5;
 }
+.today-schedule-section{
+  margin-top:20px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+
+.today-schedule-head{
+  margin-bottom:14px;
+}
+
+.schedule-list{
+  display:grid;
+  gap:12px;
+}
+
+.schedule-empty{
+  padding:16px;
+  border:1px dashed var(--border);
+  border-radius:18px;
+  text-align:center;
+  color:var(--muted);
+  background:#fafafa;
+  font-size:14px;
+}
+
+.schedule-item{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:#fff;
+}
+
+.schedule-person{
+  min-width:0;
+}
+
+.schedule-name{
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:4px;
+}
+
+.schedule-meta{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.4;
+}
+
+.schedule-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
+  background:#ecfdf5;
+  color:#15803d;
+}
+  
 
 /* Legacy views */
 .legacy-card{margin-top:20px}
@@ -1216,44 +1281,52 @@ button.cancel{background:#6b7280}
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">Quick Insights</h3>
-            <p class="card-subtitle">Live activity from your leave records</p>
-          </div>
-          <div class="card-body">
-            <div class="info-list">
-              <div class="info-item">
-                <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
-                <div>
-                  <h4>Region Split</h4>
-                  <p><span id="quickPH">0</span> Philippines • <span id="quickIndia">0</span> India</p>
-                </div>
-              </div>
-              <div class="info-item">
-                <div class="info-icon"><i class="fa-regular fa-clock"></i></div>
-                <div>
-                  <h4>Recent Submission</h4>
-                  <p id="quickRecent">No submissions yet</p>
-                </div>
-              </div>
-              <div class="info-item">
-                <div class="info-icon"><i class="fa-solid fa-ban"></i></div>
-                <div>
-                  <h4>Cancelled Requests</h4>
-                  <p><span id="quickCancelled">0</span> request(s) marked cancelled</p>
-                </div>
-              </div>
-              <div class="info-item">
-                <div class="info-icon"><i class="fa-solid fa-filter"></i></div>
-                <div>
-                  <h4>Current View</h4>
-                  <p id="quickView">List View</p>
-                </div>
-              </div>
-            </div>
-          </div>
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Quick Insights</h3>
+    <p class="card-subtitle">Live activity from your leave records</p>
+  </div>
+  <div class="card-body">
+    <div class="info-list">
+      <div class="info-item">
+        <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
+        <div>
+          <h4>Region Split</h4>
+          <p><span id="quickPH">0</span> Philippines • <span id="quickIndia">0</span> India</p>
         </div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon"><i class="fa-regular fa-clock"></i></div>
+        <div>
+          <h4>Recent Submission</h4>
+          <p id="quickRecent">No submissions yet</p>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon"><i class="fa-solid fa-ban"></i></div>
+        <div>
+          <h4>Cancelled Requests</h4>
+          <p><span id="quickCancelled">0</span> request(s) marked cancelled</p>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon"><i class="fa-solid fa-filter"></i></div>
+        <div>
+          <h4>Current View</h4>
+          <p id="quickView">List View</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="today-schedule-section">
+      <div class="today-schedule-head">
+        <h3 class="card-title">Today’s Schedule</h3>
+        <p class="card-subtitle">People currently out of office</p>
+      </div>
+      <div id="todayScheduleList" class="schedule-list"></div>
+    </div>
+  </div>
+</div>
       </section>
 
       <section class="card">
@@ -1535,10 +1608,11 @@ async function loadRequests() {
       region: normalizeRegion(d.data().employeeId)
     }));
 
-    renderNotifications();
-    renderSummaryCards();
-    renderApprovalQueue();
-    render();
+renderNotifications();
+renderSummaryCards();
+renderTodaySchedule();
+renderApprovalQueue();
+render();
   } catch (err) {
     console.error("Failed to load leave requests:", err);
     alert("Failed to load leave requests. Check console.");
@@ -1583,6 +1657,43 @@ function renderSummaryCards(){
     currentView === "list" ? "List View" :
     currentView === "table" ? "Table View" : `Calendar View (${calendarMode === "year" ? "Year" : "Month"})`;
 }
+
+function renderTodaySchedule(){
+  const container = document.getElementById("todayScheduleList");
+  if(!container) return;
+
+  const today = getPHDateString();
+
+  const outToday = getFilteredData()
+    .filter(l => l.status === "Approved" && normalizeLeaveDate(l.date) === today)
+    .sort((a,b) => {
+      const nameA = (a.employeeName || "").toLowerCase();
+      const nameB = (b.employeeName || "").toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+
+  if(!outToday.length){
+    container.innerHTML = `
+      <div class="schedule-empty">
+        No employees are on approved leave today.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = outToday.map(l => `
+    <div class="schedule-item">
+      <div class="schedule-person">
+        <div class="schedule-name">${l.employeeName || "-"}</div>
+        <div class="schedule-meta">
+          ${l.type || "Leave"} • ${l.region || "-"}
+          ${l.reason ? `<br>${l.reason}` : ""}
+        </div>
+      </div>
+      <div class="schedule-badge">Out Today</div>
+    </div>
+  `).join("");
+}  
 
 function getStatusBadge(status){
   if(status === "Approved") return `<span class="badge badge-approved">Approved</span>`;
@@ -1712,8 +1823,9 @@ function render(){
     else renderYearView(data);
   }
 
-  renderSummaryCards();
-  renderApprovalQueue();
+renderSummaryCards();
+renderTodaySchedule();
+renderApprovalQueue();
 }
 
 function onRegionChange(){
