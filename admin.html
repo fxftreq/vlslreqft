@@ -550,18 +550,41 @@ button.cancel{background:#6b7280}
   min-width:42px;
   max-width:42px;
 }
-#table td:first-child,#table th:first-child{
-  position:sticky;
-  left:0;
-  min-width:190px;
-  width:190px;
-  max-width:190px;
-  padding:0 12px;
-  text-align:left;
-  font-weight:700;
-  z-index:1;
-  background:#fff;
+#table td:first-child,
+#table th:first-child {
+  position: sticky;
+  left: 0;
+  min-width: 130px;
+  width: 130px;
+  max-width: 130px;
+  padding: 0 10px;
+  text-align: left;
+  font-weight: 700;
+  z-index: 1;
+  background: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+/* Detailed Leave Views - List View column sizing */
+#table th:nth-child(5),
+#table td:nth-child(5) {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+#table th:nth-child(9),
+#table td:nth-child(9) {
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
+  padding: 8px 10px;
+}
+
+  
 #table th:first-child{
   background:var(--primary);
   color:#fff;
