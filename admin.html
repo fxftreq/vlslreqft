@@ -662,6 +662,71 @@ button.cancel{background:#6b7280}
 }
   
 
+
+/* Employee avatar cells */
+.employee-cell{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+}
+
+.employee-avatar{
+  width:38px;
+  height:38px;
+  min-width:38px;
+  border-radius:50%;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+  font-size:12px;
+  font-weight:800;
+  box-shadow:0 6px 14px rgba(77,20,140,.18);
+  flex:0 0 auto;
+}
+
+.employee-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.employee-avatar span{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:100%;
+}
+
+.employee-meta{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+
+.employee-name{
+  font-weight:700;
+  color:var(--text);
+  line-height:1.2;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.employee-sub{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:3px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
 /* Legacy views */
 .legacy-card{margin-top:20px}
 
@@ -706,10 +771,10 @@ button.cancel{background:#6b7280}
 #table th:first-child{
   position:sticky;
   left:0;
-  min-width:125px;
-  width:125px;
-  max-width:125px;
-  padding:8px 10px;
+  min-width:180px;
+  width:180px;
+  max-width:180px;
+  padding:8px 12px;
   text-align:left;
   font-weight:700;
   z-index:1;
@@ -756,9 +821,9 @@ button.cancel{background:#6b7280}
 
 #table.list-view-table th:first-child,
 #table.list-view-table td:first-child{
-  min-width:130px;
-  width:130px;
-  max-width:130px;
+  min-width:220px;
+  width:220px;
+  max-width:220px;
 }
 
 #table.list-view-table th:nth-child(2),
@@ -1588,6 +1653,88 @@ function sanitizeProfileFileName(name){
     .replace(/\s+/g, " ");
 }
 
+
+function getProfilePictureCandidates(name){
+  const clean = sanitizeProfileFileName(name);
+  if(!clean) return [];
+
+  const dotName = clean.replace(/\s+/g, ".");
+  const spaceName = clean;
+  const extensions = ["jpg", "jpeg", "png", "JPG", "JPEG", "PNG"];
+  const folders = ["Profile Pictures", "Profile%20Pictures"];
+  const candidates = [];
+
+  folders.forEach(folder => {
+    extensions.forEach(ext => {
+      candidates.push(`${folder}/${dotName}.${ext}`);
+      if(spaceName !== dotName) candidates.push(`${folder}/${spaceName}.${ext}`);
+    });
+  });
+
+  return [...new Set(candidates)];
+}
+
+function createEmployeeCell(name, subText = ""){
+  const safeName = name || "-";
+  const initials = getInitials(safeName);
+  const candidates = JSON.stringify(getProfilePictureCandidates(safeName));
+
+  return `
+    <div class="employee-cell">
+      <div class="employee-avatar">
+        <img src="" alt="${safeName}" style="display:none;" data-candidates='${candidates}'>
+        <span>${initials}</span>
+      </div>
+      <div class="employee-meta">
+        <div class="employee-name">${safeName}</div>
+        <div class="employee-sub">${subText || "-"}</div>
+      </div>
+    </div>
+  `;
+}
+
+function hydrateEmployeeAvatars(root = document){
+  const images = root.querySelectorAll('.employee-avatar img[data-candidates]');
+
+  images.forEach(img => {
+    if(img.dataset.loaded === '1') return;
+    img.dataset.loaded = '1';
+
+    const fallback = img.nextElementSibling;
+    let candidates = [];
+
+    try {
+      candidates = JSON.parse(img.dataset.candidates || '[]');
+    } catch(err) {
+      candidates = [];
+    }
+
+    let index = 0;
+
+    function tryNext(){
+      if(index >= candidates.length){
+        img.style.display = 'none';
+        if(fallback) fallback.style.display = 'flex';
+        return;
+      }
+
+      const path = candidates[index++];
+      const testImg = new Image();
+
+      testImg.onload = function(){
+        img.src = path;
+        img.style.display = 'block';
+        if(fallback) fallback.style.display = 'none';
+      };
+
+      testImg.onerror = tryNext;
+      testImg.src = path;
+    }
+
+    tryNext();
+  });
+}
+
 function setupProfileAvatar(){
   const name = currentUser?.name || "Admin";
   const initials = getInitials(name);
@@ -1862,10 +2009,7 @@ function renderApprovalQueue(){
 
   body.innerHTML = data.slice(0, 12).map(l => `
     <tr>
-      <td>
-        <div style="font-weight:700">${l.employeeName || "-"}</div>
-        <div style="font-size:12px;color:#6b7280">${l.region || "-"}</div>
-      </td>
+      <td>${createEmployeeCell(l.employeeName || "-", l.region || "-")}</td>
       <td>${l.type || "-"}</td>
       <td>${normalizeLeaveDate(l.date) || "-"}</td>
       <td>${getStatusBadge(l.status)}</td>
@@ -1879,6 +2023,8 @@ function renderApprovalQueue(){
       </td>
     </tr>
   `).join("");
+
+  hydrateEmployeeAvatars(body);
 }
 
 function renderNotifications() {
@@ -2021,7 +2167,7 @@ function renderList(data){
     });
 
     t.innerHTML += `<tr>
-      <td>${l.employeeName || "-"}</td>
+      <td>${createEmployeeCell(l.employeeName || "-", l.employeeId || l.region || "-")}</td>
       <td>${l.type || "-"}</td>
       <td>${normalizeLeaveDate(l.date) || "-"}</td>
       <td>${str}</td>
@@ -2037,6 +2183,8 @@ function renderList(data){
       </td>
     </tr>`;
   });
+
+  hydrateEmployeeAvatars(t);
 }
 
 async function updateStatus(id, status){
