@@ -313,6 +313,33 @@ button,input,select{font:inherit}
 .tag-Rejected{background:red}
 .tag-Cancelled{background:#888}
 
+.day-avatar-stack{display:flex;flex-wrap:wrap;gap:4px;align-items:flex-start;margin-top:4px}
+.calendar-mini-avatar{
+  width:22px;height:22px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:9px;font-weight:800;
+  border:2px solid #fff;box-shadow:0 2px 6px rgba(15,23,42,.14);cursor:pointer;position:relative;flex:0 0 22px;
+}
+.calendar-mini-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.calendar-mini-avatar span{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.calendar-mini-avatar.more{background:#eef2ff;color:var(--primary);border-color:#eef2ff;font-size:8px}
+.calendar-legend{display:flex;justify-content:flex-end;gap:14px;flex-wrap:wrap;margin-top:14px;color:var(--muted);font-size:12px}
+.calendar-legend-item{display:inline-flex;align-items:center;gap:6px}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+.legend-dot.approved{background:#16a34a}
+.legend-dot.pending{background:#f59e0b}
+.legend-dot.rejected{background:#dc2626}
+.legend-dot.cancelled{background:#6b7280}
+.calendar-tooltip{
+  position:fixed;z-index:5000;min-width:240px;max-width:320px;background:#fff;border:1px solid var(--border);
+  border-radius:16px;box-shadow:0 20px 45px rgba(15,23,42,.18);padding:12px 14px;display:none;pointer-events:none
+}
+.calendar-tooltip.show{display:block}
+.calendar-tooltip-title{font-weight:800;color:var(--primary);margin-bottom:8px;font-size:13px}
+.calendar-tooltip-item + .calendar-tooltip-item{margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9}
+.calendar-tooltip-name{font-weight:700;color:var(--text);font-size:13px}
+.calendar-tooltip-meta{font-size:12px;color:var(--muted);line-height:1.45;margin-top:2px}
+.calendar-tooltip-status{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}
+
 .year-view{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .year-month{
   border:1px solid #e5e7eb;border-radius:14px;padding:12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;transition:transform .2s, box-shadow .2s;box-shadow:0 3px 10px rgba(0,0,0,.05);
@@ -384,7 +411,7 @@ tbody tr:hover{background:#fcfcff}
     <div class="sidebar-foot">
       <div class="trial-box">
         <h4>Employee Leave Workspace</h4>
-        <p>Submit leave requests, track approval status, and review your plotted leave schedule in one place.</p>
+        <p>Submit leave requests, track approval status, and review all plotted employee leaves before planning your next request.</p>
       </div>
     </div>
   </aside>
@@ -442,7 +469,7 @@ tbody tr:hover{background:#fcfcff}
     <div class="content">
       <div class="page-intro">
         <h1 id="welcomeTitle">Welcome!</h1>
-        <p>Submit your leave request, monitor your current tickets, and check your planned leave calendar without leaving this page.</p>
+        <p>Submit your leave request, monitor your current tickets, and review all plotted employee leaves before planning your next request.</p>
       </div>
 
       <section class="kpi-grid">
@@ -567,8 +594,8 @@ tbody tr:hover{background:#fcfcff}
 
       <section class="card" style="margin-bottom:20px;">
         <div class="card-header">
-          <h3 class="card-title">My Leave Calendar</h3>
-          <p class="card-subtitle">View your plotted leave requests by month or year.</p>
+          <h3 class="card-title">All Leaves Plotted by Employees</h3>
+          <p class="card-subtitle">See all submitted employee leaves by month or year so you can plan ahead with better visibility.</p>
         </div>
         <div class="card-body">
           <div class="calendar-toolbar">
@@ -613,6 +640,7 @@ tbody tr:hover{background:#fcfcff}
       </section>
 
       <div class="page-footer">© FedEx 2026</div>
+      <div id="calendarTooltip" class="calendar-tooltip"></div>
     </div>
   </main>
 </div>
@@ -639,10 +667,12 @@ if(currentUser.role === "manager"){
 }
 
 let employeeLeaves = [];
+let plottedLeaves = [];
 let viewMode = "year";
 let phNow = getPHDateObject();
 let calMonth = phNow.getMonth();
 let calYear = phNow.getFullYear();
+const profileImageCache = new Map();
 
 const dateEl = document.getElementById("date");
 const reasonEl = document.getElementById("reason");
@@ -660,6 +690,7 @@ function initPage(){
   setupProfileAvatar();
   setupProfileMenuClose();
   loadLeaves();
+  loadPlottedLeaves();
 
   document.getElementById("submitBtn").addEventListener("click", submitLeave);
 }
@@ -706,21 +737,9 @@ function sanitizeProfileFileName(name){
     .replace(/[^a-zA-Z0-9._-]/g, "");
 }
 
-function setupProfileAvatar(){
-  const name = currentUser?.name || "Employee";
-  const initials = getInitials(name);
-
-  const headerInitials = document.getElementById("headerAvatarInitials");
-  const headerImg = document.getElementById("headerAvatarImg");
-  const largeInitials = document.getElementById("profileAvatarLargeInitials");
-  const largeImg = document.getElementById("profileAvatarLargeImg");
-  document.getElementById("profileDropdownName").textContent = name;
-
-  headerInitials.textContent = initials;
-  largeInitials.textContent = initials;
-
+function getProfileImageCandidates(name){
   const fileName = sanitizeProfileFileName(name);
-  const candidates = [
+  return [
     `Profile Pictures/${fileName}.png`,
     `Profile Pictures/${fileName}.jpg`,
     `Profile Pictures/${fileName}.jpeg`,
@@ -728,36 +747,58 @@ function setupProfileAvatar(){
     `Profile%20Pictures/${fileName}.jpg`,
     `Profile%20Pictures/${fileName}.jpeg`
   ];
+}
 
-  function showInitials(){
-    headerImg.style.display = "none";
-    largeImg.style.display = "none";
-    headerInitials.style.display = "flex";
-    largeInitials.style.display = "flex";
-  }
+function resolveProfileImage(name){
+  const key = sanitizeProfileFileName(name) || "unknown";
+  if(profileImageCache.has(key)) return profileImageCache.get(key);
 
-  function showImage(path){
-    headerImg.src = path;
-    largeImg.src = path;
-    headerImg.style.display = "block";
-    largeImg.style.display = "block";
-    headerInitials.style.display = "none";
-    largeInitials.style.display = "none";
-  }
-
-  let idx = 0;
-  function tryNext(){
-    if(idx >= candidates.length){
-      showInitials();
-      return;
+  const promise = new Promise(resolve => {
+    const candidates = getProfileImageCandidates(name);
+    let idx = 0;
+    function tryNext(){
+      if(idx >= candidates.length){
+        resolve(null);
+        return;
+      }
+      const path = candidates[idx++];
+      const tester = new Image();
+      tester.onload = () => resolve(path);
+      tester.onerror = tryNext;
+      tester.src = path;
     }
-    const path = candidates[idx++];
-    const tester = new Image();
-    tester.onload = () => showImage(path);
-    tester.onerror = tryNext;
-    tester.src = path;
-  }
-  tryNext();
+    tryNext();
+  });
+
+  profileImageCache.set(key, promise);
+  return promise;
+}
+
+function applyAvatarImage(imgEl, initialsEl, name){
+  if(!imgEl || !initialsEl) return;
+  initialsEl.textContent = getInitials(name);
+  resolveProfileImage(name).then(path => {
+    if(path){
+      imgEl.src = path;
+      imgEl.style.display = "block";
+      initialsEl.style.display = "none";
+    }else{
+      imgEl.style.display = "none";
+      initialsEl.style.display = "flex";
+    }
+  });
+}
+
+function setupProfileAvatar(){
+  const name = currentUser?.name || "Employee";
+  const headerInitials = document.getElementById("headerAvatarInitials");
+  const headerImg = document.getElementById("headerAvatarImg");
+  const largeInitials = document.getElementById("profileAvatarLargeInitials");
+  const largeImg = document.getElementById("profileAvatarLargeImg");
+  document.getElementById("profileDropdownName").textContent = name;
+
+  applyAvatarImage(headerImg, headerInitials, name);
+  applyAvatarImage(largeImg, largeInitials, name);
 }
 
 function toggleProfileMenu(){
@@ -792,6 +833,7 @@ function clearForm(){
 
 function reloadAll(){
   loadLeaves();
+  loadPlottedLeaves();
 }
 
 async function submitLeave(){
@@ -835,17 +877,36 @@ function loadLeaves(){
         });
       });
 
-      const years = employeeLeaves
-        .map(l => parseInt(String(l.date || "").split("-")[0], 10))
-        .filter(Boolean);
-      calYear = years.length ? Math.max(...years) : getPHDateObject().getFullYear();
-
       renderTable();
-      renderCalendar();
       renderKPIs();
       renderUpcomingApproved();
     }, err => {
       alert("Error loading leaves: " + err.message);
+    });
+}
+
+function loadPlottedLeaves(){
+  db.collection("single_day_leave")
+    .orderBy("date", "asc")
+    .onSnapshot(snapshot => {
+      plottedLeaves = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        plottedLeaves.push({
+          id: doc.id,
+          ...data,
+          submittedAt: data.submittedAt?.toDate ? data.submittedAt.toDate() : new Date(data.submittedAt || Date.now())
+        });
+      });
+
+      const years = plottedLeaves
+        .map(l => parseInt(String(l.date || "").split("-")[0], 10))
+        .filter(Boolean);
+      const today = getPHDateObject();
+      calYear = years.length ? Math.max(today.getFullYear(), ...years) : today.getFullYear();
+      renderCalendar();
+    }, err => {
+      alert("Error loading plotted leaves: " + err.message);
     });
 }
 
@@ -883,8 +944,8 @@ function renderUpcomingApproved(){
       <div class="schedule-left">
         <div class="schedule-avatar">${initials}</div>
         <div>
-          <div class="schedule-name">${l.type}</div>
-          <div class="schedule-meta">${l.date} · ${escapeHtml(l.reason || "-")}</div>
+          <div class="schedule-name">${escapeHtml(l.type)}</div>
+          <div class="schedule-meta">${escapeHtml(l.date)} · ${escapeHtml(l.reason || "-")}</div>
         </div>
       </div>
       <div class="schedule-badge status-chip approved">Approved</div>
@@ -937,11 +998,13 @@ function renderMonth(){
   const container = document.getElementById("calendarContainer");
   container.className = "calendar";
   container.innerHTML = "";
+  const oldLegend = document.getElementById("calendarLegend");
+  if(oldLegend) oldLegend.remove();
 
   const first = new Date(calYear, calMonth, 1);
   const days = new Date(calYear, calMonth + 1, 0).getDate();
   const start = first.getDay();
-  document.getElementById("calendarLabel").textContent = first.toLocaleString('default',{month:'long'}) + " " + calYear;
+  document.getElementById("calendarLabel").textContent = first.toLocaleString("default", { month: "long" }) + " " + calYear;
 
   ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d => {
     const h = document.createElement("div");
@@ -950,9 +1013,9 @@ function renderMonth(){
     container.appendChild(h);
   });
 
-  for(let i=0;i<start;i++) container.appendChild(document.createElement("div"));
+  for(let i = 0; i < start; i++) container.appendChild(document.createElement("div"));
 
-  for(let d=1; d<=days; d++){
+  for(let d = 1; d <= days; d++){
     const cell = document.createElement("div");
     cell.className = "cal-cell";
 
@@ -961,30 +1024,73 @@ function renderMonth(){
     day.textContent = d;
     cell.appendChild(day);
 
-    const fullDate = calYear + "-" + String(calMonth + 1).padStart(2,"0") + "-" + String(d).padStart(2,"0");
-    employeeLeaves.filter(l => l.date === fullDate).forEach(l => {
-      const tag = document.createElement("div");
-      tag.className = "cal-tag tag-" + l.status;
-      tag.textContent = `${l.type} (${l.status})`;
-      cell.appendChild(tag);
-    });
+    const fullDate = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const matches = plottedLeaves.filter(l => l.date === fullDate);
+
+    if(matches.length){
+      const stack = document.createElement("div");
+      stack.className = "day-avatar-stack";
+
+      matches.slice(0, 8).forEach(l => {
+        const avatar = document.createElement("div");
+        avatar.className = `calendar-mini-avatar ${getStatusClass(l.status)}`;
+
+        const img = document.createElement("img");
+        img.alt = l.employeeName || "Employee";
+        img.style.display = "none";
+
+        const span = document.createElement("span");
+        span.textContent = getInitials(l.employeeName || "Employee");
+
+        avatar.appendChild(img);
+        avatar.appendChild(span);
+        applyAvatarImage(img, span, l.employeeName || "Employee");
+        avatar.addEventListener("mouseenter", event => showCalendarTooltip(event, matches, fullDate));
+        avatar.addEventListener("mousemove", moveCalendarTooltip);
+        avatar.addEventListener("mouseleave", hideCalendarTooltip);
+        stack.appendChild(avatar);
+      });
+
+      if(matches.length > 8){
+        const more = document.createElement("div");
+        more.className = "calendar-mini-avatar more";
+        more.textContent = `+${matches.length - 8}`;
+        more.addEventListener("mouseenter", event => showCalendarTooltip(event, matches, fullDate));
+        more.addEventListener("mousemove", moveCalendarTooltip);
+        more.addEventListener("mouseleave", hideCalendarTooltip);
+        stack.appendChild(more);
+      }
+
+      cell.appendChild(stack);
+    }
 
     container.appendChild(cell);
   }
+
+  container.insertAdjacentHTML("afterend", `
+    <div class="calendar-legend" id="calendarLegend">
+      <span class="calendar-legend-item"><span class="legend-dot approved"></span>Approved</span>
+      <span class="calendar-legend-item"><span class="legend-dot pending"></span>Pending</span>
+      <span class="calendar-legend-item"><span class="legend-dot rejected"></span>Rejected</span>
+      <span class="calendar-legend-item"><span class="legend-dot cancelled"></span>Cancelled</span>
+    </div>
+  `);
 }
 
 function renderYear(){
   const container = document.getElementById("calendarContainer");
   container.className = "year-view";
   container.innerHTML = "";
+  const oldLegend = document.getElementById("calendarLegend");
+  if(oldLegend) oldLegend.remove();
 
-  for(let m=0; m<12; m++){
+  for(let m = 0; m < 12; m++){
     const monthBox = document.createElement("div");
     monthBox.className = "year-month";
 
     const label = document.createElement("div");
     label.className = "year-month-label";
-    label.textContent = `${new Date(calYear, m, 1).toLocaleString('default',{month:'short'})} ${calYear}`;
+    label.textContent = `${new Date(calYear, m, 1).toLocaleString("default", { month: "short" })} ${calYear}`;
     monthBox.appendChild(label);
 
     const miniGrid = document.createElement("div");
@@ -1003,18 +1109,17 @@ function renderYear(){
     const daysInMonth = new Date(calYear, m + 1, 0).getDate();
     const startDay = first.getDay();
 
-    for(let i=0; i<startDay; i++){
-      const blank = document.createElement("div");
-      miniGrid.appendChild(blank);
+    for(let i = 0; i < startDay; i++){
+      miniGrid.appendChild(document.createElement("div"));
     }
 
-    for(let d=1; d<=daysInMonth; d++){
+    for(let d = 1; d <= daysInMonth; d++){
       const cell = document.createElement("div");
       cell.className = "day-cell";
       cell.textContent = d;
 
-      const fullDate = calYear + "-" + String(m + 1).padStart(2,"0") + "-" + String(d).padStart(2,"0");
-      const matches = employeeLeaves.filter(l => l.date === fullDate);
+      const fullDate = `${calYear}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      const matches = plottedLeaves.filter(l => l.date === fullDate);
       if(matches.length){
         const dotsWrap = document.createElement("div");
         dotsWrap.className = "day-dots";
@@ -1042,6 +1147,42 @@ function renderYear(){
   document.getElementById("calendarLabel").textContent = calYear;
 }
 
+function showCalendarTooltip(event, leaves, dateStr){
+  const tooltip = document.getElementById("calendarTooltip");
+  if(!tooltip) return;
+  const sortedLeaves = [...leaves].sort((a,b) => String(a.employeeName || "").localeCompare(String(b.employeeName || "")));
+  tooltip.innerHTML = `
+    <div class="calendar-tooltip-title">${escapeHtml(dateStr)} · ${sortedLeaves.length} plotted leave${sortedLeaves.length > 1 ? "s" : ""}</div>
+    ${sortedLeaves.map(item => `
+      <div class="calendar-tooltip-item">
+        <div class="calendar-tooltip-name">${escapeHtml(item.employeeName || "Employee")}</div>
+        <div class="calendar-tooltip-meta">${escapeHtml(item.type || "-")} · ${escapeHtml(item.reason || "-")}</div>
+        <div class="calendar-tooltip-meta">Notes: ${escapeHtml(item.notes || "-")}</div>
+        <div class="calendar-tooltip-status status-chip ${getStatusClass(item.status)}">${escapeHtml(item.status || "Pending")}</div>
+      </div>
+    `).join("")}
+  `;
+  tooltip.classList.add("show");
+  moveCalendarTooltip(event);
+}
+
+function moveCalendarTooltip(event){
+  const tooltip = document.getElementById("calendarTooltip");
+  if(!tooltip || !tooltip.classList.contains("show")) return;
+  const offset = 18;
+  const maxX = window.innerWidth - tooltip.offsetWidth - 12;
+  const maxY = window.innerHeight - tooltip.offsetHeight - 12;
+  const x = Math.min(event.clientX + offset, Math.max(12, maxX));
+  const y = Math.min(event.clientY + offset, Math.max(12, maxY));
+  tooltip.style.left = `${x}px`;
+  tooltip.style.top = `${y}px`;
+}
+
+function hideCalendarTooltip(){
+  const tooltip = document.getElementById("calendarTooltip");
+  if(tooltip) tooltip.classList.remove("show");
+}
+
 function setViewMode(mode){
   viewMode = mode;
   renderCalendar();
@@ -1064,7 +1205,7 @@ function escapeHtml(value){
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
+    .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
 </script>
