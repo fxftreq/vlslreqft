@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>FedEx Leave System - Manager</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
 :root{
   --primary:#4D148C;
@@ -29,8 +30,8 @@ body{
   background:var(--bg);
   color:var(--text);
 }
+button,input,select{font:inherit}
 
-/* Shell */
 .shell{
   display:grid;
   grid-template-columns:280px 1fr;
@@ -102,8 +103,6 @@ body{
 .trial-box p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
 
 .app-main{min-width:0}
-
-/* Header */
 .app-header{
   position:sticky;
   top:0;
@@ -120,16 +119,11 @@ body{
   justify-content:space-between;
   gap:16px;
 }
-.mobile-top{
-  display:none;
-  align-items:center;
-  gap:10px;
-}
+.mobile-top{display:none;align-items:center;gap:10px}
 .mobile-logo{
   width:36px;height:36px;border-radius:12px;
   background:linear-gradient(135deg,var(--primary),var(--accent));
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;
+  display:flex;align-items:center;justify-content:center;color:#fff;
 }
 .header-title small{
   display:block;
@@ -138,201 +132,66 @@ body{
   letter-spacing:.12em;
   text-transform:uppercase;
 }
-.header-title h2{
-  margin:4px 0 0;
-  font-size:28px;
-  color:var(--text);
-}
-.header-actions{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
-}
-.profile-menu{position:relative}
-.profile-btn{
-  background:transparent;
+.header-title h2{margin:4px 0 0;font-size:28px;color:var(--text)}
+.header-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+.icon-btn{
+  position:relative;
   border:none;
-  padding:0;
-  cursor:pointer;
-}
-.avatar-trigger{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-#profileArrow{
-  color:var(--primary);
-  font-size:12px;
-  transition:transform .25s ease;
-}
-#profileArrow.rotate{transform:rotate(180deg)}
-.header-avatar{
+  background:#fff;
   width:42px;
   height:42px;
-  border-radius:50%;
-  overflow:hidden;
-  background:linear-gradient(135deg,var(--primary),var(--accent));
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:800;
-  font-size:14px;
-  box-shadow:0 8px 18px rgba(77,20,140,.18);
-  border:2px solid #fff;
+  border-radius:14px;
+  border:1px solid var(--border);
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  color:var(--primary);
 }
-.header-avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
+.icon-btn:hover{background:#faf7ff}
+
+.profile-menu{position:relative}
+.profile-btn{background:transparent;border:none;padding:0;cursor:pointer}
+.avatar-trigger{display:flex;align-items:center;gap:10px}
+#profileArrow{color:var(--primary);font-size:12px;transition:transform .25s ease}
+#profileArrow.rotate{transform:rotate(180deg)}
+.header-avatar{
+  width:42px;height:42px;border-radius:50%;overflow:hidden;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;box-shadow:0 8px 18px rgba(77,20,140,.18);border:2px solid #fff;
+}
+.header-avatar img,.profile-avatar-large img,.employee-avatar img,.schedule-avatar img{
+  width:100%;height:100%;object-fit:cover;display:block;
 }
 .profile-dropdown{
-  position:absolute;
-  top:calc(100% + 10px);
-  right:0;
-  min-width:260px;
-  background:#fff;
-  color:#333;
-  border-radius:18px;
-  box-shadow:0 18px 40px rgba(0,0,0,.18);
-  overflow:hidden;
-  opacity:0;
-  transform:translateY(-10px) scale(.96);
-  pointer-events:none;
-  transition:opacity .25s ease, transform .25s ease;
-  transform-origin:top right;
-  z-index:100;
+  position:absolute;top:calc(100% + 10px);right:0;min-width:270px;background:#fff;color:#333;
+  border-radius:18px;box-shadow:0 18px 40px rgba(0,0,0,.18);overflow:hidden;opacity:0;
+  transform:translateY(-10px) scale(.96);pointer-events:none;transition:opacity .25s ease, transform .25s ease;
+  transform-origin:top right;z-index:100;
 }
-.profile-dropdown.show{
-  opacity:1;
-  transform:translateY(0) scale(1);
-  pointer-events:auto;
-}
-.profile-dropdown-header{
-  padding:18px 16px 16px;
-  background:linear-gradient(135deg,#f7f3fc,#ffffff);
-  border-bottom:1px solid #eee;
-}
-.profile-dropdown-header-avatar{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  text-align:left;
-}
+.profile-dropdown.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.profile-dropdown-header{padding:18px 16px 16px;background:linear-gradient(135deg,#f7f3fc,#ffffff);border-bottom:1px solid #eee}
+.profile-dropdown-header-avatar{display:flex;align-items:center;gap:14px;text-align:left}
 .profile-avatar-large{
-  width:64px;
-  height:64px;
-  border-radius:50%;
-  overflow:hidden;
+  width:64px;height:64px;border-radius:50%;overflow:hidden;
   background:linear-gradient(135deg,var(--primary),var(--accent));
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:800;
-  font-size:22px;
-  flex:0 0 auto;
+  color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;flex:0 0 auto;
   box-shadow:0 10px 24px rgba(77,20,140,.18);
 }
-.profile-avatar-large img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-.profile-header-info{min-width:0}
-.profile-name{
-  font-weight:700;
-  color:var(--primary);
-  font-size:15px;
-  line-height:1.3;
-}
-.profile-role{
-  font-size:12px;
-  color:#777;
-  margin-top:4px;
-}
+.profile-name{font-weight:700;color:var(--primary);font-size:15px;line-height:1.3}
+.profile-role{font-size:12px;color:#777;margin-top:4px}
 .profile-dropdown-item{
-  width:100%;
-  border:none;
-  background:#fff;
-  padding:13px 16px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  cursor:pointer;
-  font-size:14px;
-  transition:background .2s ease, padding-left .2s ease;
+  width:100%;border:none;background:#fff;padding:13px 16px;display:flex;align-items:center;gap:10px;
+  cursor:pointer;font-size:14px;transition:background .2s ease,padding-left .2s ease;
 }
-.profile-dropdown-item:hover{
-  background:#f8f8fb;
-  padding-left:20px;
-}
-.logout-item{
-  color:#d62828;
-  font-weight:600;
-}
+.profile-dropdown-item:hover{background:#f8f8fb;padding-left:20px}
+.logout-item{color:#d62828;font-weight:600}
 
-/* Content */
 .content{padding:24px}
-.page-intro{
-  margin-bottom:20px;
-}
-.page-intro h1{
-  margin:0;
-  font-size:32px;
-  color:var(--primary);
-}
-.page-intro p{
-  margin:8px 0 0;
-  color:var(--muted);
-}
+.page-intro{margin-bottom:20px}
+.page-intro h1{margin:0;font-size:32px;color:var(--primary)}
+.page-intro p{margin:8px 0 0;color:var(--muted)}
 
-/* KPI */
-.kpi-grid{
-  display:grid;
-  grid-template-columns:repeat(4, minmax(0,1fr));
-  gap:16px;
-  margin-bottom:20px;
-}
-.kpi-box{
-  padding:22px;
-  border-radius:22px;
-  background:#fff;
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
-}
-.kpi-top{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-}
-.kpi-label,.muted{color:var(--muted)}
-.kpi-value{
-  font-size:30px;
-  font-weight:800;
-  margin-top:8px;
-}
-.kpi-sub{
-  color:var(--muted);
-  font-size:12px;
-  margin-top:6px;
-}
-.kpi-icon{
-  width:48px;
-  height:48px;
-  border-radius:16px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#f3f0ff;
-  color:var(--primary);
-  font-size:18px;
-}
-
-/* Cards */
 .card{
   background:var(--card);
   border:1px solid var(--border);
@@ -340,378 +199,179 @@ body{
   box-shadow:var(--shadow);
   overflow:hidden;
 }
-.card-header{
-  padding:20px 22px;
-  border-bottom:1px solid var(--border);
-  background:#fff;
-}
-.card-title{
-  margin:0;
-  font-size:20px;
-  color:var(--text);
-}
-.card-subtitle{
-  margin:6px 0 0;
-  color:var(--muted);
-  font-size:14px;
-}
+.card-header{padding:20px 22px;border-bottom:1px solid var(--border);background:#fff}
+.card-title{margin:0;font-size:20px;color:var(--text)}
+.card-subtitle{margin:6px 0 0;color:var(--muted);font-size:14px}
 .card-body{padding:20px 22px}
+
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px;
+  margin-bottom:20px;
+}
+.kpi-box{
+  padding:22px;border-radius:22px;background:#fff;border:1px solid var(--border);box-shadow:var(--shadow);
+}
+.kpi-top{display:flex;justify-content:space-between;gap:12px}
+.kpi-label,.muted{color:var(--muted)}
+.kpi-value{font-size:30px;font-weight:800;margin-top:8px}
+.kpi-sub{color:var(--muted);font-size:12px;margin-top:6px}
+.kpi-icon{
+  width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  background:#f3f0ff;color:var(--primary);font-size:18px;
+}
 
 .dashboard-grid{
   display:grid;
-  grid-template-columns:1.15fr .85fr;
+  grid-template-columns:1.5fr 1fr;
   gap:20px;
   margin-bottom:20px;
 }
 
-.field-grid{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:14px;
-}
-.field{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-.field label{
-  font-size:13px;
-  font-weight:700;
-  color:#374151;
-}
-.input,.select{
-  width:100%;
-  min-height:46px;
-  padding:0 14px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:#fff;
-  color:var(--text);
-  outline:none;
-}
-.field.field-wide{grid-column:span 2}
-.btn{
-  border:none;
-  min-height:46px;
-  padding:0 18px;
-  border-radius:14px;
-  font-weight:700;
-  cursor:pointer;
-  transition:.18s ease;
-}
-.btn-primary{
-  background:linear-gradient(135deg,var(--primary),var(--accent));
-  color:#fff;
-}
-.btn-primary:hover{transform:translateY(-1px)}
-.btn-outline{
-  background:#fff;
-  color:var(--primary);
-  border:1px solid var(--border);
-}
-.btn-outline:hover{background:#faf7ff}
-.form-actions{
-  display:flex;
-  align-items:end;
-}
-
-/* Info list */
-.info-list{
-  display:grid;
-  gap:12px;
-}
-.info-item{
-  display:flex;
-  align-items:flex-start;
-  gap:12px;
-  padding:14px;
-  border:1px solid var(--border);
-  border-radius:18px;
-  background:#fff;
-}
-.info-icon{
-  width:40px;
-  height:40px;
-  border-radius:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#f3f0ff;
-  color:var(--primary);
-  flex:0 0 auto;
-}
-.info-item h4{
-  margin:0 0 4px;
-  font-size:14px;
-}
-.info-item p{
-  margin:0;
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.5;
-}
-
-/* Calendar */
-.calendar-shell{margin-bottom:20px}
-.calendar-toolbar{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  margin:0 0 16px 0;
-  padding:12px;
-  border-radius:14px;
-  background:linear-gradient(180deg,#f8f5fc,#ffffff);
-  border:1px solid #ece7f5;
-}
-.calendar-toolbar button{
-  background:var(--primary);
-  color:#fff;
-  border:none;
-  padding:9px 12px;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:600;
-}
-.calendar-toolbar button:hover{background:var(--accent)}
-#calendarLabel{
-  font-weight:700;
-  color:var(--primary);
-  min-width:180px;
-  text-align:center;
-  font-size:15px;
-  background:#fff;
-  padding:8px 14px;
-  border-radius:10px;
-  border:1px solid #ece7f5;
-}
-.calendar{
-  display:grid;
-  grid-template-columns:repeat(7,minmax(0,1fr));
-  gap:8px;
-}
-.cal-header{
-  font-weight:700;
-  background:var(--primary);
-  color:white;
-  padding:10px 0;
-  border-radius:8px;
-  text-align:center;
-}
-.cal-cell{
-  background:white;
-  border:1px solid #e5e7eb;
-  min-height:126px;
-  display:flex;
-  flex-direction:column;
-  align-items:stretch;
-  padding:8px;
-  position:relative;
-  border-radius:10px;
-  font-size:12px;
-  overflow:visible;
-  box-shadow:0 2px 6px rgba(0,0,0,.04);
-  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
-}
-.cal-cell:hover{
-  background:#faf7ff;
-  cursor:pointer;
-  transform:translateY(-1px);
-  box-shadow:0 6px 14px rgba(0,0,0,.08);
-}
-.cal-day{
-  font-weight:700;
-  font-size:13px;
-  color:#111827;
-  margin-bottom:6px;
-}
-.day-avatar-stack{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  align-items:flex-start;
-}
-.day-avatar{
-  width:26px;
-  height:26px;
-  border-radius:50%;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg,var(--primary),var(--accent));
-  color:#fff;
-  font-size:9px;
-  font-weight:800;
-  box-shadow:0 3px 8px rgba(77,20,140,.22);
-  position:relative;
-  border:2px solid #fff;
-}
-.day-avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-.day-avatar.me{
-  outline:2px solid #16a34a;
-  outline-offset:1px;
-}
-.day-avatar.more{
-  background:#eef2ff;
-  color:var(--primary);
-  font-size:10px;
-}
-.leave-tooltip{
-  position:fixed;
-  background:#fff;
-  border-radius:12px;
-  padding:12px;
-  min-width:250px;
-  max-width:320px;
-  box-shadow:0 14px 34px rgba(0,0,0,.18);
-  font-size:12px;
-  z-index:9999;
-  display:none;
-  border:1px solid var(--border);
-  pointer-events:none;
-}
-.leave-tooltip h4{
-  margin:0 0 8px;
-  font-size:13px;
-  color:var(--primary);
-}
-.leave-tooltip .leave-item{
-  border-top:1px solid #eee;
-  padding-top:8px;
-  margin-top:8px;
-  line-height:1.45;
-}
-.leave-tooltip .Approved{color:green;font-weight:bold}
-.leave-tooltip .Rejected{color:red;font-weight:bold}
-.leave-tooltip .Pending{color:orange;font-weight:bold}
-.leave-tooltip .Cancelled{color:#555;font-weight:bold}
-
-.year-view{
+.form-grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:16px;
+  gap:14px;
 }
+.form-item{display:flex;flex-direction:column;gap:6px}
+.form-item.span-3{grid-column:1 / -1}
+.form-item label{font-size:13px;font-weight:700;color:#374151}
+.input,.select,.textarea{
+  width:100%;min-height:46px;padding:0 14px;border-radius:14px;border:1px solid var(--border);
+  background:#fff;color:var(--text);outline:none;
+}
+.textarea{min-height:120px;padding:12px 14px;resize:vertical}
+.input:focus,.select:focus,.textarea:focus{border-color:#d7c7ef;box-shadow:0 0 0 4px rgba(77,20,140,.08)}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn{
+  border:none;min-height:44px;padding:0 16px;border-radius:14px;font-weight:700;cursor:pointer;transition:.18s ease;
+}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-outline{background:#fff;color:var(--primary);border:1px solid var(--border)}
+.btn-outline:hover{background:#faf7ff}
+
+.mini-note{
+  margin-top:12px;padding:12px 14px;border-radius:14px;background:#faf7ff;border:1px solid #ece7f5;color:var(--muted);font-size:13px;
+}
+
+.info-list{display:grid;gap:12px}
+.info-item{
+  display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid var(--border);border-radius:18px;background:#fff;
+}
+.info-icon{
+  width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  background:#f3f0ff;color:var(--primary);flex:0 0 auto;
+}
+.info-item h4{margin:0 0 4px;font-size:14px}
+.info-item p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+
+.schedule-list{display:grid;gap:12px}
+.schedule-empty{
+  padding:16px;border:1px dashed var(--border);border-radius:18px;text-align:center;color:var(--muted);background:#fafafa;font-size:14px;
+}
+.schedule-item{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--border);border-radius:18px;background:#fff;
+}
+.schedule-left{display:flex;align-items:center;gap:12px;min-width:0}
+.schedule-avatar{
+  width:40px;height:40px;border-radius:50%;overflow:hidden;flex:0 0 40px;background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;
+}
+.schedule-name{font-weight:700;color:var(--text);margin-bottom:4px}
+.schedule-meta{font-size:13px;color:var(--muted);line-height:1.4}
+.schedule-badge{
+  display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;
+}
+.status-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px}
+.status-Pending,.status-chip.pending{color:#c2410c;background:#fff7ed}
+.status-Approved,.status-chip.approved{color:#15803d;background:#ecfdf5}
+.status-Rejected,.status-chip.rejected{color:#b91c1c;background:#fef2f2}
+.status-Cancelled,.status-chip.cancelled{color:#4b5563;background:#f3f4f6}
+
+.calendar-toolbar{
+  display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 16px 0;padding:12px;border-radius:14px;
+  background:linear-gradient(180deg,#f8f5fc,#ffffff);border:1px solid #ece7f5;
+}
+.calendar-label{
+  font-weight:700;color:var(--primary);min-width:180px;text-align:center;font-size:15px;background:#fff;padding:8px 14px;border-radius:10px;border:1px solid #ece7f5;
+}
+.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.cal-header{font-weight:700;background:var(--primary);color:white;padding:10px 0;border-radius:8px;text-align:center}
+.cal-cell{
+  background:white;border:1px solid #e5e7eb;min-height:120px;display:flex;flex-direction:column;align-items:stretch;padding:8px;position:relative;
+  border-radius:10px;font-size:12px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.04);transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.cal-cell:hover{background:#faf7ff;transform:translateY(-1px);box-shadow:0 6px 14px rgba(0,0,0,.08)}
+.cal-day{font-weight:700;font-size:13px;color:#111827;margin-bottom:6px}
+.cal-tag{
+  display:block;padding:3px 6px;margin:2px 0;border-radius:999px;color:white;font-size:10px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;line-height:1.3;
+}
+.tag-Pending{background:orange}
+.tag-Approved{background:green}
+.tag-Rejected{background:red}
+.tag-Cancelled{background:#888}
+
+.day-avatar-stack{display:flex;flex-wrap:wrap;gap:4px;align-items:flex-start;margin-top:4px}
+.calendar-mini-avatar{
+  width:22px;height:22px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:9px;font-weight:800;
+  border:2px solid #fff;box-shadow:0 2px 6px rgba(15,23,42,.14);cursor:pointer;position:relative;flex:0 0 22px;
+}
+.calendar-mini-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.calendar-mini-avatar span{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.calendar-mini-avatar.more{background:#eef2ff;color:var(--primary);border-color:#eef2ff;font-size:8px}
+.calendar-legend{display:flex;justify-content:flex-end;gap:14px;flex-wrap:wrap;margin-top:14px;color:var(--muted);font-size:12px}
+.calendar-legend-item{display:inline-flex;align-items:center;gap:6px}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+.legend-dot.approved{background:#16a34a}
+.legend-dot.pending{background:#f59e0b}
+.legend-dot.rejected{background:#dc2626}
+.legend-dot.cancelled{background:#6b7280}
+.calendar-tooltip{
+  position:fixed;z-index:5000;min-width:240px;max-width:320px;background:#fff;border:1px solid var(--border);
+  border-radius:16px;box-shadow:0 20px 45px rgba(15,23,42,.18);padding:12px 14px;display:none;pointer-events:none
+}
+.calendar-tooltip.show{display:block}
+.calendar-tooltip-title{font-weight:800;color:var(--primary);margin-bottom:8px;font-size:13px}
+.calendar-tooltip-item + .calendar-tooltip-item{margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9}
+.calendar-tooltip-name{font-weight:700;color:var(--text);font-size:13px}
+.calendar-tooltip-meta{font-size:12px;color:var(--muted);line-height:1.45;margin-top:2px}
+.calendar-tooltip-status{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}
+
+.year-view{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .year-month{
-  border:1px solid #e5e7eb;
-  border-radius:14px;
-  padding:12px;
-  background:#fff;
-  cursor:pointer;
-  display:flex;
-  flex-direction:column;
-  transition:transform .2s, box-shadow .2s;
-  box-shadow:0 3px 10px rgba(0,0,0,.05);
+  border:1px solid #e5e7eb;border-radius:14px;padding:12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;transition:transform .2s, box-shadow .2s;box-shadow:0 3px 10px rgba(0,0,0,.05);
 }
-.year-month:hover{
-  transform:translateY(-2px);
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
-}
-.year-month-label{
-  text-align:center;
-  font-weight:700;
-  margin-bottom:8px;
-  color:var(--primary);
-  font-size:14px;
-}
-.mini-grid{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:3px;
-  font-size:9px;
-}
-.mini-grid .day-cell{
-  min-height:26px;
-  border-radius:6px;
-  text-align:center;
-  line-height:24px;
-  position:relative;
-  border:1px solid #f0f0f0;
-  font-size:9px;
-  background:#fafafa;
-}
-.mini-grid .day-dots{
-  position:absolute;
-  bottom:1px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:1px;
-  flex-wrap:wrap;
-  justify-content:center;
-  width:100%;
-  padding:0 2px;
-}
-.dot{
-  width:5px;
-  height:5px;
-  border-radius:50%;
-}
+.year-month:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.year-month-label{text-align:center;font-weight:700;margin-bottom:8px;color:var(--primary);font-size:14px}
+.mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;font-size:9px}
+.mini-grid .day-cell{min-height:26px;border-radius:6px;text-align:center;line-height:24px;position:relative;border:1px solid #f0f0f0;font-size:9px;background:#fafafa}
+.mini-grid .day-dots{position:absolute;bottom:1px;left:50%;transform:translateX(-50%);display:flex;gap:1px}
+.dot{width:5px;height:5px;border-radius:50%}
 .dot.approved{background:green}
 .dot.pending{background:orange}
 .dot.rejected{background:red}
 .dot.cancelled{background:#888}
 
-/* Table */
-.table-wrap{
-  width:100%;
-  overflow:auto;
-}
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:760px;
-}
-thead th{
-  text-align:left;
-  font-size:13px;
-  color:#475569;
-  padding:14px 12px;
-  border-bottom:1px solid var(--border);
-  background:#fafafa;
-}
-tbody td{
-  padding:14px 12px;
-  border-bottom:1px solid #f1f5f9;
-  vertical-align:middle;
-  font-size:14px;
-}
+.table-wrap{width:100%;overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:900px}
+thead th{text-align:left;font-size:13px;color:#475569;padding:14px 12px;border-bottom:1px solid var(--border);background:#fafafa}
+tbody td{padding:14px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle;font-size:14px}
 tbody tr:hover{background:#fcfcff}
-.status-chip{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:6px 10px;
-  border-radius:999px;
-  font-weight:700;
-  font-size:12px;
-}
-.status-Pending{background:#fff7ed;color:#c2410c}
-.status-Approved{background:#ecfdf5;color:#15803d}
-.status-Rejected{background:#fef2f2;color:#b91c1c}
-.status-Cancelled{background:#f3f4f6;color:#4b5563}
-.reason-col{max-width:260px;word-break:break-word}
+.reason-cell{max-width:280px;line-height:1.45;color:#374151}
 
 .empty-state{
-  padding:18px;
-  border:1px dashed var(--border);
-  border-radius:18px;
-  text-align:center;
-  color:var(--muted);
-  background:#fafafa;
+  padding:24px;border:1px dashed var(--border);border-radius:18px;background:#fafafa;text-align:center;color:var(--muted)
 }
+.page-footer{text-align:center;color:var(--muted);font-size:13px;padding:20px 0 8px}
 
-/* Responsive */
 @media (max-width:1200px){
   .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .dashboard-grid{grid-template-columns:1fr}
-  .field-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form-grid{grid-template-columns:1fr 1fr}
+  .year-view{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:900px){
   .shell{grid-template-columns:1fr}
@@ -722,10 +382,11 @@ tbody tr:hover{background:#fcfcff}
 }
 @media (max-width:700px){
   .kpi-grid{grid-template-columns:1fr}
-  .field-grid{grid-template-columns:1fr}
-  .field.field-wide{grid-column:span 1}
-  .header-title h2{font-size:22px}
+  .form-grid{grid-template-columns:1fr}
   .year-view{grid-template-columns:1fr}
+  .header-title h2{font-size:22px}
+  .form-actions{justify-content:stretch}
+  .form-actions .btn{width:100%}
 }
 </style>
 
@@ -733,7 +394,6 @@ tbody tr:hover{background:#fcfcff}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-
 <div class="shell">
   <aside class="sidebar">
     <div class="sidebar-head logo-only-head">
@@ -742,15 +402,16 @@ tbody tr:hover{background:#fcfcff}
 
     <div class="nav">
       <button class="nav-btn active"><i class="fa-solid fa-house"></i> Dashboard</button>
-      <button class="nav-btn"><i class="fa-regular fa-calendar"></i> My Leave</button>
-      <button class="nav-btn"><i class="fa-solid fa-users-viewfinder"></i> Team Planning</button>
-      <button class="nav-btn"><i class="fa-solid fa-table-list"></i> Tickets</button>
+      <button class="nav-btn"><i class="fa-regular fa-paper-plane"></i> Submit Leave</button>
+      <button class="nav-btn"><i class="fa-regular fa-calendar"></i> Leave Calendar</button>
+      <button class="nav-btn"><i class="fa-solid fa-ticket"></i> My Tickets</button>
+      <button class="nav-btn"><i class="fa-solid fa-circle-info"></i> Quick Guide</button>
     </div>
 
     <div class="sidebar-foot">
       <div class="trial-box">
-        <h4>Manager Leave Dashboard</h4>
-        <p>Plan your leave, check plotted manager leaves, and keep track of your submitted requests in one place.</p>
+        <h4>Manager Leave Workspace</h4>
+        <p>Submit leave requests, track approval status, and review all plotted manager leaves before planning your next request.</p>
       </div>
     </div>
   </aside>
@@ -763,17 +424,21 @@ tbody tr:hover{background:#fcfcff}
             <div class="mobile-logo"><i class="fa-solid fa-calendar-days"></i></div>
           </div>
           <div class="header-title">
-            <small>Manager</small>
+            <small>Manager Self-Service</small>
             <h2>Leave Dashboard</h2>
           </div>
         </div>
 
         <div class="header-actions">
+          <button class="icon-btn" title="Refresh" onclick="reloadAll()">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+
           <div class="profile-menu">
-            <button class="profile-btn avatar-trigger" id="profileBtn" type="button" onclick="toggleProfileMenu()">
+            <button class="profile-btn avatar-trigger" id="profileBtn" onclick="toggleProfileMenu()">
               <div class="header-avatar" id="headerAvatar">
                 <img id="headerAvatarImg" alt="Profile" style="display:none;">
-                <span id="headerAvatarInitials">M</span>
+                <span id="headerAvatarInitials">A</span>
               </div>
               <i class="fas fa-chevron-down" id="profileArrow"></i>
             </button>
@@ -782,7 +447,7 @@ tbody tr:hover{background:#fcfcff}
               <div class="profile-dropdown-header profile-dropdown-header-avatar">
                 <div class="profile-avatar-large" id="profileAvatarLarge">
                   <img id="profileAvatarLargeImg" alt="Profile" style="display:none;">
-                  <span id="profileAvatarLargeInitials">M</span>
+                  <span id="profileAvatarLargeInitials">A</span>
                 </div>
 
                 <div class="profile-header-info">
@@ -803,17 +468,28 @@ tbody tr:hover{background:#fcfcff}
 
     <div class="content">
       <div class="page-intro">
-        <h1>Manager Control Center</h1>
-        <p>Submit leave requests, review all plotted manager leaves for planning, and track your own tickets in a cleaner workspace.</p>
+        <h1 id="welcomeTitle">Welcome!</h1>
+        <p>Submit your leave request, monitor your current tickets, and review all plotted manager leaves before planning your next request.</p>
       </div>
 
       <section class="kpi-grid">
         <div class="kpi-box">
           <div class="kpi-top">
             <div>
-              <div class="kpi-label">My Pending Requests</div>
+              <div class="kpi-label">My Requests</div>
+              <div class="kpi-value" id="kpiTotal">0</div>
+              <div class="kpi-sub">All submitted leave tickets</div>
+            </div>
+            <div class="kpi-icon"><i class="fa-solid fa-ticket"></i></div>
+          </div>
+        </div>
+
+        <div class="kpi-box">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-label">Pending</div>
               <div class="kpi-value" id="kpiPending">0</div>
-              <div class="kpi-sub">Awaiting admin action</div>
+              <div class="kpi-sub">Waiting for review</div>
             </div>
             <div class="kpi-icon"><i class="fa-regular fa-hourglass-half"></i></div>
           </div>
@@ -822,9 +498,9 @@ tbody tr:hover{background:#fcfcff}
         <div class="kpi-box">
           <div class="kpi-top">
             <div>
-              <div class="kpi-label">Approved This Year</div>
+              <div class="kpi-label">Approved</div>
               <div class="kpi-value" id="kpiApproved">0</div>
-              <div class="kpi-sub">Based on your leave tickets</div>
+              <div class="kpi-sub">Approved leave requests</div>
             </div>
             <div class="kpi-icon"><i class="fa-regular fa-circle-check"></i></div>
           </div>
@@ -833,35 +509,24 @@ tbody tr:hover{background:#fcfcff}
         <div class="kpi-box">
           <div class="kpi-top">
             <div>
-              <div class="kpi-label">Leaves This Month</div>
-              <div class="kpi-value" id="kpiMonth">0</div>
-              <div class="kpi-sub">Your plotted days this month</div>
+              <div class="kpi-label">Next Leave</div>
+              <div class="kpi-value" id="kpiNextLeave" style="font-size:22px;">-</div>
+              <div class="kpi-sub">Nearest upcoming leave date</div>
             </div>
             <div class="kpi-icon"><i class="fa-regular fa-calendar"></i></div>
-          </div>
-        </div>
-
-        <div class="kpi-box">
-          <div class="kpi-top">
-            <div>
-              <div class="kpi-label">Managers Plotted Today</div>
-              <div class="kpi-value" id="kpiToday">0</div>
-              <div class="kpi-sub">Visible in planning calendar</div>
-            </div>
-            <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
           </div>
         </div>
       </section>
 
       <section class="dashboard-grid">
-        <section class="card">
+        <div class="card">
           <div class="card-header">
             <h3 class="card-title">Submit Leave Request</h3>
-            <p class="card-subtitle">Create a new manager leave request using the same collection and flow you already use.</p>
+            <p class="card-subtitle">Use the same leave collection and submission flow from your current manager page.</p>
           </div>
           <div class="card-body">
-            <div class="field-grid">
-              <div class="field">
+            <div class="form-grid">
+              <div class="form-item">
                 <label for="type">Leave Type</label>
                 <select id="type" class="select">
                   <option>Vacation</option>
@@ -869,71 +534,76 @@ tbody tr:hover{background:#fcfcff}
                   <option>RDCO</option>
                 </select>
               </div>
-
-              <div class="field">
+              <div class="form-item">
                 <label for="date">Leave Date</label>
                 <input type="date" id="date" class="input">
               </div>
-
-              <div class="field field-wide">
-                <label for="reason">Reason</label>
-                <input type="text" id="reason" class="input" placeholder="Enter reason">
+              <div class="form-item">
+                <label for="submittedPreview">Today in PH</label>
+                <input type="text" id="submittedPreview" class="input" disabled>
               </div>
-
-              <div class="form-actions">
-                <button class="btn btn-primary" id="submitBtn" type="button">
-                  <i class="fas fa-paper-plane"></i> Submit Leave
-                </button>
+              <div class="form-item span-3">
+                <label for="reason">Reason</label>
+                <textarea id="reason" class="textarea" placeholder="Enter reason"></textarea>
               </div>
             </div>
-          </div>
-        </section>
 
-        <aside class="card">
+            <div class="form-actions">
+              <button class="btn btn-outline" onclick="clearForm()">Clear</button>
+              <button class="btn btn-primary" id="submitBtn">Submit Leave</button>
+            </div>
+
+            <div class="mini-note">
+              Submitted requests are saved to <strong>manager_single_day_leave</strong> and will immediately appear below once stored successfully.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Quick Guide</h3>
-            <p class="card-subtitle">Use the planning calendar to avoid overlapping leave dates and check who is already plotted.</p>
+            <h3 class="card-title">Quick Insights</h3>
+            <p class="card-subtitle">A quick look at your current leave activity.</p>
           </div>
           <div class="card-body">
             <div class="info-list">
               <div class="info-item">
-                <div class="info-icon"><i class="fa-solid fa-user-check"></i></div>
+                <div class="info-icon"><i class="fa-solid fa-bolt"></i></div>
                 <div>
-                  <h4>Submit your leave first</h4>
-                  <p>Fill out the leave type, leave date, and reason, then submit to send your request for approval.</p>
+                  <h4>Fast tracking</h4>
+                  <p>New requests appear live in your ticket list after submission so you can confirm they were saved right away.</p>
                 </div>
               </div>
               <div class="info-item">
-                <div class="info-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                <div class="info-icon"><i class="fa-solid fa-shield-heart"></i></div>
                 <div>
-                  <h4>Review plotted leaves</h4>
-                  <p>The month view shows mini profile pictures for all managers who already filed leave on that date.</p>
-                </div>
-              </div>
-              <div class="info-item">
-                <div class="info-icon"><i class="fa-solid fa-ticket"></i></div>
-                <div>
-                  <h4>Track your status</h4>
-                  <p>Your leave tickets remain listed below so you can monitor status changes and submission times.</p>
+                  <h4>Status visibility</h4>
+                  <p>Every ticket keeps its latest approval status and admin notes so nothing gets missed.</p>
                 </div>
               </div>
             </div>
+
+            <div style="margin-top:18px;padding-top:18px;border-top:1px solid var(--border);">
+              <div style="margin-bottom:12px;font-weight:700;color:var(--text);">Upcoming approved leaves</div>
+              <div class="schedule-list" id="upcomingApprovedList">
+                <div class="schedule-empty">No upcoming approved leave yet.</div>
+              </div>
+            </div>
           </div>
-        </aside>
+        </div>
       </section>
 
-      <section class="card calendar-shell">
+      <section class="card" style="margin-bottom:20px;">
         <div class="card-header">
-          <h3 class="card-title">All Plotted Manager Leaves</h3>
-          <p class="card-subtitle">Month view shows mini profile pictures per day. Hover an avatar to view leave details.</p>
+          <h3 class="card-title">All Leaves Plotted by Managers</h3>
+          <p class="card-subtitle">See all submitted manager leaves by month or year so you can plan ahead with better visibility.</p>
         </div>
         <div class="card-body">
           <div class="calendar-toolbar">
-            <button type="button" onclick="changeMonth(-1)">◀</button>
-            <span id="calendarLabel"></span>
-            <button type="button" onclick="changeMonth(1)">▶</button>
-            <button type="button" onclick="setViewMode('month')">Month</button>
-            <button type="button" onclick="setViewMode('year')">Year</button>
+            <button class="btn btn-outline" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="calendar-label" id="calendarLabel">-</div>
+            <button class="btn btn-outline" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+            <button class="btn btn-outline" onclick="setViewMode('month')">Month</button>
+            <button class="btn btn-outline" onclick="setViewMode('year')">Year</button>
           </div>
           <div id="calendarContainer"></div>
         </div>
@@ -942,38 +612,47 @@ tbody tr:hover{background:#fcfcff}
       <section class="card">
         <div class="card-header">
           <h3 class="card-title">My Leave Tickets</h3>
-          <p class="card-subtitle">Only your own submitted manager leave tickets are shown here.</p>
+          <p class="card-subtitle">Live ticket list with status and notes from the current manager page.</p>
         </div>
         <div class="card-body">
           <div class="table-wrap">
-            <table id="table">
+            <table>
               <thead>
                 <tr>
                   <th>Leave Type</th>
                   <th>Leave Date</th>
                   <th>Reason</th>
                   <th>Status</th>
+                  <th>Admin Notes</th>
                   <th>Submitted Date</th>
                 </tr>
               </thead>
-              <tbody id="tableBody"></tbody>
+              <tbody id="tableBody">
+                <tr>
+                  <td colspan="6">
+                    <div class="empty-state">Loading your leave tickets...</div>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
       </section>
 
       <div class="page-footer">© FedEx 2026</div>
+      <div id="calendarTooltip" class="calendar-tooltip"></div>
     </div>
   </main>
 </div>
-
-<div class="leave-tooltip" id="leaveTooltip"></div>
 
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain: "fedex-attendance-system.firebaseapp.com",
   projectId: "fedex-attendance-system",
+  storageBucket: "fedex-attendance-system.firebasestorage.app",
+  messagingSenderId: "1049424874301",
+  appId: "1:1049424874301:web:f94559159b19ee39c19354"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
@@ -983,103 +662,143 @@ if(!currentUser){
   alert("Please login first");
   location.href = "index.html";
 }
-
-const PROFILE_BASES = [
-  "https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/Profile%20Pictures/",
-  "https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/Profile Pictures/"
-];
+if(currentUser.role === "employee"){
+  location.href = "employee.html";
+}
 
 let managerLeaves = [];
-let myLeaves = [];
-let viewMode = "month";
-let calMonth = new Date().getMonth();
-let calYear = new Date().getFullYear();
+let managerPlottedLeaves = [];
+let viewMode = "year";
+let phNow = getPHDateObject();
+let calMonth = phNow.getMonth();
+let calYear = phNow.getFullYear();
+const profileImageCache = new Map();
 
+const dateEl = document.getElementById("date");
+const reasonEl = document.getElementById("reason");
+const typeEl = document.getElementById("type");
 const tableBody = document.getElementById("tableBody");
-const tooltipEl = document.getElementById("leaveTooltip");
+const submittedPreview = document.getElementById("submittedPreview");
 
-function escapeHtml(value){
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#39;");
+initPage();
+
+function initPage(){
+  document.getElementById("welcomeTitle").textContent = `Welcome, ${currentUser.name || "Manager"}`;
+  submittedPreview.value = formatDateTime(getPHDateObject());
+  dateEl.value = getPHDateString();
+
+  setupProfileAvatar();
+  setupProfileMenuClose();
+  loadLeaves();
+  loadPlottedLeaves();
+
+  document.getElementById("submitBtn").addEventListener("click", submitLeave);
+}
+
+function getPHDateObject(dateObj = new Date()) {
+  return new Date(dateObj.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+}
+
+function getPHDateString(dateObj = new Date()) {
+  const phDate = getPHDateObject(dateObj);
+  const year = phDate.getFullYear();
+  const month = String(phDate.getMonth() + 1).padStart(2, "0");
+  const day = String(phDate.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatDateTime(ts){
+  if(!ts) return "-";
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleString("en-PH", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
 }
 
 function getInitials(name){
-  const clean = (name || "").trim();
+  const clean = String(name || "").trim();
   if(!clean) return "?";
   const parts = clean.split(/\s+/).filter(Boolean);
   if(parts.length === 1) return parts[0].slice(0,2).toUpperCase();
-  return (parts[0][0] + parts[1][0]).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
 }
 
-function getProfileFileBase(name){
-  return (name || "")
+function sanitizeProfileFileName(name){
+  return String(name || "")
     .trim()
     .replace(/\s+/g, ".")
-    .replace(/\.{2,}/g, ".");
+    .replace(/\.{2,}/g, ".")
+    .replace(/[^a-zA-Z0-9._-]/g, "");
 }
 
-function getProfileCandidates(name){
-  const base = getProfileFileBase(name);
-  const exts = ["jpg","jpeg","png","webp"];
-  const urls = [];
-  PROFILE_BASES.forEach(prefix=>{
-    exts.forEach(ext=>{
-      urls.push(prefix + encodeURIComponent(base) + "." + ext);
-    });
-  });
-  return urls;
+function getProfileImageCandidates(name){
+  const fileName = sanitizeProfileFileName(name);
+  return [
+    `Profile Pictures/${fileName}.png`,
+    `Profile Pictures/${fileName}.jpg`,
+    `Profile Pictures/${fileName}.jpeg`,
+    `Profile%20Pictures/${fileName}.png`,
+    `Profile%20Pictures/${fileName}.jpg`,
+    `Profile%20Pictures/${fileName}.jpeg`
+  ];
 }
 
-function renderAvatarContent(name, extraClass = ""){
-  const initials = getInitials(name);
-  const candidates = getProfileCandidates(name);
-  return `
-    <div class="day-avatar ${extraClass}" data-candidates='${JSON.stringify(candidates)}'>
-      <img alt="${escapeHtml(name)}" style="display:none;">
-      <span>${escapeHtml(initials)}</span>
-    </div>
-  `;
-}
+function resolveProfileImage(name){
+  const key = sanitizeProfileFileName(name) || "unknown";
+  if(profileImageCache.has(key)) return profileImageCache.get(key);
 
-function hydrateAvatar(el){
-  if(!el || el.dataset.hydrated === "1") return;
-  el.dataset.hydrated = "1";
-  const img = el.querySelector("img");
-  const span = el.querySelector("span");
-  let candidates = [];
-  try{
-    candidates = JSON.parse(el.dataset.candidates || "[]");
-  }catch(e){
-    candidates = [];
-  }
-  let index = 0;
-  function tryNext(){
-    if(index >= candidates.length){
-      img.style.display = "none";
-      span.style.display = "flex";
-      span.style.width = "100%";
-      span.style.height = "100%";
-      span.style.alignItems = "center";
-      span.style.justifyContent = "center";
-      return;
+  const promise = new Promise(resolve => {
+    const candidates = getProfileImageCandidates(name);
+    let idx = 0;
+    function tryNext(){
+      if(idx >= candidates.length){
+        resolve(null);
+        return;
+      }
+      const path = candidates[idx++];
+      const tester = new Image();
+      tester.onload = () => resolve(path);
+      tester.onerror = tryNext;
+      tester.src = path;
     }
-    const url = candidates[index++];
-    img.onload = ()=>{
-      img.style.display = "block";
-      span.style.display = "none";
-    };
-    img.onerror = tryNext;
-    img.src = url;
-  }
-  tryNext();
+    tryNext();
+  });
+
+  profileImageCache.set(key, promise);
+  return promise;
 }
 
-function hydrateAllAvatars(){
-  document.querySelectorAll(".day-avatar, .header-avatar, .profile-avatar-large").forEach(hydrateAvatar);
+function applyAvatarImage(imgEl, initialsEl, name){
+  if(!imgEl || !initialsEl) return;
+  initialsEl.textContent = getInitials(name);
+  resolveProfileImage(name).then(path => {
+    if(path){
+      imgEl.src = path;
+      imgEl.style.display = "block";
+      initialsEl.style.display = "none";
+    }else{
+      imgEl.style.display = "none";
+      initialsEl.style.display = "flex";
+    }
+  });
+}
+
+function setupProfileAvatar(){
+  const name = currentUser?.name || "Manager";
+  const headerInitials = document.getElementById("headerAvatarInitials");
+  const headerImg = document.getElementById("headerAvatarImg");
+  const largeInitials = document.getElementById("profileAvatarLargeInitials");
+  const largeImg = document.getElementById("profileAvatarLargeImg");
+  document.getElementById("profileDropdownName").textContent = name;
+
+  applyAvatarImage(headerImg, headerInitials, name);
+  applyAvatarImage(largeImg, largeInitials, name);
 }
 
 function toggleProfileMenu(){
@@ -1089,301 +808,379 @@ function toggleProfileMenu(){
   arrow.classList.toggle("rotate");
 }
 
-document.addEventListener("click", (e)=>{
-  const menu = document.querySelector(".profile-menu");
-  if(menu && !menu.contains(e.target)){
-    document.getElementById("profileDropdown")?.classList.remove("show");
-    document.getElementById("profileArrow")?.classList.remove("rotate");
-  }
-});
-
-function setupUserProfile(){
-  const name = currentUser?.name || "Manager";
-  const initials = getInitials(name);
-
-  document.getElementById("profileDropdownName").textContent = name;
-  document.getElementById("headerAvatarInitials").textContent = initials;
-  document.getElementById("profileAvatarLargeInitials").textContent = initials;
-
-  const header = document.getElementById("headerAvatar");
-  const large = document.getElementById("profileAvatarLarge");
-
-  header.dataset.candidates = JSON.stringify(getProfileCandidates(name));
-  large.dataset.candidates = JSON.stringify(getProfileCandidates(name));
-
-  hydrateAvatar(header);
-  hydrateAvatar(large);
+function setupProfileMenuClose(){
+  document.addEventListener("click", function(event){
+    const menu = document.querySelector(".profile-menu");
+    if(!menu.contains(event.target)){
+      document.getElementById("profileDropdown").classList.remove("show");
+      document.getElementById("profileArrow").classList.remove("rotate");
+    }
+  });
 }
 
 function logout(){
-  if(confirm("Logout?")){
+  if(confirm("Are you sure you want to logout?")){
     localStorage.removeItem("currentUser");
     location.href = "index.html";
   }
 }
 
-const dateEl = document.getElementById("date");
-const nowPH = new Date().toLocaleString("en-US",{timeZone:"Asia/Manila"});
-const phDate = new Date(nowPH);
-dateEl.value = `${phDate.getFullYear()}-${String(phDate.getMonth()+1).padStart(2,"0")}-${String(phDate.getDate()).padStart(2,"0")}`;
+function clearForm(){
+  typeEl.selectedIndex = 0;
+  dateEl.value = getPHDateString();
+  reasonEl.value = "";
+}
 
-document.getElementById("submitBtn").addEventListener("click", async ()=>{
-  const reason = document.getElementById("reason").value.trim();
-  if(!dateEl.value || !reason){
+function reloadAll(){
+  loadLeaves();
+  loadPlottedLeaves();
+}
+
+async function submitLeave(){
+  if(!dateEl.value || !reasonEl.value.trim()){
     alert("Complete all fields");
     return;
   }
 
   const now = new Date();
   const leaveData = {
+    managerId: currentUser.id,
     managerName: currentUser.name,
-    type: document.getElementById("type").value,
+    type: typeEl.value,
     date: dateEl.value,
-    reason,
+    reason: reasonEl.value.trim(),
     status: "Pending",
     submittedAt: now
   };
 
   try{
     await db.collection("manager_single_day_leave").add(leaveData);
-    alert("Leave submitted!");
-    document.getElementById("reason").value = "";
-    dateEl.value = `${phDate.getFullYear()}-${String(phDate.getMonth()+1).padStart(2,"0")}-${String(phDate.getDate()).padStart(2,"0")}`;
+    alert("Leave request submitted!");
+    clearForm();
   }catch(err){
-    alert("Error: " + err.message);
+    alert("Error submitting leave: " + err.message);
   }
-});
-
-function formatDateTime(value){
-  const dt = value?.toDate ? value.toDate() : new Date(value || Date.now());
-  return dt.toLocaleString("en-PH", {
-    timeZone:"Asia/Manila",
-    year:"numeric",
-    month:"short",
-    day:"numeric",
-    hour:"2-digit",
-    minute:"2-digit"
-  });
 }
 
-function renderTicketTable(){
-  if(!myLeaves.length){
-    tableBody.innerHTML = `<tr><td colspan="5"><div class="empty-state">No leave records found.</div></td></tr>`;
+function loadLeaves(){
+  db.collection("manager_single_day_leave")
+    .orderBy("date", "asc")
+    .onSnapshot(snapshot => {
+      managerLeaves = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if(data.managerName !== currentUser.name) return;
+        managerLeaves.push({
+          id: doc.id,
+          ...data,
+          submittedAt: data.submittedAt?.toDate ? data.submittedAt.toDate() : new Date(data.submittedAt || Date.now())
+        });
+      });
+
+      renderTable();
+      renderKPIs();
+      renderUpcomingApproved();
+    }, err => {
+      alert("Error loading leaves: " + err.message);
+    });
+}
+
+function loadPlottedLeaves(){
+  db.collection("manager_single_day_leave")
+    .orderBy("date", "asc")
+    .onSnapshot(snapshot => {
+      managerPlottedLeaves = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        managerPlottedLeaves.push({
+          id: doc.id,
+          ...data,
+          submittedAt: data.submittedAt?.toDate ? data.submittedAt.toDate() : new Date(data.submittedAt || Date.now())
+        });
+      });
+
+      const years = managerPlottedLeaves
+        .map(l => parseInt(String(l.date || "").split("-")[0], 10))
+        .filter(Boolean);
+      const today = getPHDateObject();
+      calYear = years.length ? Math.max(today.getFullYear(), ...years) : today.getFullYear();
+      renderCalendar();
+    }, err => {
+      alert("Error loading plotted leaves: " + err.message);
+    });
+}
+
+function renderKPIs(){
+  const total = managerLeaves.length;
+  const pending = managerLeaves.filter(l => l.status === "Pending").length;
+  const approved = managerLeaves.filter(l => l.status === "Approved").length;
+  const todayStr = getPHDateString();
+  const nextApproved = managerLeaves
+    .filter(l => l.status === "Approved" && l.date >= todayStr)
+    .sort((a,b) => a.date.localeCompare(b.date))[0];
+
+  document.getElementById("kpiTotal").textContent = total;
+  document.getElementById("kpiPending").textContent = pending;
+  document.getElementById("kpiApproved").textContent = approved;
+  document.getElementById("kpiNextLeave").textContent = nextApproved ? nextApproved.date : "-";
+}
+
+function renderUpcomingApproved(){
+  const box = document.getElementById("upcomingApprovedList");
+  const todayStr = getPHDateString();
+  const items = managerLeaves
+    .filter(l => l.status === "Approved" && l.date >= todayStr)
+    .sort((a,b) => a.date.localeCompare(b.date))
+    .slice(0,3);
+
+  if(!items.length){
+    box.innerHTML = `<div class="schedule-empty">No upcoming approved leave yet.</div>`;
     return;
   }
 
-  tableBody.innerHTML = myLeaves.map(l => `
+  const initials = getInitials(currentUser.name);
+  box.innerHTML = items.map(l => `
+    <div class="schedule-item">
+      <div class="schedule-left">
+        <div class="schedule-avatar">${initials}</div>
+        <div>
+          <div class="schedule-name">${escapeHtml(l.type)}</div>
+          <div class="schedule-meta">${escapeHtml(l.date)} · ${escapeHtml(l.reason || "-")}</div>
+        </div>
+      </div>
+      <div class="schedule-badge status-chip approved">Approved</div>
+    </div>
+  `).join("");
+}
+
+function renderTable(){
+  if(!managerLeaves.length){
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="6"><div class="empty-state">No leave tickets found yet.</div></td>
+      </tr>
+    `;
+    return;
+  }
+
+  const sorted = [...managerLeaves].sort((a,b) => {
+    if(a.date === b.date) return (b.submittedAt || 0) - (a.submittedAt || 0);
+    return b.date.localeCompare(a.date);
+  });
+
+  tableBody.innerHTML = sorted.map(l => `
     <tr>
       <td>${escapeHtml(l.type || "-")}</td>
       <td>${escapeHtml(l.date || "-")}</td>
-      <td class="reason-col">${escapeHtml(l.reason || "-")}</td>
-      <td><span class="status-chip status-${escapeHtml(l.status || "Pending")}">${escapeHtml(l.status || "Pending")}</span></td>
-      <td>${escapeHtml(formatDateTime(l.submittedAt))}</td>
+      <td class="reason-cell">${escapeHtml(l.reason || "-")}</td>
+      <td><span class="status-chip ${getStatusClass(l.status)}">${escapeHtml(l.status || "-")}</span></td>
+      <td class="reason-cell">${escapeHtml(l.notes ? l.notes : (l.status === "Rejected" ? "No note provided" : "-"))}</td>
+      <td>${formatDateTime(l.submittedAt)}</td>
     </tr>
   `).join("");
 }
 
-function updateKpis(){
-  const now = new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Manila"}));
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
-  const todayStr = `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
-
-  const pending = myLeaves.filter(l => (l.status || "") === "Pending").length;
-  const approved = myLeaves.filter(l => {
-    const dt = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
-    return (l.status || "") === "Approved" && dt.getFullYear() === currentYear;
-  }).length;
-  const monthCount = myLeaves.filter(l => {
-    if(!l.date) return false;
-    const [y,m] = l.date.split("-").map(Number);
-    return y === currentYear && (m-1) === currentMonth;
-  }).length;
-  const todayCount = managerLeaves.filter(l => l.date === todayStr).length;
-
-  document.getElementById("kpiPending").textContent = pending;
-  document.getElementById("kpiApproved").textContent = approved;
-  document.getElementById("kpiMonth").textContent = monthCount;
-  document.getElementById("kpiToday").textContent = todayCount;
-}
-
-function showTooltipForLeaves(leaves, x, y){
-  if(!leaves || !leaves.length) return;
-  tooltipEl.innerHTML = `
-    <h4>Leave details</h4>
-    ${leaves.map(l => `
-      <div class="leave-item">
-        <strong>${escapeHtml(l.managerName || "Manager")}</strong><br>
-        Type: ${escapeHtml(l.type || "-")}<br>
-        Date: ${escapeHtml(l.date || "-")}<br>
-        Reason: ${escapeHtml(l.reason || "-")}<br>
-        Status: <span class="${escapeHtml(l.status || "Pending")}">${escapeHtml(l.status || "Pending")}</span>
-      </div>
-    `).join("")}
-  `;
-  tooltipEl.style.display = "block";
-  tooltipEl.style.left = Math.min(x + 14, window.innerWidth - 340) + "px";
-  tooltipEl.style.top = Math.min(y + 14, window.innerHeight - 240) + "px";
-}
-
-function hideTooltip(){
-  tooltipEl.style.display = "none";
-}
-
-document.addEventListener("mousemove", (e)=>{
-  if(tooltipEl.style.display === "block"){
-    tooltipEl.style.left = Math.min(e.clientX + 14, window.innerWidth - 340) + "px";
-    tooltipEl.style.top = Math.min(e.clientY + 14, window.innerHeight - 240) + "px";
+function getStatusClass(status){
+  switch(status){
+    case "Approved": return "approved";
+    case "Rejected": return "rejected";
+    case "Cancelled": return "cancelled";
+    default: return "pending";
   }
-});
+}
+
+function renderCalendar(){
+  if(viewMode === "month") renderMonth();
+  else renderYear();
+}
 
 function renderMonth(){
   const container = document.getElementById("calendarContainer");
   container.className = "calendar";
   container.innerHTML = "";
+  const oldLegend = document.getElementById("calendarLegend");
+  if(oldLegend) oldLegend.remove();
 
   const first = new Date(calYear, calMonth, 1);
   const days = new Date(calYear, calMonth + 1, 0).getDate();
   const start = first.getDay();
-  document.getElementById("calendarLabel").textContent = first.toLocaleString("default",{month:"long"}) + " " + calYear;
+  document.getElementById("calendarLabel").textContent = first.toLocaleString("default", { month: "long" }) + " " + calYear;
 
-  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d => {
     const h = document.createElement("div");
     h.className = "cal-header";
     h.textContent = d;
     container.appendChild(h);
   });
 
-  for(let i=0; i<start; i++) container.appendChild(document.createElement("div"));
+  for(let i = 0; i < start; i++) container.appendChild(document.createElement("div"));
 
-  for(let d=1; d<=days; d++){
+  for(let d = 1; d <= days; d++){
     const cell = document.createElement("div");
     cell.className = "cal-cell";
 
-    const dayDiv = document.createElement("div");
-    dayDiv.className = "cal-day";
-    dayDiv.textContent = d;
-    cell.appendChild(dayDiv);
+    const day = document.createElement("div");
+    day.className = "cal-day";
+    day.textContent = d;
+    cell.appendChild(day);
 
-    const stack = document.createElement("div");
-    stack.className = "day-avatar-stack";
+    const fullDate = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const matches = managerPlottedLeaves.filter(l => l.date === fullDate);
 
-    const fullDate = calYear + "-" + String(calMonth + 1).padStart(2,"0") + "-" + String(d).padStart(2,"0");
-    const leavesOnDay = managerLeaves.filter(l => l.date === fullDate);
+    if(matches.length){
+      const stack = document.createElement("div");
+      stack.className = "day-avatar-stack";
 
-    const visibleLeaves = leavesOnDay.slice(0, 8);
-    visibleLeaves.forEach(l => {
-      const wrap = document.createElement("div");
-      wrap.innerHTML = renderAvatarContent(l.managerName || "Manager", (l.managerName === currentUser.name ? "me" : ""));
-      const avatar = wrap.firstElementChild;
-      avatar.addEventListener("mouseenter", (e)=>showTooltipForLeaves([l], e.clientX, e.clientY));
-      avatar.addEventListener("mouseleave", hideTooltip);
-      stack.appendChild(avatar);
-    });
+      matches.slice(0, 8).forEach(l => {
+        const avatar = document.createElement("div");
+        avatar.className = `calendar-mini-avatar ${getStatusClass(l.status)}`;
 
-    if(leavesOnDay.length > visibleLeaves.length){
-      const more = document.createElement("div");
-      more.className = "day-avatar more";
-      more.textContent = "+" + (leavesOnDay.length - visibleLeaves.length);
-      more.addEventListener("mouseenter", (e)=>showTooltipForLeaves(leavesOnDay, e.clientX, e.clientY));
-      more.addEventListener("mouseleave", hideTooltip);
-      stack.appendChild(more);
+        const img = document.createElement("img");
+        img.alt = l.managerName || "Employee";
+        img.style.display = "none";
+
+        const span = document.createElement("span");
+        span.textContent = getInitials(l.managerName || "Employee");
+
+        avatar.appendChild(img);
+        avatar.appendChild(span);
+        applyAvatarImage(img, span, l.managerName || "Employee");
+        avatar.addEventListener("mouseenter", event => showCalendarTooltip(event, matches, fullDate));
+        avatar.addEventListener("mousemove", moveCalendarTooltip);
+        avatar.addEventListener("mouseleave", hideCalendarTooltip);
+        stack.appendChild(avatar);
+      });
+
+      if(matches.length > 8){
+        const more = document.createElement("div");
+        more.className = "calendar-mini-avatar more";
+        more.textContent = `+${matches.length - 8}`;
+        more.addEventListener("mouseenter", event => showCalendarTooltip(event, matches, fullDate));
+        more.addEventListener("mousemove", moveCalendarTooltip);
+        more.addEventListener("mouseleave", hideCalendarTooltip);
+        stack.appendChild(more);
+      }
+
+      cell.appendChild(stack);
     }
 
-    cell.addEventListener("mouseenter", (e)=>{
-      if(leavesOnDay.length) showTooltipForLeaves(leavesOnDay, e.clientX, e.clientY);
-    });
-    cell.addEventListener("mouseleave", hideTooltip);
-
-    cell.appendChild(stack);
     container.appendChild(cell);
   }
 
-  hydrateAllAvatars();
-}
-
-function getDotClass(status){
-  const s = String(status || "").toLowerCase();
-  if(s === "approved") return "approved";
-  if(s === "rejected") return "rejected";
-  if(s === "cancelled") return "cancelled";
-  return "pending";
+  container.insertAdjacentHTML("afterend", `
+    <div class="calendar-legend" id="calendarLegend">
+      <span class="calendar-legend-item"><span class="legend-dot approved"></span>Approved</span>
+      <span class="calendar-legend-item"><span class="legend-dot pending"></span>Pending</span>
+      <span class="calendar-legend-item"><span class="legend-dot rejected"></span>Rejected</span>
+      <span class="calendar-legend-item"><span class="legend-dot cancelled"></span>Cancelled</span>
+    </div>
+  `);
 }
 
 function renderYear(){
   const container = document.getElementById("calendarContainer");
   container.className = "year-view";
   container.innerHTML = "";
+  const oldLegend = document.getElementById("calendarLegend");
+  if(oldLegend) oldLegend.remove();
 
-  for(let m=0; m<12; m++){
+  for(let m = 0; m < 12; m++){
     const monthBox = document.createElement("div");
     monthBox.className = "year-month";
 
-    const title = document.createElement("div");
-    title.className = "year-month-label";
-    title.textContent = new Date(calYear, m, 1).toLocaleString("default", {month:"short"}) + " " + calYear;
-    monthBox.appendChild(title);
+    const label = document.createElement("div");
+    label.className = "year-month-label";
+    label.textContent = `${new Date(calYear, m, 1).toLocaleString("default", { month: "short" })} ${calYear}`;
+    monthBox.appendChild(label);
 
-    const mini = document.createElement("div");
-    mini.className = "mini-grid";
+    const miniGrid = document.createElement("div");
+    miniGrid.className = "mini-grid";
 
-    ["S","M","T","W","T","F","S"].forEach(day=>{
-      const h = document.createElement("div");
-      h.className = "day-cell";
-      h.style.fontWeight = "700";
-      h.style.background = "#4D148C";
-      h.style.color = "#fff";
-      h.textContent = day;
-      mini.appendChild(h);
+    ["S","M","T","W","T","F","S"].forEach(day => {
+      const head = document.createElement("div");
+      head.className = "day-cell";
+      head.style.fontWeight = "700";
+      head.style.background = "#ede9fe";
+      head.textContent = day;
+      miniGrid.appendChild(head);
     });
 
     const first = new Date(calYear, m, 1);
-    const daysInMonth = new Date(calYear, m+1, 0).getDate();
+    const daysInMonth = new Date(calYear, m + 1, 0).getDate();
     const startDay = first.getDay();
 
-    for(let i=0; i<startDay; i++) mini.appendChild(document.createElement("div"));
+    for(let i = 0; i < startDay; i++){
+      miniGrid.appendChild(document.createElement("div"));
+    }
 
-    for(let d=1; d<=daysInMonth; d++){
+    for(let d = 1; d <= daysInMonth; d++){
       const cell = document.createElement("div");
       cell.className = "day-cell";
       cell.textContent = d;
 
-      const fullDate = calYear + "-" + String(m+1).padStart(2,"0") + "-" + String(d).padStart(2,"0");
-      const leavesOnDay = managerLeaves.filter(l => l.date === fullDate);
-
-      if(leavesOnDay.length){
-        const dots = document.createElement("div");
-        dots.className = "day-dots";
-        leavesOnDay.slice(0,4).forEach(l => {
+      const fullDate = `${calYear}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      const matches = managerPlottedLeaves.filter(l => l.date === fullDate);
+      if(matches.length){
+        const dotsWrap = document.createElement("div");
+        dotsWrap.className = "day-dots";
+        const uniq = [...new Set(matches.map(l => String(l.status || "Pending").toLowerCase()))].slice(0,3);
+        uniq.forEach(status => {
           const dot = document.createElement("span");
-          dot.className = "dot " + getDotClass(l.status);
-          dots.appendChild(dot);
+          dot.className = `dot ${status}`;
+          dotsWrap.appendChild(dot);
         });
-        cell.appendChild(dots);
-
-        cell.addEventListener("mouseenter", (e)=>showTooltipForLeaves(leavesOnDay, e.clientX, e.clientY));
-        cell.addEventListener("mouseleave", hideTooltip);
+        cell.appendChild(dotsWrap);
+        cell.style.background = "#faf7ff";
       }
-
-      cell.addEventListener("click", ()=>{
+      cell.addEventListener("click", () => {
         calMonth = m;
         viewMode = "month";
         renderCalendar();
       });
-
-      mini.appendChild(cell);
+      miniGrid.appendChild(cell);
     }
 
-    monthBox.appendChild(mini);
+    monthBox.appendChild(miniGrid);
     container.appendChild(monthBox);
   }
 
   document.getElementById("calendarLabel").textContent = calYear;
 }
 
-function renderCalendar(){
-  if(viewMode === "month") renderMonth();
-  else renderYear();
+function showCalendarTooltip(event, leaves, dateStr){
+  const tooltip = document.getElementById("calendarTooltip");
+  if(!tooltip) return;
+  const sortedLeaves = [...leaves].sort((a,b) => String(a.managerName || "").localeCompare(String(b.managerName || "")));
+  tooltip.innerHTML = `
+    <div class="calendar-tooltip-title">${escapeHtml(dateStr)} · ${sortedLeaves.length} plotted leave${sortedLeaves.length > 1 ? "s" : ""}</div>
+    ${sortedLeaves.map(item => `
+      <div class="calendar-tooltip-item">
+        <div class="calendar-tooltip-name">${escapeHtml(item.managerName || "Employee")}</div>
+        <div class="calendar-tooltip-meta">${escapeHtml(item.type || "-")} · ${escapeHtml(item.reason || "-")}</div>
+        <div class="calendar-tooltip-meta">Notes: ${escapeHtml(item.notes || "-")}</div>
+        <div class="calendar-tooltip-status status-chip ${getStatusClass(item.status)}">${escapeHtml(item.status || "Pending")}</div>
+      </div>
+    `).join("")}
+  `;
+  tooltip.classList.add("show");
+  moveCalendarTooltip(event);
+}
+
+function moveCalendarTooltip(event){
+  const tooltip = document.getElementById("calendarTooltip");
+  if(!tooltip || !tooltip.classList.contains("show")) return;
+  const offset = 18;
+  const maxX = window.innerWidth - tooltip.offsetWidth - 12;
+  const maxY = window.innerHeight - tooltip.offsetHeight - 12;
+  const x = Math.min(event.clientX + offset, Math.max(12, maxX));
+  const y = Math.min(event.clientY + offset, Math.max(12, maxY));
+  tooltip.style.left = `${x}px`;
+  tooltip.style.top = `${y}px`;
+}
+
+function hideCalendarTooltip(){
+  const tooltip = document.getElementById("calendarTooltip");
+  if(tooltip) tooltip.classList.remove("show");
 }
 
 function setViewMode(mode){
@@ -1392,47 +1189,25 @@ function setViewMode(mode){
 }
 
 function changeMonth(dir){
+  if(viewMode === "year"){
+    calYear += dir;
+    renderCalendar();
+    return;
+  }
   calMonth += dir;
-  if(calMonth < 0){
-    calMonth = 11;
-    calYear--;
-  }
-  if(calMonth > 11){
-    calMonth = 0;
-    calYear++;
-  }
+  if(calMonth < 0){ calMonth = 11; calYear--; }
+  if(calMonth > 11){ calMonth = 0; calYear++; }
   renderCalendar();
 }
 
-function syncData(snapshot){
-  managerLeaves = [];
-  myLeaves = [];
-
-  snapshot.forEach(doc => {
-    const l = doc.data();
-    const submittedDate = l.submittedAt?.toDate ? l.submittedAt.toDate() : new Date(l.submittedAt || Date.now());
-    const item = {...l, submittedAt: submittedDate};
-
-    managerLeaves.push(item);
-    if(l.managerName === currentUser.name){
-      myLeaves.push(item);
-    }
-  });
-
-  myLeaves.sort((a,b)=> new Date(b.date || 0) - new Date(a.date || 0));
-  updateKpis();
-  renderTicketTable();
-  renderCalendar();
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
-
-db.collection("manager_single_day_leave")
-  .orderBy("date","asc")
-  .onSnapshot(syncData, err => {
-    alert("Error loading leaves: " + err.message);
-  });
-
-setupUserProfile();
-hydrateAllAvatars();
 </script>
 </body>
 </html>
