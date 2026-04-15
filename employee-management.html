@@ -611,11 +611,23 @@ function getDisplayRole(emp){
     };
   }
 
-  if (
-    cleanEmail === "trevorbarry.imatong@iqor.com" ||
-    cleanEmail === "jonie.kabigting@iqor.com" ||
-    cleanEmail === "vicky.das@iqor.com"
-  ) {
+  if (cleanEmail === "trevorbarry.imatong@iqor.com") {
+    return {
+      value: "super_saiyan_god",
+      label: "Admin Manager",
+      className: "badge-god"
+    };
+  }
+
+  if (cleanEmail === "jonie.kabigting@iqor.com") {
+    return {
+      value: "super_saiyan_god",
+      label: "Manager/Admin Team Leader",
+      className: "badge-god"
+    };
+  }
+
+  if (cleanEmail === "vicky.das@iqor.com") {
     return {
       value: "manager",
       label: "Manager",
@@ -705,6 +717,36 @@ function hydrateEmployeeAvatars(root = document){
   });
 }
 
+function mergeEmployeesByEmail(list){
+  const map = new Map();
+
+  list.forEach(emp => {
+    const emailKey = String(emp.email || "").toLowerCase();
+    if (!emailKey) return;
+
+    if (!map.has(emailKey)) {
+      map.set(emailKey, { ...emp });
+      return;
+    }
+
+    const existing = map.get(emailKey);
+
+    map.set(emailKey, {
+      ...existing,
+      ...emp,
+      name: existing.name || emp.name,
+      email: existing.email || emp.email,
+      roleType:
+        existing.roleType === "manager" || emp.roleType === "manager"
+          ? "manager"
+          : "team_leader",
+      region: normalizeRegion(existing.email || emp.email)
+    });
+  });
+
+  return Array.from(map.values());
+}
+
 async function loadEmployees(){
   try {
     const [tlSnap, mgrSnap] = await Promise.all([
@@ -726,11 +768,11 @@ async function loadEmployees(){
       region: normalizeRegion(doc.data().email)
     }));
 
-    allEmployees = [...teamLeaders, ...managers]
+    const mergedEmployees = mergeEmployeesByEmail([...teamLeaders, ...managers]);
+
+    allEmployees = mergedEmployees
       .filter(emp => !excludedEmails.includes(String(emp.email || "").toLowerCase()))
-      .sort((a,b) => {
-        return String(a.name || "").localeCompare(String(b.name || ""));
-      });
+      .sort((a,b) => String(a.name || "").localeCompare(String(b.name || "")));
 
     renderEmployees();
   } catch (err) {
