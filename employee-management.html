@@ -564,6 +564,10 @@ const indiaEmails = [
   "sohinder.singh1@iqor.com"
 ];
 
+const excludedEmails = [
+  "jake.agdeppa@iqor.com"
+];
+
 function normalizeRegion(email){
   const cleanEmail = String(email || "").toLowerCase();
   return indiaEmails.includes(cleanEmail) ? "India" : "Philippines";
@@ -604,6 +608,18 @@ function getDisplayRole(emp){
       value: "super_saiyan_god",
       label: "Super Saiyan God",
       className: "badge-god"
+    };
+  }
+
+  if (
+    cleanEmail === "trevorbarry.imatong@iqor.com" ||
+    cleanEmail === "jonie.kabigting@iqor.com" ||
+    cleanEmail === "vicky.das@iqor.com"
+  ) {
+    return {
+      value: "manager",
+      label: "Manager",
+      className: "badge-manager"
     };
   }
 
@@ -710,9 +726,11 @@ async function loadEmployees(){
       region: normalizeRegion(doc.data().email)
     }));
 
-    allEmployees = [...teamLeaders, ...managers].sort((a,b) => {
-      return String(a.name || "").localeCompare(String(b.name || ""));
-    });
+    allEmployees = [...teamLeaders, ...managers]
+      .filter(emp => !excludedEmails.includes(String(emp.email || "").toLowerCase()))
+      .sort((a,b) => {
+        return String(a.name || "").localeCompare(String(b.name || ""));
+      });
 
     renderEmployees();
   } catch (err) {
