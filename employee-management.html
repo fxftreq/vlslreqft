@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>FedEx Leave System - Employee Management</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --primary:#4D148C;
+  --primary-dark:#3b0f70;
+  --accent:#FF6600;
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --success:#16a34a;
+  --warning:#f59e0b;
+  --danger:#dc2626;
+  --shadow:0 10px 30px rgba(15,23,42,.08);
+  --radius:22px;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.shell{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  min-height:100vh;
+}
+.sidebar{
+  background:#fff;
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+.logo-only-head{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 8px;
+  border-bottom:1px solid var(--border);
+  background:#fff;
+}
+.sidebar-fedex-logo{
+  display:block;
+  width:100%;
+  max-width:250px;
+  max-height:96px;
+  height:auto;
+  object-fit:contain;
+}
+.nav{
+  padding:16px;
+  display:grid;
+  gap:10px;
+}
+.nav-btn{
+  width:100%;
+  text-align:left;
+  border:none;
+  background:transparent;
+  padding:14px 16px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:var(--muted);
+  font-weight:700;
+  cursor:pointer;
+  transition:.18s ease;
+}
+.nav-btn:hover{background:#f8fafc;color:var(--text)}
+.nav-btn.active{
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+  box-shadow:0 12px 24px rgba(77,20,140,.22);
+}
+.sidebar-foot{
+  margin-top:auto;
+  padding:16px;
+  border-top:1px solid var(--border);
+}
+.trial-box{
+  padding:16px;
+  border-radius:18px;
+  background:#f8fafc;
+  border:1px solid var(--border);
+}
+.trial-box h4{margin:0 0 6px;color:var(--primary)}
+.trial-box p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+
+.app-main{min-width:0}
+
+.app-header{
+  position:sticky;
+  top:0;
+  z-index:30;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.app-header-inner{
+  min-height:76px;
+  padding:0 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.header-title small{
+  display:block;
+  color:var(--muted);
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.header-title h2{
+  margin:4px 0 0;
+  font-size:28px;
+  color:var(--text);
+}
+.content{padding:24px}
+.page-intro{
+  margin-bottom:20px;
+}
+.page-intro h1{
+  margin:0;
+  font-size:32px;
+  color:var(--primary);
+}
+.page-intro p{
+  margin:8px 0 0;
+  color:var(--muted);
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.card-header{
+  padding:20px 22px;
+  border-bottom:1px solid var(--border);
+  background:#fff;
+}
+.card-title{
+  margin:0;
+  font-size:20px;
+  color:var(--text);
+}
+.card-subtitle{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:14px;
+}
+.card-body{padding:20px 22px}
+
+.toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.search-box{
+  position:relative;
+  min-width:280px;
+}
+.search-box i{
+  position:absolute;
+  left:12px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--muted);
+}
+.input,.select{
+  width:100%;
+  min-height:44px;
+  padding:0 14px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--text);
+  outline:none;
+}
+.search-box .input{
+  padding-left:38px;
+}
+
+.filters-row{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.table-wrap{
+  width:100%;
+  overflow:auto;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:980px;
+}
+thead th{
+  text-align:left;
+  font-size:13px;
+  color:#475569;
+  padding:14px 12px;
+  border-bottom:1px solid var(--border);
+  background:#fafafa;
+}
+tbody td{
+  padding:14px 12px;
+  border-bottom:1px solid #f1f5f9;
+  vertical-align:middle;
+  font-size:14px;
+}
+tbody tr:hover{background:#fcfcff}
+
+.employee-cell{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+}
+.employee-avatar{
+  width:38px;
+  height:38px;
+  min-width:38px;
+  border-radius:50%;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+  font-size:12px;
+  font-weight:800;
+  box-shadow:0 6px 14px rgba(77,20,140,.18);
+  flex:0 0 auto;
+}
+.employee-meta{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+.employee-name{
+  font-weight:700;
+  color:var(--text);
+  line-height:1.2;
+}
+.employee-sub{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:12px;
+}
+.badge-ph{background:#f3f0ff;color:#4D148C}
+.badge-india{background:#fff7ed;color:#c2410c}
+.badge-manager{background:#eff6ff;color:#1d4ed8}
+.badge-team{background:#ecfdf5;color:#15803d}
+
+.action-group{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.btn{
+  border:none;
+  min-height:38px;
+  padding:0 14px;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.18s ease;
+}
+.btn-reset{
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;
+}
+.btn-reset:hover{transform:translateY(-1px)}
+.btn-copy{
+  background:#fff;
+  color:var(--primary);
+  border:1px solid var(--border);
+}
+.btn-copy:hover{background:#faf7ff}
+
+.empty-state{
+  padding:28px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.page-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  padding:20px 0 8px;
+}
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  z-index:999;
+  justify-content:center;
+  align-items:center;
+  padding:16px;
+}
+.modal.show{
+  display:flex;
+}
+.modal-card{
+  width:100%;
+  max-width:460px;
+  background:#fff;
+  border-radius:22px;
+  box-shadow:0 18px 40px rgba(0,0,0,.18);
+  overflow:hidden;
+}
+.modal-head{
+  padding:20px 22px;
+  border-bottom:1px solid var(--border);
+}
+.modal-body{
+  padding:20px 22px;
+}
+.password-box{
+  margin-top:14px;
+  padding:16px;
+  border-radius:16px;
+  background:#f8fafc;
+  border:1px dashed var(--border);
+}
+.password-value{
+  font-size:24px;
+  font-weight:800;
+  color:var(--primary);
+  word-break:break-word;
+}
+.modal-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:16px;
+}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .content{padding:16px}
+}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-head logo-only-head">
+      <img src="fedex-logo1.png" alt="FedEx Logo" class="sidebar-fedex-logo">
+    </div>
+
+    <div class="nav">
+      <button class="nav-btn" onclick="location.href='admin.html'">
+        <i class="fa-solid fa-house"></i> Dashboard
+      </button>
+      <button class="nav-btn">
+        <i class="fa-regular fa-calendar"></i> Leave Requests
+      </button>
+      <button class="nav-btn">
+        <i class="fa-solid fa-table"></i> Views
+      </button>
+      <button class="nav-btn">
+        <i class="fa-solid fa-location-dot"></i> Region Control
+      </button>
+      <button class="nav-btn">
+        <i class="fa-solid fa-file-export"></i> Reports
+      </button>
+      <button class="nav-btn active">
+        <i class="fa-solid fa-users-gear"></i> Employee Management
+      </button>
+    </div>
+
+    <div class="sidebar-foot">
+      <div class="trial-box">
+        <h4>Employee Management</h4>
+        <p>Search users, review role assignments, and reset temporary passwords in one place.</p>
+      </div>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <header class="app-header">
+      <div class="app-header-inner">
+        <div class="header-title">
+          <small>Administration</small>
+          <h2>Employee Management</h2>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="page-intro">
+        <h1>Employee Management</h1>
+        <p>Manage employee access and issue temporary passwords for login recovery.</p>
+      </div>
+
+      <section class="card">
+        <div class="card-header">
+          <div class="toolbar">
+            <div>
+              <h3 class="card-title">All Employees</h3>
+              <p class="card-subtitle">This page is only visible to the primary admin.</p>
+            </div>
+
+            <div class="filters-row">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input class="input" id="employeeSearch" placeholder="Search name or email" oninput="renderEmployees()">
+              </div>
+
+              <select id="roleFilter" class="select" style="width:180px;" onchange="renderEmployees()">
+                <option value="All">All Roles</option>
+                <option value="team_leader">Team Leader</option>
+                <option value="manager">Manager</option>
+              </select>
+
+              <select id="regionFilter" class="select" style="width:180px;" onchange="renderEmployees()">
+                <option value="All">All Regions</option>
+                <option value="Philippines">Philippines</option>
+                <option value="India">India</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Region</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="employeeTableBody">
+                <tr>
+                  <td colspan="5" class="empty-state">Loading employees...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <div class="page-footer">© FedEx 2026</div>
+    </div>
+  </main>
+</div>
+
+<div class="modal" id="passwordModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 style="margin:0;color:#111827;">Temporary Password Generated</h3>
+    </div>
+    <div class="modal-body">
+      <div id="passwordModalText" style="color:#6b7280;"></div>
+
+      <div class="password-box">
+        <div class="password-value" id="generatedPassword">-</div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-copy" onclick="copyGeneratedPassword()">Copy Password</button>
+        <button class="btn btn-reset" onclick="closePasswordModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+  authDomain:"fedex-attendance-system.firebaseapp.com",
+  projectId:"fedex-attendance-system"
+});
+
+const db = firebase.firestore();
+const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+
+if (!currentUser) {
+  alert("Please login first");
+  location.href = "index.html";
+}
+
+if (String(currentUser?.email || "").toLowerCase() !== "julanguinto@gmail.com") {
+  alert("You are not authorized to access this page.");
+  location.href = "admin.html";
+}
+
+let allEmployees = [];
+let currentGeneratedPassword = "";
+
+function normalizeRegion(email){
+  return String(email || "").includes("@") ? "India" : "Philippines";
+}
+
+function createEmployeeCell(name, subText = ""){
+  const safeName = name || "-";
+  const initials = safeName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0,2)
+    .map(v => v[0]?.toUpperCase() || "")
+    .join("") || "A";
+
+  return `
+    <div class="employee-cell">
+      <div class="employee-avatar">${initials}</div>
+      <div class="employee-meta">
+        <div class="employee-name">${safeName}</div>
+        <div class="employee-sub">${subText || "-"}</div>
+      </div>
+    </div>
+  `;
+}
+
+async function loadEmployees(){
+  try {
+    const [tlSnap, mgrSnap] = await Promise.all([
+      db.collection("leave_users").get(),
+      db.collection("manager_leave_user").get()
+    ]);
+
+    const teamLeaders = tlSnap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      roleType: "team_leader",
+      region: normalizeRegion(doc.data().email)
+    }));
+
+    const managers = mgrSnap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      roleType: "manager",
+      region: normalizeRegion(doc.data().email)
+    }));
+
+    allEmployees = [...teamLeaders, ...managers].sort((a,b) => {
+      return String(a.name || "").localeCompare(String(b.name || ""));
+    });
+
+    renderEmployees();
+  } catch (err) {
+    console.error(err);
+    document.getElementById("employeeTableBody").innerHTML = `
+      <tr><td colspan="5" class="empty-state">Failed to load employees.</td></tr>
+    `;
+  }
+}
+
+function renderEmployees(){
+  const tbody = document.getElementById("employeeTableBody");
+  const search = String(document.getElementById("employeeSearch").value || "").trim().toLowerCase();
+  const roleFilter = document.getElementById("roleFilter").value;
+  const regionFilter = document.getElementById("regionFilter").value;
+
+  let data = [...allEmployees];
+
+  if (search) {
+    data = data.filter(emp => {
+      const blob = [
+        emp.name,
+        emp.email,
+        emp.roleType,
+        emp.region
+      ].join(" ").toLowerCase();
+      return blob.includes(search);
+    });
+  }
+
+  if (roleFilter !== "All") {
+    data = data.filter(emp => emp.roleType === roleFilter);
+  }
+
+  if (regionFilter !== "All") {
+    data = data.filter(emp => emp.region === regionFilter);
+  }
+
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No employees found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map(emp => `
+    <tr>
+      <td>${createEmployeeCell(emp.name || "-", emp.region || "-")}</td>
+      <td>${emp.email || "-"}</td>
+      <td>
+        <span class="badge ${emp.roleType === "manager" ? "badge-manager" : "badge-team"}">
+          ${emp.roleType === "manager" ? "Manager" : "Team Leader"}
+        </span>
+      </td>
+      <td>
+        <span class="badge ${emp.region === "India" ? "badge-india" : "badge-ph"}">
+          ${emp.region}
+        </span>
+      </td>
+      <td>
+        <div class="action-group">
+          <button class="btn btn-reset" onclick="resetUserPassword('${String(emp.email || "").replace(/'/g, "\\'")}')">
+            Reset Password
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+}
+
+async function resetUserPassword(email) {
+  if (String(currentUser?.email || "").toLowerCase() !== "julanguinto@gmail.com") {
+    alert("You are not allowed to reset passwords.");
+    return;
+  }
+
+  if (!confirm(`Reset password for ${email}?`)) return;
+
+  try {
+    const res = await fetch("http://localhost:3000/reset-password", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        requestedBy: currentUser.email
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || "Failed to reset password.");
+
+    currentGeneratedPassword = data.tempPassword;
+    document.getElementById("passwordModalText").textContent = `Temporary password for ${email}`;
+    document.getElementById("generatedPassword").textContent = data.tempPassword;
+    document.getElementById("passwordModal").classList.add("show");
+
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+}
+
+async function copyGeneratedPassword(){
+  if (!currentGeneratedPassword) return;
+  await navigator.clipboard.writeText(currentGeneratedPassword);
+  alert("Temporary password copied.");
+}
+
+function closePasswordModal(){
+  document.getElementById("passwordModal").classList.remove("show");
+}
+
+loadEmployees();
+</script>
+
+</body>
+</html>
