@@ -19,6 +19,7 @@
   --success:#16a34a;
   --warning:#f59e0b;
   --danger:#dc2626;
+  --danger-dark:#b91c1c;
   --shadow:0 10px 30px rgba(15,23,42,.08);
   --radius:22px;
 }
@@ -254,6 +255,19 @@ tbody tr:hover{background:#fcfcff}
   box-shadow:0 6px 14px rgba(77,20,140,.18);
   flex:0 0 auto;
 }
+.employee-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.employee-avatar span{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:100%;
+}
 .employee-meta{
   min-width:0;
   display:flex;
@@ -283,7 +297,10 @@ tbody tr:hover{background:#fcfcff}
 .badge-india{background:#fff7ed;color:#c2410c}
 .badge-manager{background:#eff6ff;color:#1d4ed8}
 .badge-team{background:#ecfdf5;color:#15803d}
-.badge-god{background:#111827;color:#fff}
+.badge-god{
+  background:#111827;
+  color:#fff;
+}
 
 .action-group{
   display:flex;
@@ -300,12 +317,14 @@ tbody tr:hover{background:#fcfcff}
   transition:.18s ease;
 }
 .btn-reset{
-  background:#dc2626;
+  background:var(--danger);
   color:#fff;
+  box-shadow:0 8px 18px rgba(220,38,38,.18);
 }
 .btn-reset:hover{
-  background:#b91c1c;
+  background:var(--danger-dark);
   transform:translateY(-1px);
+  box-shadow:0 10px 22px rgba(185,28,28,.24);
 }
 .btn-copy{
   background:#fff;
@@ -451,8 +470,9 @@ tbody tr:hover{background:#fcfcff}
                 <input class="input" id="employeeSearch" placeholder="Search name or email" oninput="renderEmployees()">
               </div>
 
-              <select id="roleFilter" class="select" style="width:180px;" onchange="renderEmployees()">
+              <select id="roleFilter" class="select" style="width:210px;" onchange="renderEmployees()">
                 <option value="All">All Roles</option>
+                <option value="super_saiyan_god">Super Saiyan God</option>
                 <option value="team_leader">Team Leader</option>
                 <option value="manager">Manager</option>
               </select>
@@ -549,24 +569,54 @@ function normalizeRegion(email){
   return indiaEmails.includes(cleanEmail) ? "India" : "Philippines";
 }
 
+function sanitizeProfileFileName(name){
+  return String(name || "")
+    .trim()
+    .replace(/[\\/:*?"<>|]/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function getProfilePictureCandidates(name){
+  const clean = sanitizeProfileFileName(name);
+  if(!clean) return [];
+
+  const dotName = clean.replace(/\s+/g, ".");
+  const spaceName = clean;
+  const extensions = ["jpg", "jpeg", "png", "JPG", "JPEG", "PNG"];
+  const folders = ["Profile Pictures", "Profile%20Pictures"];
+  const candidates = [];
+
+  folders.forEach(folder => {
+    extensions.forEach(ext => {
+      candidates.push(`${folder}/${dotName}.${ext}`);
+      if(spaceName !== dotName) candidates.push(`${folder}/${spaceName}.${ext}`);
+    });
+  });
+
+  return [...new Set(candidates)];
+}
+
 function getDisplayRole(emp){
   const cleanEmail = String(emp.email || "").toLowerCase();
 
   if (cleanEmail === "julanguinto@gmail.com") {
     return {
-      label: "God",
+      value: "super_saiyan_god",
+      label: "Super Saiyan God",
       className: "badge-god"
     };
   }
 
   if (emp.roleType === "manager") {
     return {
+      value: "manager",
       label: "Manager",
       className: "badge-manager"
     };
   }
 
   return {
+    value: "team_leader",
     label: "Team Leader",
     className: "badge-team"
   };
@@ -581,15 +631,62 @@ function createEmployeeCell(name, subText = ""){
     .map(v => v[0]?.toUpperCase() || "")
     .join("") || "A";
 
+  const candidates = JSON.stringify(getProfilePictureCandidates(safeName));
+
   return `
     <div class="employee-cell">
-      <div class="employee-avatar">${initials}</div>
+      <div class="employee-avatar">
+        <img src="" alt="${safeName}" style="display:none;" data-candidates='${candidates}'>
+        <span>${initials}</span>
+      </div>
       <div class="employee-meta">
         <div class="employee-name">${safeName}</div>
         <div class="employee-sub">${subText || "-"}</div>
       </div>
     </div>
   `;
+}
+
+function hydrateEmployeeAvatars(root = document){
+  const images = root.querySelectorAll('.employee-avatar img[data-candidates]');
+
+  images.forEach(img => {
+    if(img.dataset.loaded === "1") return;
+    img.dataset.loaded = "1";
+
+    const fallback = img.nextElementSibling;
+    let candidates = [];
+
+    try {
+      candidates = JSON.parse(img.dataset.candidates || "[]");
+    } catch(err) {
+      candidates = [];
+    }
+
+    let index = 0;
+
+    function tryNext(){
+      if(index >= candidates.length){
+        img.style.display = "none";
+        if(fallback) fallback.style.display = "flex";
+        return;
+      }
+
+      const path = candidates[index++];
+      const testImg = new Image();
+
+      testImg.onload = function(){
+        img.src = path;
+        img.style.display = "block";
+        if(fallback) fallback.style.display = "none";
+      };
+
+      testImg.onerror = tryNext;
+      testImg.src = path;
+    }
+
+    tryNext();
+  });
 }
 
 async function loadEmployees(){
@@ -636,20 +733,21 @@ function renderEmployees(){
 
   if (search) {
     data = data.filter(emp => {
-      const displayRole = getDisplayRole(emp).label.toLowerCase();
+      const displayRole = getDisplayRole(emp);
       const blob = [
         emp.name,
         emp.email,
         emp.roleType,
         emp.region,
-        displayRole
+        displayRole.label,
+        displayRole.value
       ].join(" ").toLowerCase();
       return blob.includes(search);
     });
   }
 
   if (roleFilter !== "All") {
-    data = data.filter(emp => emp.roleType === roleFilter);
+    data = data.filter(emp => getDisplayRole(emp).value === roleFilter);
   }
 
   if (regionFilter !== "All") {
@@ -688,6 +786,8 @@ function renderEmployees(){
       </tr>
     `;
   }).join("");
+
+  hydrateEmployeeAvatars(tbody);
 }
 
 async function resetUserPassword(email) {
