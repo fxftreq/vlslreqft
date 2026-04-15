@@ -283,6 +283,7 @@ tbody tr:hover{background:#fcfcff}
 .badge-india{background:#fff7ed;color:#c2410c}
 .badge-manager{background:#eff6ff;color:#1d4ed8}
 .badge-team{background:#ecfdf5;color:#15803d}
+.badge-god{background:#111827;color:#fff}
 
 .action-group{
   display:flex;
@@ -299,10 +300,13 @@ tbody tr:hover{background:#fcfcff}
   transition:.18s ease;
 }
 .btn-reset{
-  background:linear-gradient(135deg,var(--primary),var(--accent));
+  background:#dc2626;
   color:#fff;
 }
-.btn-reset:hover{transform:translateY(-1px)}
+.btn-reset:hover{
+  background:#b91c1c;
+  transform:translateY(-1px);
+}
 .btn-copy{
   background:#fff;
   color:var(--primary);
@@ -532,8 +536,40 @@ if (String(currentUser?.email || "").toLowerCase() !== "julanguinto@gmail.com") 
 let allEmployees = [];
 let currentGeneratedPassword = "";
 
+const indiaEmails = [
+  "vicky.das@iqor.com",
+  "mohd.fahad@iqor.com",
+  "prince.singh3@iqor.com",
+  "rishabh.kumar5@iqor.com",
+  "sohinder.singh1@iqor.com"
+];
+
 function normalizeRegion(email){
-  return String(email || "").includes("@") ? "India" : "Philippines";
+  const cleanEmail = String(email || "").toLowerCase();
+  return indiaEmails.includes(cleanEmail) ? "India" : "Philippines";
+}
+
+function getDisplayRole(emp){
+  const cleanEmail = String(emp.email || "").toLowerCase();
+
+  if (cleanEmail === "julanguinto@gmail.com") {
+    return {
+      label: "God",
+      className: "badge-god"
+    };
+  }
+
+  if (emp.roleType === "manager") {
+    return {
+      label: "Manager",
+      className: "badge-manager"
+    };
+  }
+
+  return {
+    label: "Team Leader",
+    className: "badge-team"
+  };
 }
 
 function createEmployeeCell(name, subText = ""){
@@ -600,11 +636,13 @@ function renderEmployees(){
 
   if (search) {
     data = data.filter(emp => {
+      const displayRole = getDisplayRole(emp).label.toLowerCase();
       const blob = [
         emp.name,
         emp.email,
         emp.roleType,
-        emp.region
+        emp.region,
+        displayRole
       ].join(" ").toLowerCase();
       return blob.includes(search);
     });
@@ -623,29 +661,33 @@ function renderEmployees(){
     return;
   }
 
-  tbody.innerHTML = data.map(emp => `
-    <tr>
-      <td>${createEmployeeCell(emp.name || "-", emp.region || "-")}</td>
-      <td>${emp.email || "-"}</td>
-      <td>
-        <span class="badge ${emp.roleType === "manager" ? "badge-manager" : "badge-team"}">
-          ${emp.roleType === "manager" ? "Manager" : "Team Leader"}
-        </span>
-      </td>
-      <td>
-        <span class="badge ${emp.region === "India" ? "badge-india" : "badge-ph"}">
-          ${emp.region}
-        </span>
-      </td>
-      <td>
-        <div class="action-group">
-          <button class="btn btn-reset" onclick="resetUserPassword('${String(emp.email || "").replace(/'/g, "\\'")}')">
-            Reset Password
-          </button>
-        </div>
-      </td>
-    </tr>
-  `).join("");
+  tbody.innerHTML = data.map(emp => {
+    const displayRole = getDisplayRole(emp);
+
+    return `
+      <tr>
+        <td>${createEmployeeCell(emp.name || "-", emp.region || "-")}</td>
+        <td>${emp.email || "-"}</td>
+        <td>
+          <span class="badge ${displayRole.className}">
+            ${displayRole.label}
+          </span>
+        </td>
+        <td>
+          <span class="badge ${emp.region === "India" ? "badge-india" : "badge-ph"}">
+            ${emp.region}
+          </span>
+        </td>
+        <td>
+          <div class="action-group">
+            <button class="btn btn-reset" onclick="resetUserPassword('${String(emp.email || "").replace(/'/g, "\\'")}')">
+              Reset Password
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
 }
 
 async function resetUserPassword(email) {
