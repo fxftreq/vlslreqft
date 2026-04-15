@@ -160,18 +160,19 @@ loginBtn.addEventListener("click", async () => {
     }
 
     // Force password change
-if (userData.forcePasswordChange === true) {
-  localStorage.setItem("currentUser", JSON.stringify({
-    id: user.uid,
-    email: user.email,
-    name: userData.name,
-    role: role,
-    forcePasswordChange: true
-  }));
+    if (userData.forcePasswordChange === true) {
+      localStorage.setItem("currentUser", JSON.stringify({
+        id: user.uid,
+        email: user.email,
+        name: userData.name,
+        role: role,
+        loginType: loginType,
+        forcePasswordChange: true
+      }));
 
-  location.href = "change-password.html";
-  return;
-}
+      location.href = "change-password.html";
+      return;
+    }
 
     // SuperAdmin routing (case-insensitive)
     if(superAdmins.some(a => a.toLowerCase() === email.toLowerCase())){
@@ -179,7 +180,8 @@ if (userData.forcePasswordChange === true) {
         id: user.uid,
         email: user.email,
         name: userData.name,
-        role: role
+        role: role,
+        loginType: loginType
       }));
       if(loginType==="team_leader") location.href = "admin.html";
       else if(loginType==="manager") location.href = "manager-admin.html";
@@ -193,7 +195,8 @@ if (userData.forcePasswordChange === true) {
           id: user.uid,
           email: user.email,
           name: userData.name,
-          role: role
+          role: role,
+          loginType: loginType
         }));
         location.href = "admin.html";
         return;
@@ -207,7 +210,8 @@ if (userData.forcePasswordChange === true) {
         id: user.uid,
         email: user.email,
         name: userData.name,
-        role: role
+        role: role,
+        loginType: loginType
       }));
       location.href = "employee.html";
       return;
@@ -224,7 +228,8 @@ if (userData.forcePasswordChange === true) {
         id: user.uid,
         email: user.email,
         name: userData.name,
-        role: role
+        role: role,
+        loginType: loginType
       }));
       if(superAdmins.some(a => a.toLowerCase() === email.toLowerCase())){
         location.href = "manager-admin.html";
