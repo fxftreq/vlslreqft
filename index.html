@@ -159,6 +159,20 @@ loginBtn.addEventListener("click", async () => {
       return;
     }
 
+    // Force password change
+if (userData.forcePasswordChange === true) {
+  localStorage.setItem("currentUser", JSON.stringify({
+    id: user.uid,
+    email: user.email,
+    name: userData.name,
+    role: role,
+    forcePasswordChange: true
+  }));
+
+  location.href = "change-password.html";
+  return;
+}
+
     // SuperAdmin routing (case-insensitive)
     if(superAdmins.some(a => a.toLowerCase() === email.toLowerCase())){
       localStorage.setItem("currentUser", JSON.stringify({
