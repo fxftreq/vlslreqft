@@ -1257,13 +1257,31 @@ button.cancel{background:#6b7280}
       <img src="fedex-logo1.png" alt="FedEx Logo" class="sidebar-fedex-logo">
     </div>
 
-    <div class="nav">
-      <button class="nav-btn active"><i class="fa-solid fa-house"></i> Dashboard</button>
-      <button class="nav-btn"><i class="fa-regular fa-calendar"></i> Leave Requests</button>
-      <button class="nav-btn"><i class="fa-solid fa-table"></i> Views</button>
-      <button class="nav-btn"><i class="fa-solid fa-location-dot"></i> Region Control</button>
-      <button class="nav-btn"><i class="fa-solid fa-file-export"></i> Reports</button>
-    </div>
+<div class="nav" id="sidebarNav">
+  <button class="nav-btn active" onclick="location.href='admin.html'">
+    <i class="fa-solid fa-house"></i> Dashboard
+  </button>
+
+  <button class="nav-btn">
+    <i class="fa-regular fa-calendar"></i> Leave Requests
+  </button>
+
+  <button class="nav-btn">
+    <i class="fa-solid fa-table"></i> Views
+  </button>
+
+  <button class="nav-btn">
+    <i class="fa-solid fa-location-dot"></i> Region Control
+  </button>
+
+  <button class="nav-btn">
+    <i class="fa-solid fa-file-export"></i> Reports
+  </button>
+
+  <button class="nav-btn" id="employeeManagementBtn" style="display:none;" onclick="location.href='employee-management.html'">
+    <i class="fa-solid fa-users-gear"></i> Employee Management
+  </button>
+</div>
 
 <div class="sidebar-foot">
   <div class="trial-box">
@@ -1629,6 +1647,16 @@ const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 if(!currentUser){
   alert("Please login first");
   location.href = "index.html";
+}
+  
+  const isJulAdmin =
+  String(currentUser?.email || "").toLowerCase() === "julanguinto@gmail.com";
+
+if (isJulAdmin) {
+  const employeeManagementBtn = document.getElementById("employeeManagementBtn");
+  if (employeeManagementBtn) {
+    employeeManagementBtn.style.display = "flex";
+  }
 }
 
 setupProfileAvatar();
