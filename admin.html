@@ -1855,8 +1855,26 @@ let calendarMonth = phNow.getMonth();
 let calendarYear = phNow.getFullYear();
 let calendarMode = "month";
 
-function normalizeRegion(employeeId){
-  return String(employeeId || "").includes("@") ? "India" : "Philippines";
+function normalizeRegionValue(value){
+  const v = String(value || "").trim().toLowerCase();
+  if(!v) return "";
+
+  if(["india","in","ind"].includes(v))               return "India";
+  if(["philippines","ph","philippine","phl"].includes(v)) return "Philippines";
+
+  return ""; // unknown — let caller decide fallback
+}
+
+function resolveRegion(docData){
+  // 1) Prefer the explicit region field on the leave document
+  const fromField = normalizeRegionValue(docData.region);
+  if(fromField) return fromField;
+
+  // 2) Fallback: email-like employeeId => India
+  if(String(docData.employeeId || "").includes("@")) return "India";
+
+  // 3) Default
+  return "Philippines";
 }
 
 function normalizeLeaveDate(value){
@@ -1877,9 +1895,10 @@ function getFilteredData() {
 
   let data = [...cachedRequests];
 
-  if (region !== "All") {
-    data = data.filter(r => r.region === region);
-  }
+if (region !== "All") {
+  const target = region.toLowerCase();
+  data = data.filter(r => String(r.region || "").toLowerCase() === target);
+}
 
   if (status !== "All") data = data.filter(r => r.status === status);
 
@@ -1922,11 +1941,14 @@ async function loadRequests() {
   try {
     const snapshot = await db.collection("single_day_leave").orderBy("submittedAt", "asc").get();
 
-    cachedRequests = snapshot.docs.map(d => ({
-      id: d.id,
-      ...d.data(),
-      region: normalizeRegion(d.data().employeeId)
-    }));
+cachedRequests = snapshot.docs.map(d => {
+  const data = d.data();
+  return {
+    id: d.id,
+    ...data,
+    region: resolveRegion(data)   // still last, but now reads data.region first
+  };
+});
 
 renderNotifications();
 renderSummaryCards();
@@ -1955,8 +1977,8 @@ function renderSummaryCards(){
   document.getElementById("kpiEmployees").textContent = uniqueEmployees;
   document.getElementById("kpiOnLeaveToday").textContent = onLeaveToday;
 
-  const phCount = data.filter(l => l.region === "Philippines").length;
-  const indiaCount = data.filter(l => l.region === "India").length;
+const phCount    = data.filter(l => String(l.region || "").toLowerCase() === "philippines").length;
+const indiaCount = data.filter(l => String(l.region || "").toLowerCase() === "india").length;
   document.getElementById("quickPH").textContent = phCount;
   document.getElementById("quickIndia").textContent = indiaCount;
 
