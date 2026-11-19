@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>FedEx Leave System - Employee Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
@@ -23,387 +26,250 @@
   --shadow:0 10px 30px rgba(15,23,42,.08);
   --radius:22px;
 }
-
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{
-  font-family:Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
+body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text);}
 
-.shell{
-  display:grid;
-  grid-template-columns:280px 1fr;
-  min-height:100vh;
-}
-.sidebar{
-  background:#fff;
-  border-right:1px solid var(--border);
-  display:flex;
-  flex-direction:column;
-  position:sticky;
-  top:0;
-  height:100vh;
-}
-.logo-only-head{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:6px 8px;
-  border-bottom:1px solid var(--border);
-  background:#fff;
-}
-.sidebar-fedex-logo{
-  display:block;
-  width:100%;
-  max-width:250px;
-  max-height:96px;
-  height:auto;
-  object-fit:contain;
-}
-.nav{
-  padding:16px;
-  display:grid;
-  gap:10px;
-}
-.nav-btn{
-  width:100%;
-  text-align:left;
-  border:none;
-  background:transparent;
-  padding:14px 16px;
-  border-radius:18px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  color:var(--muted);
-  font-weight:700;
-  cursor:pointer;
-  transition:.18s ease;
-}
+/* Shell */
+.shell{display:grid;grid-template-columns:280px 1fr;min-height:100vh;}
+.sidebar{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;}
+.logo-only-head{display:flex;align-items:center;justify-content:center;padding:6px 8px;border-bottom:1px solid var(--border);background:#fff;}
+.sidebar-fedex-logo{display:block;width:100%;max-width:250px;max-height:96px;height:auto;object-fit:contain;}
+.nav{padding:16px;display:grid;gap:10px;}
+.nav-btn{width:100%;text-align:left;border:none;background:transparent;padding:14px 16px;border-radius:18px;display:flex;align-items:center;gap:12px;color:var(--muted);font-weight:700;cursor:pointer;transition:.18s ease;font-family:inherit;}
 .nav-btn:hover{background:#f8fafc;color:var(--text)}
-.nav-btn.active{
-  background:linear-gradient(135deg,var(--primary),var(--accent));
-  color:#fff;
-  box-shadow:0 12px 24px rgba(77,20,140,.22);
-}
-.sidebar-foot{
-  margin-top:auto;
-  padding:16px;
-  border-top:1px solid var(--border);
-}
-.trial-box{
-  padding:16px;
-  border-radius:18px;
-  background:#f8fafc;
-  border:1px solid var(--border);
-}
+.nav-btn.active{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;box-shadow:0 12px 24px rgba(77,20,140,.22);}
+.sidebar-foot{margin-top:auto;padding:16px;border-top:1px solid var(--border);}
+.trial-box{padding:16px;border-radius:18px;background:#f8fafc;border:1px solid var(--border);}
 .trial-box h4{margin:0 0 6px;color:var(--primary)}
 .trial-box p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
-
 .app-main{min-width:0}
 
-.app-header{
-  position:sticky;
-  top:0;
-  z-index:30;
-  background:rgba(255,255,255,.9);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-}
-.app-header-inner{
-  min-height:76px;
-  padding:0 24px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-}
-.header-title small{
-  display:block;
-  color:var(--muted);
-  font-weight:700;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-}
-.header-title h2{
-  margin:4px 0 0;
-  font-size:28px;
-  color:var(--text);
-}
+/* Header */
+.app-header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+.app-header-inner{min-height:76px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.header-title small{display:block;color:var(--muted);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:11px;}
+.header-title h2{margin:4px 0 0;font-size:28px;color:var(--text);}
+.header-back{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--primary);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;}
+.header-back:hover{background:#faf7ff}
+
+/* Content */
 .content{padding:24px}
-.page-intro{
-  margin-bottom:20px;
-}
-.page-intro h1{
-  margin:0;
-  font-size:32px;
-  color:var(--primary);
-}
-.page-intro p{
-  margin:8px 0 0;
-  color:var(--muted);
-}
+.page-intro{margin-bottom:20px;}
+.page-intro h1{margin:0;font-size:32px;color:var(--primary);}
+.page-intro p{margin:8px 0 0;color:var(--muted);}
 
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  overflow:hidden;
-}
-.card-header{
-  padding:20px 22px;
-  border-bottom:1px solid var(--border);
-  background:#fff;
-}
-.card-title{
-  margin:0;
-  font-size:20px;
-  color:var(--text);
-}
-.card-subtitle{
-  margin:6px 0 0;
-  color:var(--muted);
-  font-size:14px;
-}
-.card-body{padding:20px 22px}
+/* Stat cards */
+.um-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px;}
+.um-stat{min-height:110px;padding:18px;position:relative;display:flex;align-items:center;gap:14px;overflow:hidden;border:1px solid #e7e6ef;border-radius:18px;background:#fff;box-shadow:0 2px 10px rgba(33,25,85,.035);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;}
+.um-stat:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(33,25,85,.07);border-color:#dcd6ee;}
+.um-stat:nth-child(1){background:linear-gradient(135deg,#fff,#fbf9ff);}
+.um-stat:nth-child(2){background:linear-gradient(135deg,#fff,#f8fff9);}
+.um-stat:nth-child(3){background:linear-gradient(135deg,#fff,#fff8fa);}
+.um-stat:nth-child(4){background:linear-gradient(135deg,#fff,#fff9f3);}
+.um-stat-icon{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;border-radius:12px;}
+.um-stat-icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.um-stat-purple{color:#5723c9;background:#eee7ff;}
+.um-stat-green{color:#159b5a;background:#ddf6e8;}
+.um-stat-red{color:#e4425b;background:#ffe6eb;}
+.um-stat-orange{color:#e97819;background:#fff0df;}
+.um-stat-body{display:flex;flex-direction:column;min-width:0;}
+.um-stat-label{color:#747493;font-size:11px;font-weight:600;}
+.um-stat-value{color:#171750;font-size:28px;font-weight:800;line-height:1;letter-spacing:-.5px;margin:4px 0 5px;}
+.um-stat-hint{color:#9999ad;font-size:10px;font-weight:500;}
 
-.toolbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  flex-wrap:wrap;
-}
-.search-box{
-  position:relative;
-  min-width:280px;
-}
-.search-box i{
-  position:absolute;
-  left:12px;
-  top:50%;
-  transform:translateY(-50%);
-  color:var(--muted);
-}
-.input,.select{
-  width:100%;
-  min-height:44px;
-  padding:0 14px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:#fff;
-  color:var(--text);
-  outline:none;
-}
-.search-box .input{
-  padding-left:38px;
-}
+/* Panel */
+.um-panel{background:#fff;border:1px solid #eceaf3;border-radius:18px;padding:18px;box-shadow:0 2px 10px rgba(23,20,65,.04);}
+.um-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.um-toolbar-actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.um-search{flex:1 1 260px;display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;background:#fff;border:1px solid #e1e0ec;border-radius:10px;min-width:0;}
+.um-search svg{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#7d7da5;stroke-width:1.9;stroke-linecap:round;}
+.um-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#1e1e4a;font:inherit;font-size:13px;}
+.um-search input::placeholder{color:#9a9cb5;}
+.um-select{height:40px;padding:0 12px;background:#fff;border:1px solid #e1e0ec;border-radius:10px;color:#33345f;font:inherit;font-size:13px;font-weight:600;cursor:pointer;outline:none;transition:border-color .15s ease,box-shadow .15s ease;}
+.um-select:focus{border-color:#7441d5;box-shadow:0 0 0 3px rgba(107,32,208,.09);}
 
-.filters-row{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-}
+/* Buttons */
+.um-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:40px;padding:0 16px;border-radius:10px;border:1px solid transparent;font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease,border-color .15s ease;white-space:nowrap;}
+.um-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.um-btn-ghost{background:#fff;border-color:#e1e1ec;color:#33345f;}
+.um-btn-ghost:hover{background:#f6f4fe;border-color:#d6d2ea;}
+.um-btn-primary{background:linear-gradient(135deg,#6b20d0,#4d148c);color:#fff;box-shadow:0 8px 16px rgba(77,20,140,.18);}
+.um-btn-primary:hover{transform:translateY(-1px);box-shadow:0 11px 22px rgba(77,20,140,.24);}
+.um-btn-danger{background:linear-gradient(135deg,#d63a56,#a5132c);color:#fff;box-shadow:0 8px 16px rgba(165,19,44,.22);}
+.um-btn-danger:hover{transform:translateY(-1px);box-shadow:0 11px 22px rgba(165,19,44,.28);}
+.um-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
 
-.table-wrap{
-  width:100%;
-  overflow:auto;
-}
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:980px;
-}
-thead th{
-  text-align:left;
-  font-size:13px;
-  color:#475569;
-  padding:14px 12px;
-  border-bottom:1px solid var(--border);
-  background:#fafafa;
-}
-tbody td{
-  padding:14px 12px;
-  border-bottom:1px solid #f1f5f9;
-  vertical-align:middle;
-  font-size:14px;
-}
-tbody tr:hover{background:#fcfcff}
+/* Bulk bar */
+.um-bulk-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;margin-bottom:12px;background:#f6f4fe;border:1px solid #e0d8f5;border-radius:10px;}
+.um-bulk-bar[hidden]{display:none !important;}
+.um-bulk-count{font-size:12px;font-weight:800;color:#4d148c;}
+.um-bulk-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.um-bulk-btn{height:30px;padding:0 14px;border-radius:8px;border:1px solid #d6d2ea;background:#fff;color:#33345f;font:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease;}
+.um-bulk-btn:hover{background:#efe9ff;color:#4d148c;border-color:#b9a9e6;}
+.um-bulk-btn.danger{color:#b42318;border-color:#f5c8cb;}
+.um-bulk-btn.danger:hover{background:#fdeef1;border-color:#ee99a3;}
+.um-bulk-btn.ghost{background:transparent;color:#8a8ca8;border-color:transparent;}
+.um-bulk-btn.ghost:hover{background:#efe9ff;color:#4d148c;}
 
-.employee-cell{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  min-width:0;
-}
-.employee-avatar{
-  width:38px;
-  height:38px;
-  min-width:38px;
-  border-radius:50%;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg,var(--primary),var(--accent));
-  color:#fff;
-  font-size:12px;
-  font-weight:800;
-  box-shadow:0 6px 14px rgba(77,20,140,.18);
-  flex:0 0 auto;
-}
-.employee-avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-.employee-avatar span{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:100%;
-  height:100%;
-}
-.employee-meta{
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-}
-.employee-name{
-  font-weight:700;
-  color:var(--text);
-  line-height:1.2;
-}
-.employee-sub{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:3px;
-}
+/* Table */
+.um-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid #f1eff7;}
+.um-table{width:100%;border-collapse:separate;border-spacing:0;}
+.um-table thead th{height:42px;padding:0 12px;background:#f7f6fc;color:#777790;font-size:11px;font-weight:800;text-align:left;white-space:nowrap;letter-spacing:.3px;border-bottom:1px solid #eeecf6;}
+.um-table thead th.um-col-check{width:38px;padding:0 8px;}
+.um-table thead th.um-col-actions{text-align:right;}
+.um-table tbody td{padding:12px;border-bottom:1px solid #f2f0f9;font-size:13px;color:#55567a;vertical-align:middle;white-space:nowrap;}
+.um-table tbody tr:last-child td{border-bottom:0;}
+.um-table tbody tr{transition:background .12s ease;}
+.um-table tbody tr:hover{background:#fbf9ff;}
+.um-table tbody tr.is-selected{background:#f6f4fe;}
+.um-table td.um-col-check{padding:0 8px;}
+.um-table td.um-col-actions{text-align:right;padding-right:14px;}
+.um-checkbox{width:15px;height:15px;accent-color:#6b20d0;cursor:pointer;}
 
-.badge{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:6px 10px;
-  border-radius:999px;
-  font-weight:700;
-  font-size:12px;
-}
-.badge-ph{background:#f3f0ff;color:#4D148C}
-.badge-india{background:#fff7ed;color:#c2410c}
-.badge-manager{background:#eff6ff;color:#1d4ed8}
-.badge-team{background:#ecfdf5;color:#15803d}
-.badge-god{
-  background:#111827;
-  color:#fff;
-}
+/* User cell */
+.um-user-cell{display:flex;align-items:center;gap:10px;min-width:0;}
+.um-avatar{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,#791eff,#4d148c);color:#fff;font-size:11px;font-weight:800;overflow:hidden;position:relative;}
+.um-avatar img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.um-user-name{font-size:13px;font-weight:700;color:#17195d;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.um-user-sub{font-size:11px;color:#9a9cb5;margin-top:2px;}
 
-.action-group{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-}
-.btn{
-  border:none;
-  min-height:38px;
-  padding:0 14px;
-  border-radius:12px;
-  font-weight:700;
-  cursor:pointer;
-  transition:.18s ease;
-}
-.btn-reset{
-  background:var(--danger);
-  color:#fff;
-  box-shadow:0 8px 18px rgba(220,38,38,.18);
-}
-.btn-reset:hover{
-  background:var(--danger-dark);
-  transform:translateY(-1px);
-  box-shadow:0 10px 22px rgba(185,28,28,.24);
-}
-.btn-copy{
-  background:#fff;
-  color:var(--primary);
-  border:1px solid var(--border);
-}
-.btn-copy:hover{background:#faf7ff}
+/* Pills */
+.um-pill{display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:20px;font-size:11px;font-weight:800;white-space:nowrap;}
+.um-pill-role-employee{background:#eeeaff;color:#5530c6;}
+.um-pill-role-teamleader{background:#e7efff;color:#2557c9;}
+.um-pill-role-manager{background:#fff0df;color:#b35400;}
+.um-pill-role-admin{background:#ffe0eb;color:#c81e5c;}
+.um-pill-role-god{background:#111827;color:#fff;}
+.um-pill-region-ph{background:#f3f0ff;color:#4D148C;}
+.um-pill-region-india{background:#fff7ed;color:#c2410c;}
+.um-pill-region-other{background:#f3f4f6;color:#4b5563;}
 
-.empty-state{
-  padding:28px;
-  text-align:center;
-  color:var(--muted);
-}
+/* Row actions */
+.um-row-actions{display:inline-flex;align-items:center;gap:4px;justify-content:flex-end;}
+.um-row-action{height:30px;padding:0 10px;display:inline-flex;align-items:center;gap:5px;border-radius:7px;border:1px solid transparent;background:transparent;color:#8a8ca8;cursor:pointer;font:inherit;font-size:11px;font-weight:700;transition:background .15s ease,color .15s ease,border-color .15s ease;white-space:nowrap;}
+.um-row-action svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.um-row-action:hover{background:#f6f4fe;color:#4d148c;border-color:#d6d2ea;}
+.um-row-action.danger:hover{background:#fdeef1;color:#b42318;border-color:#f5c8cb;}
+.um-row-action.warn:hover{background:#fff7ed;color:#c2410c;border-color:#fed7aa;}
 
-.page-footer{
-  text-align:center;
-  color:var(--muted);
-  font-size:13px;
-  padding:20px 0 8px;
-}
+/* Loading / empty */
+.um-loading-row{text-align:center;padding:40px 12px !important;color:#8a8ca8;font-size:13px;}
+.um-spinner{display:inline-block;width:14px;height:14px;border:2px solid #e5e2f3;border-top-color:#6b20d0;border-radius:50%;animation:umSpin .8s linear infinite;vertical-align:-2px;margin-right:8px;}
+@keyframes umSpin{to{transform:rotate(360deg);}}
+.um-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center;}
+.um-empty[hidden]{display:none !important;}
+.um-empty-icon{width:52px;height:52px;border-radius:50%;background:#f1eefb;color:#6b20d0;display:grid;place-items:center;margin-bottom:12px;}
+.um-empty-icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.um-empty strong{color:#17195d;font-size:14px;font-weight:800;margin-bottom:4px;}
+.um-empty p{margin:0 0 14px;color:#6d6e94;font-size:13px;line-height:1.5;max-width:340px;}
+.um-footer-info{margin-top:12px;text-align:right;color:#9a9cb5;font-size:12px;font-weight:500;}
 
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  z-index:999;
-  justify-content:center;
-  align-items:center;
-  padding:16px;
-}
-.modal.show{
-  display:flex;
-}
-.modal-card{
-  width:100%;
-  max-width:460px;
-  background:#fff;
-  border-radius:22px;
-  box-shadow:0 18px 40px rgba(0,0,0,.18);
-  overflow:hidden;
-}
-.modal-head{
-  padding:20px 22px;
-  border-bottom:1px solid var(--border);
-}
-.modal-body{
-  padding:20px 22px;
-}
-.password-box{
-  margin-top:14px;
-  padding:16px;
-  border-radius:16px;
-  background:#f8fafc;
-  border:1px dashed var(--border);
-}
-.password-value{
-  font-size:24px;
-  font-weight:800;
-  color:var(--primary);
-  word-break:break-word;
-}
-.modal-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:16px;
-}
+/* Modals */
+.um-modal{position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;}
+.um-modal[hidden]{display:none !important;}
+.um-modal-backdrop{position:absolute;inset:0;background:rgba(15,12,42,.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:umFade .2s ease;}
+@keyframes umFade{from{opacity:0;}to{opacity:1;}}
+.um-modal-card{position:relative;width:min(560px,100%);max-height:calc(100vh - 40px);background:#fff;border-radius:16px;box-shadow:0 30px 80px rgba(20,10,60,.32);display:flex;flex-direction:column;overflow:hidden;animation:umRise .28s cubic-bezier(.22,1,.36,1);}
+@keyframes umRise{from{opacity:0;transform:translateY(14px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+.um-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:20px 24px 16px;border-bottom:1px solid #eeecf6;background:linear-gradient(180deg,#fbf9ff 0%,#ffffff 100%);}
+.um-modal-kicker{display:block;color:#8b7ab5;font-size:10px;font-weight:800;letter-spacing:.12em;margin-bottom:4px;}
+.um-modal-kicker.danger{color:#c81e3a;}
+.um-modal-head h2{margin:0;color:#17195d;font-size:18px;line-height:1.25;font-weight:800;}
+.um-modal-close{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;border:1px solid #e1e1ee;border-radius:9px;background:#fff;color:#7d809a;cursor:pointer;transition:background .15s ease,color .15s ease;}
+.um-modal-close svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;}
+.um-modal-close:hover{background:#f6f5fa;color:#4d148c;}
+
+/* Form */
+.um-form{padding:20px 24px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;}
+.um-form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.um-field{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.um-field-label{font-size:11px;font-weight:700;color:#4b4d6b;letter-spacing:.02em;}
+.um-field input[type="text"],
+.um-field input[type="email"],
+.um-field select{width:100%;height:40px;padding:0 12px;border:1px solid #e1e0ec;border-radius:9px;background:#faf9ff;color:#17195d;font:inherit;font-size:13px;font-weight:500;outline:none;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
+.um-field input:focus,
+.um-field select:focus{border-color:#7441d5;background:#fff;box-shadow:0 0 0 3px rgba(107,32,208,.09);}
+.um-field input::placeholder{color:#b1b2c4;}
+.um-field input:disabled,
+.um-field select:disabled{background:#f2f0f9;color:#8a8ca8;cursor:not-allowed;}
+.um-field-hint{font-size:11px;color:#8a8ca8;line-height:1.4;}
+.um-field-toggle{flex-direction:row;align-items:center;justify-content:space-between;}
+.um-toggle-wrap{display:inline-flex;align-items:center;gap:10px;cursor:pointer;}
+.um-toggle-wrap input[type="checkbox"]{position:absolute;opacity:0;pointer-events:none;}
+.um-toggle{width:38px;height:22px;border-radius:999px;background:#d4d2e0;position:relative;transition:background .2s ease;}
+.um-toggle-knob{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);transition:transform .2s ease;}
+.um-toggle-wrap input:checked + .um-toggle{background:#17945c;}
+.um-toggle-wrap input:checked + .um-toggle .um-toggle-knob{transform:translateX(16px);}
+.um-toggle-label{font-size:12px;font-weight:600;color:#4b4d6b;}
+.um-form-error{min-height:0;padding:0;font-size:12px;color:#c81e3a;font-weight:600;transition:all .15s ease;}
+.um-form-error:not(:empty){padding:10px 12px;background:#fdeef1;border:1px solid #f5c8cb;border-radius:8px;}
+.um-modal-foot{display:flex;justify-content:flex-end;gap:10px;padding-top:16px;border-top:1px solid #f2f0f9;margin-top:6px;}
+
+/* Submit spinner */
+.um-submit-spinner{display:none;width:12px;height:12px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:umSpin .7s linear infinite;margin-left:6px;}
+.um-btn.loading .um-submit-spinner{display:inline-block;}
+.um-btn.loading .um-submit-label{opacity:.75;}
+
+/* Delete modal */
+.um-modal-danger .um-modal-head{background:linear-gradient(180deg,#fef5f6 0%,#ffffff 100%);}
+.um-delete-body{padding:18px 24px 12px;display:flex;flex-direction:column;gap:12px;}
+.um-delete-body > p{margin:0;font-size:12px;line-height:1.6;color:#55567a;}
+.um-delete-names{max-height:130px;overflow-y:auto;padding:10px 12px;background:#faf9ff;border:1px solid #eeecf6;border-radius:9px;font-size:12px;color:#17195d;font-weight:600;line-height:1.7;}
+.um-delete-names:empty{display:none;}
+.um-delete-hint{font-size:12px !important;color:#8a8ca8;}
+.um-delete-hint code{background:#f4f2fb;color:#4d148c;padding:2px 8px;border-radius:5px;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-weight:700;letter-spacing:.5px;}
+.um-delete-input{height:40px;padding:0 12px;border:1px solid #f5c8cb;border-radius:9px;background:#fff;color:#17195d;font:inherit;font-size:13px;font-weight:700;letter-spacing:.1em;outline:none;transition:border-color .15s ease,box-shadow .15s ease;}
+.um-delete-input:focus{border-color:#c81e3a;box-shadow:0 0 0 3px rgba(200,30,58,.12);}
+
+/* Page loader */
+.page-loader{position:fixed;inset:0;background:#f7f7fc;display:flex;align-items:center;justify-content:center;z-index:99999;transition:opacity .35s ease;}
+.page-loader-inner{text-align:center;}
+.page-loader-mark{width:44px;height:44px;position:relative;margin:0 auto 14px;}
+.page-loader-ring{position:absolute;inset:0;border:3px solid #eee7ff;border-top-color:#4D148C;border-radius:50%;animation:umSpin 1s linear infinite;}
+.page-loader-dot{position:absolute;inset:14px;border-radius:50%;background:linear-gradient(135deg,#6b20d0,#FF6600);}
+.page-loader-text{color:#6b7280;font-size:13px;font-weight:600;margin:0;}
+
+/* Toast */
+.um-toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:#17195d;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 16px 34px rgba(20,10,60,.25);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .25s ease;z-index:99999;max-width:min(90vw,420px);text-align:center;}
+.um-toast.is-visible{opacity:1;transform:translate(-50%,0);}
+.um-toast.is-error{background:#b42318;}
+.um-toast.is-success{background:#17945c;}
+
+/* Responsive */
+@media (max-width:1200px){.um-stats{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media (max-width:900px){
-  .shell{grid-template-columns:1fr}
-  .sidebar{display:none}
-  .content{padding:16px}
+  .shell{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .app-header-inner{padding:0 16px;}
+  .content{padding:16px;}
+  .um-toolbar{flex-direction:column;align-items:stretch;}
+  .um-select{width:100%;}
+  .um-toolbar-actions{margin-left:0;width:100%;}
+  .um-toolbar-actions .um-btn{flex:1;}
+  .um-form-row{grid-template-columns:1fr;}
+}
+@media (max-width:600px){
+  .um-stats{grid-template-columns:1fr;}
+  .um-modal-card{border-radius:12px;}
+  .um-bulk-bar{flex-direction:column;align-items:stretch;}
+  .um-bulk-actions{justify-content:stretch;}
+  .um-bulk-btn{flex:1;}
 }
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
+
+<div class="page-loader" id="pageLoader">
+  <div class="page-loader-inner">
+    <div class="page-loader-mark"><span class="page-loader-ring"></span><span class="page-loader-dot"></span></div>
+    <p class="page-loader-text">Loading Users…</p>
+  </div>
+</div>
 
 <div class="shell">
   <aside class="sidebar">
@@ -412,30 +278,18 @@ tbody tr:hover{background:#fcfcff}
     </div>
 
     <div class="nav">
-      <button class="nav-btn" onclick="location.href='admin.html'">
-        <i class="fa-solid fa-house"></i> Dashboard
-      </button>
-      <button class="nav-btn">
-        <i class="fa-regular fa-calendar"></i> Leave Requests
-      </button>
-      <button class="nav-btn">
-        <i class="fa-solid fa-table"></i> Views
-      </button>
-      <button class="nav-btn">
-        <i class="fa-solid fa-location-dot"></i> Region Control
-      </button>
-      <button class="nav-btn">
-        <i class="fa-solid fa-file-export"></i> Reports
-      </button>
-      <button class="nav-btn active">
-        <i class="fa-solid fa-users-gear"></i> Employee Management
-      </button>
+      <button class="nav-btn" onclick="location.href='admin.html'"><i class="fa-solid fa-house"></i> Dashboard</button>
+      <button class="nav-btn"><i class="fa-regular fa-calendar"></i> Leave Requests</button>
+      <button class="nav-btn"><i class="fa-solid fa-table"></i> Views</button>
+      <button class="nav-btn"><i class="fa-solid fa-location-dot"></i> Region Control</button>
+      <button class="nav-btn"><i class="fa-solid fa-file-export"></i> Reports</button>
+      <button class="nav-btn active"><i class="fa-solid fa-users-gear"></i> Employee Management</button>
     </div>
 
     <div class="sidebar-foot">
       <div class="trial-box">
         <h4>Employee Management</h4>
-        <p>Search users, review role assignments, and reset temporary passwords in one place.</p>
+        <p>Search users, update employee records, manage roles, and send password reset emails.</p>
       </div>
     </div>
   </aside>
@@ -447,116 +301,257 @@ tbody tr:hover{background:#fcfcff}
           <small>Administration</small>
           <h2>Employee Management</h2>
         </div>
+        <button class="header-back" onclick="location.href='admin.html'">
+          <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </button>
       </div>
     </header>
 
     <div class="content">
       <div class="page-intro">
         <h1>Employee Management</h1>
-        <p>Manage employee access and issue temporary passwords for login recovery.</p>
+        <p>Manage employee access, roles, regions, and password recovery in one place.</p>
       </div>
 
-      <section class="card">
-        <div class="card-header">
-          <div class="toolbar">
-            <div>
-              <h3 class="card-title">All Employees</h3>
-              <p class="card-subtitle">This page is only visible to the primary admin.</p>
-            </div>
-
-            <div class="filters-row">
-              <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input class="input" id="employeeSearch" placeholder="Search name or email" oninput="renderEmployees()">
-              </div>
-
-              <select id="roleFilter" class="select" style="width:210px;" onchange="renderEmployees()">
-                <option value="All">All Roles</option>
-                <option value="super_saiyan_god">Super Saiyan God</option>
-                <option value="team_leader">Team Leader</option>
-                <option value="manager">Manager</option>
-              </select>
-
-              <select id="regionFilter" class="select" style="width:180px;" onchange="renderEmployees()">
-                <option value="All">All Regions</option>
-                <option value="Philippines">Philippines</option>
-                <option value="India">India</option>
-              </select>
-            </div>
+      <!-- Stat cards -->
+      <section class="um-stats" aria-label="User overview">
+        <article class="um-stat">
+          <div class="um-stat-icon um-stat-purple">
+            <svg viewBox="0 0 24 24"><path d="M17 20h5v-2a4 4 0 0 0-3-3.87"/><path d="M9 20H4v-2a4 4 0 0 1 3-3.87"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><circle cx="17" cy="7" r="4"/></svg>
           </div>
-        </div>
-
-        <div class="card-body">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Employee</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Region</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="employeeTableBody">
-                <tr>
-                  <td colspan="5" class="empty-state">Loading employees...</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="um-stat-body">
+            <span class="um-stat-label">Total Users</span>
+            <strong class="um-stat-value" id="umStatTotal">—</strong>
+            <span class="um-stat-hint">All registered employees</span>
           </div>
-        </div>
+        </article>
+        <article class="um-stat">
+          <div class="um-stat-icon um-stat-green">
+            <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <div class="um-stat-body">
+            <span class="um-stat-label">Team Leaders</span>
+            <strong class="um-stat-value" id="umStatTL">—</strong>
+            <span class="um-stat-hint">From leave_users</span>
+          </div>
+        </article>
+        <article class="um-stat">
+          <div class="um-stat-icon um-stat-red">
+            <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+          </div>
+          <div class="um-stat-body">
+            <span class="um-stat-label">Managers</span>
+            <strong class="um-stat-value" id="umStatMgr">—</strong>
+            <span class="um-stat-hint">From manager_leave_user</span>
+          </div>
+        </article>
+        <article class="um-stat">
+          <div class="um-stat-icon um-stat-orange">
+            <svg viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.3 8.2-8 10-4.7-1.8-8-5-8-10V6l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg>
+          </div>
+          <div class="um-stat-body">
+            <span class="um-stat-label">Admins</span>
+            <strong class="um-stat-value" id="umStatAdmin">—</strong>
+            <span class="um-stat-hint">Elevated access</span>
+          </div>
+        </article>
       </section>
 
-      <div class="page-footer">© FedEx 2026</div>
+      <!-- Panel -->
+      <section class="um-panel">
+        <div class="um-toolbar">
+          <div class="um-search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5"/><path d="m16 16 5 5"/></svg>
+            <input type="search" id="umSearch" placeholder="Search by name, email, or EMP ID…" autocomplete="off">
+          </div>
+
+          <select class="um-select" id="umRoleFilter" aria-label="Filter by role">
+            <option value="">All Roles</option>
+            <option value="super_saiyan_god">Admins (God mode)</option>
+            <option value="manager">Manager</option>
+            <option value="team_leader">Team Leader</option>
+          </select>
+
+          <select class="um-select" id="umRegionFilter" aria-label="Filter by region">
+            <option value="">All Regions</option>
+            <option value="Philippines">Philippines</option>
+            <option value="India">India</option>
+          </select>
+
+          <select class="um-select" id="umSort" aria-label="Sort users">
+            <option value="name">Name A–Z</option>
+            <option value="role">Role</option>
+            <option value="region">Region</option>
+          </select>
+
+          <div class="um-toolbar-actions">
+            <button type="button" class="um-btn um-btn-ghost" id="umExportBtn">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>
+              <span>Export CSV</span>
+            </button>
+            <button type="button" class="um-btn um-btn-primary" id="umAddUserBtn">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              <span>Add User</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="um-bulk-bar" id="umBulkBar" hidden>
+          <span class="um-bulk-count" id="umBulkCount">0 selected</span>
+          <div class="um-bulk-actions">
+            <button type="button" class="um-bulk-btn danger" data-bulk="delete">Delete Selected</button>
+            <button type="button" class="um-bulk-btn ghost" data-bulk="clear">Clear</button>
+          </div>
+        </div>
+
+        <div class="um-table-wrap">
+          <table class="um-table">
+            <thead>
+              <tr>
+                <th class="um-col-check"><input type="checkbox" id="umSelectAll" class="um-checkbox" aria-label="Select all users"></th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Region</th>
+                <th class="um-col-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="umTableBody">
+              <tr><td colspan="6" class="um-loading-row"><span class="um-spinner"></span>Loading users…</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="um-empty" id="umEmptyState" hidden>
+          <div class="um-empty-icon">
+            <svg viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.2"/><path d="M4.5 19c.6-3.4 2.7-5.2 5.5-5.2s4.9 1.8 5.5 5.2"/><path d="m17.5 8.5 2 2 3.5-4"/></svg>
+          </div>
+          <strong id="umEmptyTitle">No users yet</strong>
+          <p id="umEmptyText">Add your first employee to get started.</p>
+          <button type="button" class="um-btn um-btn-primary" id="umEmptyAddBtn" hidden>
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Add User</span>
+          </button>
+        </div>
+
+        <div class="um-footer-info" id="umFooterInfo"></div>
+      </section>
+
+      <div class="page-footer" style="text-align:center;color:#6b7280;font-size:13px;padding:20px 0 8px;">© FedEx 2026</div>
     </div>
   </main>
 </div>
 
-<div class="modal" id="passwordModal">
-  <div class="modal-card">
-    <div class="modal-head">
-      <h3 style="margin:0;color:#111827;">Temporary Password Generated</h3>
-    </div>
-    <div class="modal-body">
-      <div id="passwordModalText" style="color:#6b7280;"></div>
+<!-- Add / Edit modal -->
+<div class="um-modal" id="umUserModal" hidden>
+  <div class="um-modal-backdrop" data-close-modal="user"></div>
+  <div class="um-modal-card" role="dialog" aria-modal="true" aria-labelledby="umModalTitle">
+    <header class="um-modal-head">
+      <div>
+        <span class="um-modal-kicker" id="umModalKicker">NEW EMPLOYEE</span>
+        <h2 id="umModalTitle">Add New User</h2>
+      </div>
+      <button type="button" class="um-modal-close" data-close-modal="user" aria-label="Close">
+        <svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></svg>
+      </button>
+    </header>
 
-      <div class="password-box">
-        <div class="password-value" id="generatedPassword">-</div>
+    <form class="um-form" id="umUserForm" novalidate>
+      <input type="hidden" id="umEditingId" value="">
+
+      <div class="um-form-row">
+        <label class="um-field">
+          <span class="um-field-label">First Name *</span>
+          <input type="text" id="umFieldFirstName" placeholder="First name" autocomplete="off" required>
+        </label>
+        <label class="um-field">
+          <span class="um-field-label">Last Name *</span>
+          <input type="text" id="umFieldLastName" placeholder="Last name" autocomplete="off" required>
+        </label>
       </div>
 
-      <div class="modal-actions">
-        <button class="btn btn-copy" onclick="copyGeneratedPassword()">Copy Password</button>
-        <button class="btn btn-reset" onclick="closePasswordModal()">Close</button>
+      <label class="um-field">
+        <span class="um-field-label">Email *</span>
+        <input type="email" id="umFieldEmail" placeholder="name@iqor.com" autocomplete="off" required>
+      </label>
+
+      <div class="um-form-row">
+        <label class="um-field">
+          <span class="um-field-label">Role *</span>
+          <select id="umFieldRole" required>
+            <option value="">Select role…</option>
+            <option value="team_leader">Team Leader</option>
+            <option value="manager">Manager</option>
+          </select>
+          <span class="um-field-hint">Role cannot be changed after creation. Delete and re-add to change role.</span>
+        </label>
+        <label class="um-field">
+          <span class="um-field-label">Region *</span>
+          <select id="umFieldRegion" required>
+            <option value="">Select region…</option>
+            <option value="Philippines">Philippines</option>
+            <option value="India">India</option>
+          </select>
+        </label>
       </div>
-    </div>
+
+      <div class="um-form-error" id="umFormError" role="alert" aria-live="polite"></div>
+
+      <footer class="um-modal-foot">
+        <button type="button" class="um-btn um-btn-ghost" data-close-modal="user">Cancel</button>
+        <button type="submit" class="um-btn um-btn-primary" id="umSubmitBtn">
+          <span class="um-submit-label">Save User</span>
+          <span class="um-submit-spinner" aria-hidden="true"></span>
+        </button>
+      </footer>
+    </form>
   </div>
 </div>
 
+<!-- Delete modal -->
+<div class="um-modal" id="umDeleteModal" hidden>
+  <div class="um-modal-backdrop" data-close-modal="delete"></div>
+  <div class="um-modal-card um-modal-danger" role="dialog" aria-modal="true" aria-labelledby="umDeleteTitle">
+    <header class="um-modal-head">
+      <div>
+        <span class="um-modal-kicker danger">DANGER ZONE</span>
+        <h2 id="umDeleteTitle">Delete User?</h2>
+      </div>
+      <button type="button" class="um-modal-close" data-close-modal="delete" aria-label="Close">
+        <svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></svg>
+      </button>
+    </header>
+
+    <div class="um-delete-body">
+      <p id="umDeleteCopy">This permanently removes the user from Firestore. This cannot be undone.</p>
+      <div class="um-delete-names" id="umDeleteNames"></div>
+      <p class="um-delete-hint">Type <code>DELETE</code> to confirm.</p>
+      <input type="text" id="umDeleteConfirmInput" class="um-delete-input" placeholder="DELETE" autocomplete="off" spellcheck="false">
+      <div class="um-form-error" id="umDeleteError" role="alert" aria-live="polite"></div>
+    </div>
+
+    <footer class="um-modal-foot" style="padding:0 24px 22px;">
+      <button type="button" class="um-btn um-btn-ghost" data-close-modal="delete">Cancel</button>
+      <button type="button" class="um-btn um-btn-danger" id="umDeleteConfirmBtn" disabled>
+        <span class="um-submit-label">Delete</span>
+        <span class="um-submit-spinner" aria-hidden="true"></span>
+      </button>
+    </footer>
+  </div>
+</div>
+
+<div class="um-toast" id="umToast" role="status" aria-live="polite"></div>
+
 <script>
-firebase.initializeApp({
-  apiKey:"AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
-  authDomain:"fedex-attendance-system.firebaseapp.com",
-  projectId:"fedex-attendance-system"
-});
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const COLLECTIONS = {
+  team_leader: "leave_users",
+  manager: "manager_leave_user"
+};
 
-const db = firebase.firestore();
-const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-
-if (!currentUser) {
-  alert("Please login first");
-  location.href = "index.html";
-}
-
-if (String(currentUser?.email || "").toLowerCase() !== "julanguinto@gmail.com") {
-  alert("You are not authorized to access this page.");
-  location.href = "admin.html";
-}
-
-let allEmployees = [];
-let currentGeneratedPassword = "";
-
-const indiaEmails = [
+const INDIA_EMAILS = [
   "vicky.das@iqor.com",
   "mohd.fahad@iqor.com",
   "prince.singh3@iqor.com",
@@ -564,338 +559,729 @@ const indiaEmails = [
   "sohinder.singh1@iqor.com"
 ];
 
-const excludedEmails = [
-  "jake.agdeppa@iqor.com"
-];
+const EXCLUDED_EMAILS = ["jake.agdeppa@iqor.com"];
 
-function normalizeRegion(email){
-  const cleanEmail = String(email || "").toLowerCase();
-  return indiaEmails.includes(cleanEmail) ? "India" : "Philippines";
+// Hardcoded role overrides — preserved from your current logic.
+// These users always display with the label shown regardless of collection.
+const ROLE_OVERRIDES = {
+  "julanguinto@gmail.com":           { value: "super_saiyan_god", label: "Super Saiyan God",          className: "um-pill-role-god" },
+  "trevorbarry.imatong@iqor.com":    { value: "super_saiyan_god", label: "Admin Manager",             className: "um-pill-role-god" },
+  "jonie.kabigting@iqor.com":        { value: "super_saiyan_god", label: "Manager/Admin Team Leader", className: "um-pill-role-god" },
+  "vicky.das@iqor.com":              { value: "manager",          label: "Manager",                   className: "um-pill-role-manager" }
+};
+
+/* ============================================================
+   FIREBASE
+   ============================================================ */
+firebase.initializeApp({
+  apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
+  authDomain: "fedex-attendance-system.firebaseapp.com",
+  projectId: "fedex-attendance-system"
+});
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+/* ============================================================
+   ACCESS CONTROL
+   ============================================================ */
+const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+if (!currentUser) {
+  alert("Please login first");
+  location.href = "index.html";
+}
+if (String(currentUser?.email || "").toLowerCase() !== "julanguinto@gmail.com") {
+  alert("You are not authorized to access this page.");
+  location.href = "admin.html";
 }
 
-function sanitizeProfileFileName(name){
-  return String(name || "")
-    .trim()
-    .replace(/[\\/:*?"<>|]/g, "")
-    .replace(/\s+/g, " ");
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  users: [],
+  selected: new Set(),
+  filters: { search: "", role: "", region: "", sort: "name" },
+  editing: null,
+  deleting: null,
+  loaded: false
+};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $ = id => document.getElementById(id);
+
+function esc(v) {
+  return String(v ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
 }
 
-function getProfilePictureCandidates(name){
-  const clean = sanitizeProfileFileName(name);
-  if(!clean) return [];
+function getInitials(name) {
+  const clean = String(name || "").trim();
+  if (!clean) return "??";
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
+function sanitizeFileName(name) {
+  return String(name || "").trim().replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, " ");
+}
+
+function getProfilePictureCandidates(name) {
+  const clean = sanitizeFileName(name);
+  if (!clean) return [];
   const dotName = clean.replace(/\s+/g, ".");
   const spaceName = clean;
   const extensions = ["jpg", "jpeg", "png", "JPG", "JPEG", "PNG"];
   const folders = ["Profile Pictures", "Profile%20Pictures"];
   const candidates = [];
-
   folders.forEach(folder => {
     extensions.forEach(ext => {
       candidates.push(`${folder}/${dotName}.${ext}`);
-      if(spaceName !== dotName) candidates.push(`${folder}/${spaceName}.${ext}`);
+      if (spaceName !== dotName) candidates.push(`${folder}/${spaceName}.${ext}`);
     });
   });
-
   return [...new Set(candidates)];
 }
 
-function getDisplayRole(emp){
-  const cleanEmail = String(emp.email || "").toLowerCase();
-
-  if (cleanEmail === "julanguinto@gmail.com") {
-    return {
-      value: "super_saiyan_god",
-      label: "Super Saiyan God",
-      className: "badge-god"
-    };
-  }
-
-  if (cleanEmail === "trevorbarry.imatong@iqor.com") {
-    return {
-      value: "super_saiyan_god",
-      label: "Admin Manager",
-      className: "badge-god"
-    };
-  }
-
-  if (cleanEmail === "jonie.kabigting@iqor.com") {
-    return {
-      value: "super_saiyan_god",
-      label: "Manager/Admin Team Leader",
-      className: "badge-god"
-    };
-  }
-
-  if (cleanEmail === "vicky.das@iqor.com") {
-    return {
-      value: "manager",
-      label: "Manager",
-      className: "badge-manager"
-    };
-  }
-
-  if (emp.roleType === "manager") {
-    return {
-      value: "manager",
-      label: "Manager",
-      className: "badge-manager"
-    };
-  }
-
-  return {
-    value: "team_leader",
-    label: "Team Leader",
-    className: "badge-team"
-  };
+function normalizeRegion(emp) {
+  const direct = String(emp?.region || "").trim();
+  if (direct === "India" || direct === "Philippines") return direct;
+  if (direct) return direct;
+  const cleanEmail = String(emp?.email || "").toLowerCase();
+  return INDIA_EMAILS.includes(cleanEmail) ? "India" : "Philippines";
 }
 
-function createEmployeeCell(name, subText = ""){
-  const safeName = name || "-";
-  const initials = safeName
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0,2)
-    .map(v => v[0]?.toUpperCase() || "")
-    .join("") || "A";
+function getDisplayRole(emp) {
+  const cleanEmail = String(emp.email || "").toLowerCase();
+  if (ROLE_OVERRIDES[cleanEmail]) return ROLE_OVERRIDES[cleanEmail];
+  if (emp.roleType === "manager") {
+    return { value: "manager", label: "Manager", className: "um-pill-role-manager" };
+  }
+  return { value: "team_leader", label: "Team Leader", className: "um-pill-role-teamleader" };
+}
 
-  const candidates = JSON.stringify(getProfilePictureCandidates(safeName));
+function getRegionPillClass(region) {
+  if (region === "India") return "um-pill-region-india";
+  if (region === "Philippines") return "um-pill-region-ph";
+  return "um-pill-region-other";
+}
+
+function showToast(msg, type = "success") {
+  const el = $("umToast");
+  el.textContent = msg;
+  el.className = "um-toast is-visible" + (type === "error" ? " is-error" : type === "success" ? " is-success" : "");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => { el.className = "um-toast"; }, 2600);
+}
+
+function describeError(err) {
+  if (!err) return "Something went wrong.";
+  const code = String(err.code || "").toLowerCase();
+  if (code.includes("permission-denied")) return "Permission denied. Check your Firestore rules.";
+  if (code.includes("unavailable") || code.includes("network")) return "Network unavailable. Please try again.";
+  return err.message || "Something went wrong.";
+}
+
+function debounce(fn, wait = 200) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
+}
+
+function hideLoader() {
+  const el = $("pageLoader");
+  if (!el) return;
+  el.style.opacity = "0";
+  setTimeout(() => el.remove(), 380);
+}
+
+/* ============================================================
+   DATA LOADING — merge leave_users + manager_leave_user
+   ============================================================ */
+let tlSnap = null, mgrSnap = null;
+let tlLoaded = false, mgrLoaded = false;
+
+function mergeEmployees() {
+  const tlDocs = (tlSnap?.docs || []).map(doc => ({
+    id: doc.id,
+    _collection: COLLECTIONS.team_leader,
+    _collections: [COLLECTIONS.team_leader],
+    ...doc.data(),
+    roleType: "team_leader"
+  }));
+
+  const mgrDocs = (mgrSnap?.docs || []).map(doc => ({
+    id: doc.id,
+    _collection: COLLECTIONS.manager,
+    _collections: [COLLECTIONS.manager],
+    ...doc.data(),
+    roleType: "manager"
+  }));
+
+  const byEmail = new Map();
+
+  [...tlDocs, ...mgrDocs].forEach(emp => {
+    const emailKey = String(emp.email || "").toLowerCase();
+    if (!emailKey) return;
+
+    if (!byEmail.has(emailKey)) {
+      byEmail.set(emailKey, { ...emp, region: normalizeRegion(emp) });
+      return;
+    }
+
+    const existing = byEmail.get(emailKey);
+    const isManager = existing.roleType === "manager" || emp.roleType === "manager";
+    byEmail.set(emailKey, {
+      ...existing,
+      ...emp,
+      id: existing.id,
+      name: existing.name || emp.name,
+      email: existing.email || emp.email,
+      roleType: isManager ? "manager" : "team_leader",
+      _collection: isManager
+        ? (existing.roleType === "manager" ? existing._collection : emp._collection)
+        : existing._collection,
+      _collections: [...new Set([...(existing._collections || []), emp._collection])],
+      region: normalizeRegion({ email: existing.email || emp.email, region: existing.region || emp.region })
+    });
+  });
+
+  state.users = Array.from(byEmail.values())
+    .filter(emp => !EXCLUDED_EMAILS.includes(String(emp.email || "").toLowerCase()))
+    .map(emp => ({
+      ...emp,
+      _displayRole: getDisplayRole(emp)
+    }));
+
+  state.loaded = tlLoaded && mgrLoaded;
+
+  renderStats();
+  renderTable();
+  syncSelectionUI();
+  if (state.loaded) hideLoader();
+}
+
+db.collection(COLLECTIONS.team_leader).onSnapshot(
+  snap => { tlSnap = snap; tlLoaded = true; mergeEmployees(); },
+  err => { console.error("leave_users listener failed:", err); showToast(describeError(err), "error"); hideLoader(); }
+);
+
+db.collection(COLLECTIONS.manager).onSnapshot(
+  snap => { mgrSnap = snap; mgrLoaded = true; mergeEmployees(); },
+  err => { console.error("manager_leave_user listener failed:", err); showToast(describeError(err), "error"); hideLoader(); }
+);
+
+// Safety net: hide loader after 5s regardless
+setTimeout(hideLoader, 5000);
+
+/* ============================================================
+   STATS
+   ============================================================ */
+function renderStats() {
+  const users = state.users;
+  $("umStatTotal").textContent = users.length;
+  $("umStatTL").textContent    = users.filter(u => u.roleType === "team_leader").length;
+  $("umStatMgr").textContent   = users.filter(u => u.roleType === "manager").length;
+  $("umStatAdmin").textContent = users.filter(u => {
+    const r = u._displayRole?.value;
+    return r === "manager" || r === "super_saiyan_god";
+  }).length;
+}
+
+/* ============================================================
+   FILTER / SORT
+   ============================================================ */
+function filteredUsers() {
+  const f = state.filters;
+  const q = f.search.toLowerCase();
+
+  let rows = state.users.filter(u => {
+    if (f.role && u._displayRole?.value !== f.role) return false;
+    if (f.region && u.region !== f.region) return false;
+    if (q) {
+      const hay = `${u.name} ${u.email} ${u.roleType} ${u.region} ${u._displayRole?.label}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  switch (f.sort) {
+    case "role":
+      rows.sort((a, b) => (a._displayRole?.label || "").localeCompare(b._displayRole?.label || ""));
+      break;
+    case "region":
+      rows.sort((a, b) => (a.region || "").localeCompare(b.region || ""));
+      break;
+    default:
+      rows.sort((a, b) => (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }));
+  }
+  return rows;
+}
+
+/* ============================================================
+   TABLE RENDER
+   ============================================================ */
+function renderTable() {
+  const tbody = $("umTableBody");
+  const empty = $("umEmptyState");
+  const footer = $("umFooterInfo");
+  const rows = filteredUsers();
+  const hasAny = state.users.length > 0;
+  const hasFilters = state.filters.search || state.filters.role || state.filters.region;
+
+  if (!rows.length) {
+    tbody.innerHTML = "";
+    empty.hidden = false;
+    if (!hasAny) {
+      $("umEmptyTitle").textContent = "No users yet";
+      $("umEmptyText").textContent = "Add your first employee to get started.";
+      $("umEmptyAddBtn").hidden = false;
+    } else if (hasFilters) {
+      $("umEmptyTitle").textContent = "No users match your filters";
+      $("umEmptyText").textContent = "Try clearing the search or filter options.";
+      $("umEmptyAddBtn").hidden = true;
+    } else {
+      $("umEmptyTitle").textContent = "No users yet";
+      $("umEmptyText").textContent = "Add your first employee to get started.";
+      $("umEmptyAddBtn").hidden = false;
+    }
+    footer.textContent = "";
+    return;
+  }
+
+  empty.hidden = true;
+  tbody.innerHTML = rows.map(rowHtml).join("");
+  footer.textContent = `Showing ${rows.length} of ${state.users.length} users`;
+  bindRowEvents();
+  hydrateAvatars(tbody);
+}
+
+function rowHtml(u) {
+  const isSelected = state.selected.has(u.id);
+  const role = u._displayRole || { label: "—", className: "um-pill-role-employee" };
+  const region = u.region || "—";
+  const picCandidates = JSON.stringify(getProfilePictureCandidates(u.name || ""));
 
   return `
-    <div class="employee-cell">
-      <div class="employee-avatar">
-        <img src="" alt="${safeName}" style="display:none;" data-candidates='${candidates}'>
-        <span>${initials}</span>
-      </div>
-      <div class="employee-meta">
-        <div class="employee-name">${safeName}</div>
-        <div class="employee-sub">${subText || "-"}</div>
-      </div>
-    </div>
+    <tr data-id="${esc(u.id)}" class="${isSelected ? "is-selected" : ""}">
+      <td class="um-col-check">
+        <input type="checkbox" class="um-checkbox" data-check="${esc(u.id)}" ${isSelected ? "checked" : ""} aria-label="Select ${esc(u.name)}">
+      </td>
+      <td>
+        <div class="um-user-cell">
+          <span class="um-avatar">
+            <img src="" alt="${esc(u.name)}" style="display:none;" data-candidates='${esc(picCandidates)}'>
+            <span class="um-avatar-initials">${esc(getInitials(u.name))}</span>
+          </span>
+          <div style="min-width:0;">
+            <div class="um-user-name">${esc(u.name || "—")}</div>
+            <div class="um-user-sub">${esc(u.email || "—")}</div>
+          </div>
+        </div>
+      </td>
+      <td>${esc(u.email || "—")}</td>
+      <td><span class="um-pill ${role.className}">${esc(role.label)}</span></td>
+      <td><span class="um-pill ${getRegionPillClass(region)}">${esc(region)}</span></td>
+      <td class="um-col-actions">
+        <div class="um-row-actions">
+          <button type="button" class="um-row-action warn" data-reset="${esc(u.email || "")}" title="Send password reset email">
+            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.7 3"/><path d="M3 4v5h5"/></svg>
+            <span>Reset</span>
+          </button>
+          <button type="button" class="um-row-action" data-edit="${esc(u.id)}" title="Edit user">
+            <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            <span>Edit</span>
+          </button>
+          <button type="button" class="um-row-action danger" data-delete="${esc(u.id)}" title="Delete user">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M6 6v14a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V6"/><path d="M10 11v6M14 11v6"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>
   `;
 }
 
-function hydrateEmployeeAvatars(root = document){
-  const images = root.querySelectorAll('.employee-avatar img[data-candidates]');
-
-  images.forEach(img => {
-    if(img.dataset.loaded === "1") return;
+function hydrateAvatars(root) {
+  root.querySelectorAll('.um-avatar img[data-candidates]').forEach(img => {
+    if (img.dataset.loaded === "1") return;
     img.dataset.loaded = "1";
-
     const fallback = img.nextElementSibling;
     let candidates = [];
-
-    try {
-      candidates = JSON.parse(img.dataset.candidates || "[]");
-    } catch(err) {
-      candidates = [];
+    try { candidates = JSON.parse(img.dataset.candidates || "[]"); } catch { candidates = []; }
+    let i = 0;
+    function tryNext() {
+      if (i >= candidates.length) { img.style.display = "none"; if (fallback) fallback.style.display = ""; return; }
+      const path = candidates[i++];
+      const t = new Image();
+      t.onload = () => { img.src = path; img.style.display = "block"; if (fallback) fallback.style.display = "none"; };
+      t.onerror = tryNext;
+      t.src = path;
     }
-
-    let index = 0;
-
-    function tryNext(){
-      if(index >= candidates.length){
-        img.style.display = "none";
-        if(fallback) fallback.style.display = "flex";
-        return;
-      }
-
-      const path = candidates[index++];
-      const testImg = new Image();
-
-      testImg.onload = function(){
-        img.src = path;
-        img.style.display = "block";
-        if(fallback) fallback.style.display = "none";
-      };
-
-      testImg.onerror = tryNext;
-      testImg.src = path;
-    }
-
     tryNext();
   });
 }
 
-function mergeEmployeesByEmail(list){
-  const map = new Map();
-
-  list.forEach(emp => {
-    const emailKey = String(emp.email || "").toLowerCase();
-    if (!emailKey) return;
-
-    if (!map.has(emailKey)) {
-      map.set(emailKey, { ...emp });
-      return;
-    }
-
-    const existing = map.get(emailKey);
-
-    map.set(emailKey, {
-      ...existing,
-      ...emp,
-      name: existing.name || emp.name,
-      email: existing.email || emp.email,
-      roleType:
-        existing.roleType === "manager" || emp.roleType === "manager"
-          ? "manager"
-          : "team_leader",
-      region: normalizeRegion(existing.email || emp.email)
+function bindRowEvents() {
+  document.querySelectorAll("#umTableBody [data-check]").forEach(cb => {
+    cb.addEventListener("change", () => {
+      if (cb.checked) state.selected.add(cb.dataset.check);
+      else state.selected.delete(cb.dataset.check);
+      cb.closest("tr")?.classList.toggle("is-selected", cb.checked);
+      syncSelectionUI();
     });
   });
 
-  return Array.from(map.values());
-}
-
-async function loadEmployees(){
-  try {
-    const [tlSnap, mgrSnap] = await Promise.all([
-      db.collection("leave_users").get(),
-      db.collection("manager_leave_user").get()
-    ]);
-
-    const teamLeaders = tlSnap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      roleType: "team_leader",
-      region: normalizeRegion(doc.data().email)
-    }));
-
-    const managers = mgrSnap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      roleType: "manager",
-      region: normalizeRegion(doc.data().email)
-    }));
-
-    const mergedEmployees = mergeEmployeesByEmail([...teamLeaders, ...managers]);
-
-    allEmployees = mergedEmployees
-      .filter(emp => !excludedEmails.includes(String(emp.email || "").toLowerCase()))
-      .sort((a,b) => String(a.name || "").localeCompare(String(b.name || "")));
-
-    renderEmployees();
-  } catch (err) {
-    console.error(err);
-    document.getElementById("employeeTableBody").innerHTML = `
-      <tr><td colspan="5" class="empty-state">Failed to load employees.</td></tr>
-    `;
-  }
-}
-
-function renderEmployees(){
-  const tbody = document.getElementById("employeeTableBody");
-  const search = String(document.getElementById("employeeSearch").value || "").trim().toLowerCase();
-  const roleFilter = document.getElementById("roleFilter").value;
-  const regionFilter = document.getElementById("regionFilter").value;
-
-  let data = [...allEmployees];
-
-  if (search) {
-    data = data.filter(emp => {
-      const displayRole = getDisplayRole(emp);
-      const blob = [
-        emp.name,
-        emp.email,
-        emp.roleType,
-        emp.region,
-        displayRole.label,
-        displayRole.value
-      ].join(" ").toLowerCase();
-      return blob.includes(search);
+  document.querySelectorAll("#umTableBody [data-edit]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const user = state.users.find(u => u.id === btn.dataset.edit);
+      if (user) openEditModal(user);
     });
-  }
+  });
 
-  if (roleFilter !== "All") {
-    data = data.filter(emp => getDisplayRole(emp).value === roleFilter);
-  }
+  document.querySelectorAll("#umTableBody [data-delete]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const user = state.users.find(u => u.id === btn.dataset.delete);
+      if (user) openDeleteModal([user]);
+    });
+  });
 
-  if (regionFilter !== "All") {
-    data = data.filter(emp => emp.region === regionFilter);
-  }
-
-  if (!data.length) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No employees found.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = data.map(emp => {
-    const displayRole = getDisplayRole(emp);
-
-    return `
-      <tr>
-        <td>${createEmployeeCell(emp.name || "-", emp.region || "-")}</td>
-        <td>${emp.email || "-"}</td>
-        <td>
-          <span class="badge ${displayRole.className}">
-            ${displayRole.label}
-          </span>
-        </td>
-        <td>
-          <span class="badge ${emp.region === "India" ? "badge-india" : "badge-ph"}">
-            ${emp.region}
-          </span>
-        </td>
-        <td>
-          <div class="action-group">
-            <button class="btn btn-reset" onclick="resetUserPassword('${String(emp.email || "").replace(/'/g, "\\'")}')">
-              Reset Password
-            </button>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join("");
-
-  hydrateEmployeeAvatars(tbody);
+  document.querySelectorAll("#umTableBody [data-reset]").forEach(btn => {
+    btn.addEventListener("click", () => resetPassword(btn.dataset.reset));
+  });
 }
 
-async function resetUserPassword(email) {
-  if (String(currentUser?.email || "").toLowerCase() !== "julanguinto@gmail.com") {
-    alert("You are not allowed to reset passwords.");
-    return;
+function syncSelectionUI() {
+  const bar = $("umBulkBar");
+  const count = $("umBulkCount");
+  const selectAll = $("umSelectAll");
+  const visible = filteredUsers();
+  const selectedVisible = visible.filter(u => state.selected.has(u.id)).length;
+
+  if (state.selected.size > 0) {
+    bar.hidden = false;
+    count.textContent = `${state.selected.size} selected`;
+  } else {
+    bar.hidden = true;
   }
 
-  if (!confirm(`Reset password for ${email}?`)) return;
+  if (selectAll) {
+    selectAll.checked = visible.length > 0 && selectedVisible === visible.length;
+    selectAll.indeterminate = selectedVisible > 0 && selectedVisible < visible.length;
+  }
+}
+
+/* ============================================================
+   ADD / EDIT MODAL
+   ============================================================ */
+function openAddModal() {
+  state.editing = null;
+  $("umModalKicker").textContent = "NEW EMPLOYEE";
+  $("umModalTitle").textContent = "Add New User";
+  document.querySelector("#umSubmitBtn .um-submit-label").textContent = "Add User";
+
+  $("umEditingId").value = "";
+  $("umFieldFirstName").value = "";
+  $("umFieldLastName").value = "";
+  $("umFieldEmail").value = "";
+  $("umFieldRole").value = "";
+  $("umFieldRole").disabled = false;
+  $("umFieldRegion").value = "Philippines";
+  $("umFormError").textContent = "";
+
+  $("umUserModal").hidden = false;
+  setTimeout(() => $("umFieldFirstName").focus(), 80);
+}
+
+function openEditModal(user) {
+  state.editing = user;
+  $("umModalKicker").textContent = "EDIT EMPLOYEE";
+  $("umModalTitle").textContent = "Edit User";
+  document.querySelector("#umSubmitBtn .um-submit-label").textContent = "Save Changes";
+
+  $("umEditingId").value = user.id;
+
+  const nameParts = String(user.name || "").split(/\s+/);
+  $("umFieldFirstName").value = user.firstName || nameParts[0] || "";
+  $("umFieldLastName").value  = user.lastName  || nameParts.slice(1).join(" ") || "";
+  $("umFieldEmail").value = user.email || "";
+
+  // Lock the role — hardcoded overrides depend on email, so we can't freely change role
+  $("umFieldRole").value = user.roleType;
+  $("umFieldRole").disabled = true;
+
+  $("umFieldRegion").value = user.region || "Philippines";
+  $("umFormError").textContent = "";
+
+  $("umUserModal").hidden = false;
+  setTimeout(() => $("umFieldFirstName").focus(), 80);
+}
+
+function closeUserModal() {
+  $("umUserModal").hidden = true;
+  state.editing = null;
+}
+
+async function saveUser(e) {
+  e.preventDefault();
+  const errEl = $("umFormError");
+  errEl.textContent = "";
+
+  const first  = $("umFieldFirstName").value.trim();
+  const last   = $("umFieldLastName").value.trim();
+  const email  = $("umFieldEmail").value.trim().toLowerCase();
+  const role   = $("umFieldRole").value;
+  const region = $("umFieldRegion").value;
+
+  if (!first) return (errEl.textContent = "First name is required.");
+  if (!last)  return (errEl.textContent = "Last name is required.");
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return (errEl.textContent = "Enter a valid email address.");
+  if (!role)  return (errEl.textContent = "Please select a role.");
+  if (!region) return (errEl.textContent = "Please select a region.");
+
+  const btn = $("umSubmitBtn");
+  btn.disabled = true;
+  btn.classList.add("loading");
 
   try {
-    const res = await fetch("http://localhost:3000/reset-password", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
+    const fullName = `${first} ${last}`.trim();
+    const editingId = $("umEditingId").value;
+    const editing = state.editing;
+
+    // Duplicate email check (ignore self)
+    const dupKey = email;
+    const conflict = state.users.find(u =>
+      String(u.email || "").toLowerCase() === dupKey && u.id !== editingId
+    );
+    if (conflict) {
+      errEl.textContent = `Email "${email}" is already registered to another user.`;
+      return;
+    }
+
+    if (editingId) {
+      // EDIT — update in place (collection can't change, role can't change)
+      const payload = { name: fullName, firstName: first, lastName: last, email, region };
+      await db.collection(editing._collection).doc(editingId).update(payload);
+      showToast(`Updated ${fullName}.`, "success");
+    } else {
+      // ADD — write to the correct collection based on role
+      const collection = COLLECTIONS[role];
+      if (!collection) {
+        errEl.textContent = "Invalid role.";
+        return;
+      }
+      await db.collection(collection).add({
+        name: fullName,
+        firstName: first,
+        lastName: last,
         email,
-        requestedBy: currentUser.email
-      })
-    });
+        region,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showToast(`Added ${fullName} to ${role === "manager" ? "Managers" : "Team Leaders"}.`, "success");
+    }
 
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.error || "Failed to reset password.");
-
-    currentGeneratedPassword = data.tempPassword;
-    document.getElementById("passwordModalText").textContent = `Temporary password for ${email}`;
-    document.getElementById("generatedPassword").textContent = data.tempPassword;
-    document.getElementById("passwordModal").classList.add("show");
-
+    closeUserModal();
   } catch (err) {
-    alert("Error: " + err.message);
+    console.error("[emp-mgmt] save failed:", err);
+    errEl.textContent = describeError(err);
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove("loading");
   }
 }
 
-async function copyGeneratedPassword(){
-  if (!currentGeneratedPassword) return;
-  await navigator.clipboard.writeText(currentGeneratedPassword);
-  alert("Temporary password copied.");
+/* ============================================================
+   DELETE MODAL
+   ============================================================ */
+function openDeleteModal(users) {
+  state.deleting = { users };
+  const input = $("umDeleteConfirmInput");
+  const btn = $("umDeleteConfirmBtn");
+  const errEl = $("umDeleteError");
+
+  errEl.textContent = "";
+  input.value = "";
+  btn.disabled = true;
+
+  if (users.length === 1) {
+    $("umDeleteCopy").textContent = "This permanently removes this user from Firestore. This cannot be undone.";
+    $("umDeleteNames").innerHTML = `<div>${esc(users[0].name)} — ${esc(users[0].email)}</div>`;
+  } else {
+    $("umDeleteCopy").textContent = `This permanently removes ${users.length} users from Firestore. This cannot be undone.`;
+    $("umDeleteNames").innerHTML = users.map(u => `<div>${esc(u.name)} — ${esc(u.email)}</div>`).join("");
+  }
+
+  $("umDeleteModal").hidden = false;
+  setTimeout(() => input.focus(), 80);
 }
 
-function closePasswordModal(){
-  document.getElementById("passwordModal").classList.remove("show");
+function closeDeleteModal() {
+  $("umDeleteModal").hidden = true;
+  state.deleting = null;
 }
 
-loadEmployees();
+async function confirmDelete() {
+  const input = $("umDeleteConfirmInput");
+  if (!input || input.value.trim() !== "DELETE") return;
+  if (!state.deleting) return;
+
+  const users = state.deleting.users;
+  const btn = $("umDeleteConfirmBtn");
+  const errEl = $("umDeleteError");
+  errEl.textContent = "";
+  btn.disabled = true;
+  btn.classList.add("loading");
+
+  try {
+    const batch = db.batch();
+    users.forEach(u => {
+      const collections = u._collections || [u._collection];
+      collections.forEach(col => {
+        batch.delete(db.collection(col).doc(u.id));
+      });
+    });
+    await batch.commit();
+    users.forEach(u => state.selected.delete(u.id));
+    showToast(`Deleted ${users.length} user${users.length === 1 ? "" : "s"}.`, "success");
+    closeDeleteModal();
+    syncSelectionUI();
+  } catch (err) {
+    console.error("[emp-mgmt] delete failed:", err);
+    errEl.textContent = describeError(err);
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove("loading");
+  }
+}
+
+/* ============================================================
+   RESET PASSWORD — via Firebase Auth (no backend needed)
+   ============================================================ */
+async function resetPassword(email) {
+  if (!email) return;
+  if (!confirm(`Send a password reset email to ${email}?`)) return;
+
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showToast(`Password reset email sent to ${email}.`, "success");
+  } catch (err) {
+    console.error("[emp-mgmt] reset failed:", err);
+    const code = String(err.code || "").toLowerCase();
+    if (code.includes("user-not-found")) {
+      showToast(`No Firebase Auth account exists for ${email}.`, "error");
+    } else if (code.includes("invalid-email")) {
+      showToast("Invalid email address.", "error");
+    } else if (code.includes("too-many-requests")) {
+      showToast("Too many reset attempts. Please wait a minute.", "error");
+    } else {
+      showToast(describeError(err), "error");
+    }
+  }
+}
+
+/* ============================================================
+   BULK
+   ============================================================ */
+function bulkAction(action) {
+  const ids = Array.from(state.selected);
+  if (action === "clear") {
+    state.selected.clear();
+    renderTable();
+    syncSelectionUI();
+    return;
+  }
+  if (action === "delete") {
+    if (!ids.length) return;
+    const users = state.users.filter(u => ids.includes(u.id));
+    openDeleteModal(users);
+  }
+}
+
+/* ============================================================
+   EXPORT
+   ============================================================ */
+function exportCsv() {
+  const rows = filteredUsers();
+  if (!rows.length) { showToast("No users to export.", "error"); return; }
+
+  const header = ["Name", "Email", "Role", "Region", "Collection"];
+  const data = rows.map(u => [
+    u.name, u.email, u._displayRole?.label || u.roleType, u.region, u._collection
+  ]);
+  const csv = [header, ...data]
+    .map(r => r.map(v => {
+      const s = String(v == null ? "" : v);
+      return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    }).join(","))
+    .join("\r\n");
+
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `employees-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${rows.length} user${rows.length === 1 ? "" : "s"}.`, "success");
+}
+
+/* ============================================================
+   EVENT WIRING
+   ============================================================ */
+$("umAddUserBtn").addEventListener("click", openAddModal);
+$("umEmptyAddBtn").addEventListener("click", openAddModal);
+$("umExportBtn").addEventListener("click", exportCsv);
+
+$("umSearch").addEventListener("input", debounce(e => {
+  state.filters.search = e.target.value.trim();
+  renderTable();
+  syncSelectionUI();
+}));
+$("umRoleFilter").addEventListener("change", e => {
+  state.filters.role = e.target.value;
+  renderTable();
+  syncSelectionUI();
+});
+$("umRegionFilter").addEventListener("change", e => {
+  state.filters.region = e.target.value;
+  renderTable();
+  syncSelectionUI();
+});
+$("umSort").addEventListener("change", e => {
+  state.filters.sort = e.target.value;
+  renderTable();
+});
+
+$("umSelectAll").addEventListener("change", e => {
+  const visible = filteredUsers();
+  if (e.target.checked) visible.forEach(u => state.selected.add(u.id));
+  else visible.forEach(u => state.selected.delete(u.id));
+  renderTable();
+  syncSelectionUI();
+});
+
+document.querySelectorAll("[data-bulk]").forEach(btn => {
+  btn.addEventListener("click", () => bulkAction(btn.dataset.bulk));
+});
+
+$("umUserForm").addEventListener("submit", saveUser);
+document.querySelectorAll('[data-close-modal="user"]').forEach(el => el.addEventListener("click", closeUserModal));
+document.querySelectorAll('[data-close-modal="delete"]').forEach(el => el.addEventListener("click", closeDeleteModal));
+
+$("umDeleteConfirmInput").addEventListener("input", e => {
+  $("umDeleteConfirmBtn").disabled = e.target.value.trim() !== "DELETE";
+});
+$("umDeleteConfirmBtn").addEventListener("click", confirmDelete);
+
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  if (!$("umUserModal").hidden) closeUserModal();
+  else if (!$("umDeleteModal").hidden) closeDeleteModal();
+});
 </script>
-
 </body>
 </html>
