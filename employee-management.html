@@ -11,26 +11,15 @@
 
 <style>
 :root{
-  --primary:#4D148C;
-  --primary-dark:#3b0f70;
-  --accent:#FF6600;
-  --bg:#f5f7fb;
-  --card:#ffffff;
-  --text:#111827;
-  --muted:#6b7280;
-  --border:#e5e7eb;
-  --success:#16a34a;
-  --warning:#f59e0b;
-  --danger:#dc2626;
-  --danger-dark:#b91c1c;
-  --shadow:0 10px 30px rgba(15,23,42,.08);
-  --radius:22px;
+  --primary:#4D148C;--primary-dark:#3b0f70;--accent:#FF6600;
+  --bg:#f5f7fb;--card:#ffffff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;
+  --success:#16a34a;--warning:#f59e0b;--danger:#dc2626;--danger-dark:#b91c1c;
+  --shadow:0 10px 30px rgba(15,23,42,.08);--radius:22px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text);}
 
-/* Shell */
 .shell{display:grid;grid-template-columns:280px 1fr;min-height:100vh;}
 .sidebar{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;}
 .logo-only-head{display:flex;align-items:center;justify-content:center;padding:6px 8px;border-bottom:1px solid var(--border);background:#fff;}
@@ -45,7 +34,6 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .trial-box p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
 .app-main{min-width:0}
 
-/* Header */
 .app-header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
 .app-header-inner{min-height:76px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
 .header-title small{display:block;color:var(--muted);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:11px;}
@@ -53,13 +41,11 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .header-back{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--primary);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;}
 .header-back:hover{background:#faf7ff}
 
-/* Content */
 .content{padding:24px}
 .page-intro{margin-bottom:20px;}
 .page-intro h1{margin:0;font-size:32px;color:var(--primary);}
 .page-intro p{margin:8px 0 0;color:var(--muted);}
 
-/* Stat cards */
 .um-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px;}
 .um-stat{min-height:110px;padding:18px;position:relative;display:flex;align-items:center;gap:14px;overflow:hidden;border:1px solid #e7e6ef;border-radius:18px;background:#fff;box-shadow:0 2px 10px rgba(33,25,85,.035);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;}
 .um-stat:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(33,25,85,.07);border-color:#dcd6ee;}
@@ -78,18 +64,16 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .um-stat-value{color:#171750;font-size:28px;font-weight:800;line-height:1;letter-spacing:-.5px;margin:4px 0 5px;}
 .um-stat-hint{color:#9999ad;font-size:10px;font-weight:500;}
 
-/* Panel */
 .um-panel{background:#fff;border:1px solid #eceaf3;border-radius:18px;padding:18px;box-shadow:0 2px 10px rgba(23,20,65,.04);}
 .um-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
 .um-toolbar-actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
-.um-search{flex:1 1 260px;display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;background:#fff;border:1px solid #e1e0ec;border-radius:10px;min-width:0;}
+.um-search{flex:1 1 240px;display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;background:#fff;border:1px solid #e1e0ec;border-radius:10px;min-width:0;}
 .um-search svg{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#7d7da5;stroke-width:1.9;stroke-linecap:round;}
 .um-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#1e1e4a;font:inherit;font-size:13px;}
 .um-search input::placeholder{color:#9a9cb5;}
 .um-select{height:40px;padding:0 12px;background:#fff;border:1px solid #e1e0ec;border-radius:10px;color:#33345f;font:inherit;font-size:13px;font-weight:600;cursor:pointer;outline:none;transition:border-color .15s ease,box-shadow .15s ease;}
 .um-select:focus{border-color:#7441d5;box-shadow:0 0 0 3px rgba(107,32,208,.09);}
 
-/* Buttons */
 .um-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:40px;padding:0 16px;border-radius:10px;border:1px solid transparent;font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease,border-color .15s ease;white-space:nowrap;}
 .um-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .um-btn-ghost{background:#fff;border-color:#e1e1ec;color:#33345f;}
@@ -100,7 +84,6 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .um-btn-danger:hover{transform:translateY(-1px);box-shadow:0 11px 22px rgba(165,19,44,.28);}
 .um-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
 
-/* Bulk bar */
 .um-bulk-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;margin-bottom:12px;background:#f6f4fe;border:1px solid #e0d8f5;border-radius:10px;}
 .um-bulk-bar[hidden]{display:none !important;}
 .um-bulk-count{font-size:12px;font-weight:800;color:#4d148c;}
@@ -112,7 +95,6 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .um-bulk-btn.ghost{background:transparent;color:#8a8ca8;border-color:transparent;}
 .um-bulk-btn.ghost:hover{background:#efe9ff;color:#4d148c;}
 
-/* Table */
 .um-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid #f1eff7;}
 .um-table{width:100%;border-collapse:separate;border-spacing:0;}
 .um-table thead th{height:42px;padding:0 12px;background:#f7f6fc;color:#777790;font-size:11px;font-weight:800;text-align:left;white-space:nowrap;letter-spacing:.3px;border-bottom:1px solid #eeecf6;}
@@ -127,14 +109,12 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .um-table td.um-col-actions{text-align:right;padding-right:14px;}
 .um-checkbox{width:15px;height:15px;accent-color:#6b20d0;cursor:pointer;}
 
-/* User cell */
 .um-user-cell{display:flex;align-items:center;gap:10px;min-width:0;}
 .um-avatar{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,#791eff,#4d148c);color:#fff;font-size:11px;font-weight:800;overflow:hidden;position:relative;}
 .um-avatar img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
 .um-user-name{font-size:13px;font-weight:700;color:#17195d;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .um-user-sub{font-size:11px;color:#9a9cb5;margin-top:2px;}
 
-/* Pills */
 .um-pill{display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:20px;font-size:11px;font-weight:800;white-space:nowrap;}
 .um-pill-role-employee{background:#eeeaff;color:#5530c6;}
 .um-pill-role-teamleader{background:#e7efff;color:#2557c9;}
@@ -144,8 +124,9 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .um-pill-region-ph{background:#f3f0ff;color:#4D148C;}
 .um-pill-region-india{background:#fff7ed;color:#c2410c;}
 .um-pill-region-other{background:#f3f4f6;color:#4b5563;}
+.um-pill-status-active{background:#e5f7ee;color:#17945c;}
+.um-pill-status-inactive{background:#fdeef1;color:#b42318;}
 
-/* Row actions */
 .um-row-actions{display:inline-flex;align-items:center;gap:4px;justify-content:flex-end;}
 .um-row-action{height:30px;padding:0 10px;display:inline-flex;align-items:center;gap:5px;border-radius:7px;border:1px solid transparent;background:transparent;color:#8a8ca8;cursor:pointer;font:inherit;font-size:11px;font-weight:700;transition:background .15s ease,color .15s ease,border-color .15s ease;white-space:nowrap;}
 .um-row-action svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
@@ -153,7 +134,6 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .um-row-action.danger:hover{background:#fdeef1;color:#b42318;border-color:#f5c8cb;}
 .um-row-action.warn:hover{background:#fff7ed;color:#c2410c;border-color:#fed7aa;}
 
-/* Loading / empty */
 .um-loading-row{text-align:center;padding:40px 12px !important;color:#8a8ca8;font-size:13px;}
 .um-spinner{display:inline-block;width:14px;height:14px;border:2px solid #e5e2f3;border-top-color:#6b20d0;border-radius:50%;animation:umSpin .8s linear infinite;vertical-align:-2px;margin-right:8px;}
 @keyframes umSpin{to{transform:rotate(360deg);}}
@@ -165,7 +145,6 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .um-empty p{margin:0 0 14px;color:#6d6e94;font-size:13px;line-height:1.5;max-width:340px;}
 .um-footer-info{margin-top:12px;text-align:right;color:#9a9cb5;font-size:12px;font-weight:500;}
 
-/* Modals */
 .um-modal{position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;}
 .um-modal[hidden]{display:none !important;}
 .um-modal-backdrop{position:absolute;inset:0;background:rgba(15,12,42,.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:umFade .2s ease;}
@@ -180,7 +159,6 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .um-modal-close svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;}
 .um-modal-close:hover{background:#f6f5fa;color:#4d148c;}
 
-/* Form */
 .um-form{padding:20px 24px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;}
 .um-form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .um-field{display:flex;flex-direction:column;gap:6px;min-width:0;}
@@ -206,12 +184,10 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .um-form-error:not(:empty){padding:10px 12px;background:#fdeef1;border:1px solid #f5c8cb;border-radius:8px;}
 .um-modal-foot{display:flex;justify-content:flex-end;gap:10px;padding-top:16px;border-top:1px solid #f2f0f9;margin-top:6px;}
 
-/* Submit spinner */
 .um-submit-spinner{display:none;width:12px;height:12px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:umSpin .7s linear infinite;margin-left:6px;}
 .um-btn.loading .um-submit-spinner{display:inline-block;}
 .um-btn.loading .um-submit-label{opacity:.75;}
 
-/* Delete modal */
 .um-modal-danger .um-modal-head{background:linear-gradient(180deg,#fef5f6 0%,#ffffff 100%);}
 .um-delete-body{padding:18px 24px 12px;display:flex;flex-direction:column;gap:12px;}
 .um-delete-body > p{margin:0;font-size:12px;line-height:1.6;color:#55567a;}
@@ -222,7 +198,6 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .um-delete-input{height:40px;padding:0 12px;border:1px solid #f5c8cb;border-radius:9px;background:#fff;color:#17195d;font:inherit;font-size:13px;font-weight:700;letter-spacing:.1em;outline:none;transition:border-color .15s ease,box-shadow .15s ease;}
 .um-delete-input:focus{border-color:#c81e3a;box-shadow:0 0 0 3px rgba(200,30,58,.12);}
 
-/* Page loader */
 .page-loader{position:fixed;inset:0;background:#f7f7fc;display:flex;align-items:center;justify-content:center;z-index:99999;transition:opacity .35s ease;}
 .page-loader-inner{text-align:center;}
 .page-loader-mark{width:44px;height:44px;position:relative;margin:0 auto 14px;}
@@ -230,13 +205,11 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 .page-loader-dot{position:absolute;inset:14px;border-radius:50%;background:linear-gradient(135deg,#6b20d0,#FF6600);}
 .page-loader-text{color:#6b7280;font-size:13px;font-weight:600;margin:0;}
 
-/* Toast */
 .um-toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:#17195d;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 16px 34px rgba(20,10,60,.25);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .25s ease;z-index:99999;max-width:min(90vw,420px);text-align:center;}
 .um-toast.is-visible{opacity:1;transform:translate(-50%,0);}
 .um-toast.is-error{background:#b42318;}
 .um-toast.is-success{background:#17945c;}
 
-/* Responsive */
 @media (max-width:1200px){.um-stats{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media (max-width:900px){
   .shell{grid-template-columns:1fr;}
@@ -276,7 +249,6 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
     <div class="sidebar-head logo-only-head">
       <img src="fedex-logo1.png" alt="FedEx Logo" class="sidebar-fedex-logo">
     </div>
-
     <div class="nav">
       <button class="nav-btn" onclick="location.href='admin.html'"><i class="fa-solid fa-house"></i> Dashboard</button>
       <button class="nav-btn"><i class="fa-regular fa-calendar"></i> Leave Requests</button>
@@ -285,11 +257,10 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
       <button class="nav-btn"><i class="fa-solid fa-file-export"></i> Reports</button>
       <button class="nav-btn active"><i class="fa-solid fa-users-gear"></i> Employee Management</button>
     </div>
-
     <div class="sidebar-foot">
       <div class="trial-box">
         <h4>Employee Management</h4>
-        <p>Search users, update employee records, manage roles, and send password reset emails.</p>
+        <p>Search users, update records, change roles, manage status, and send password reset emails.</p>
       </div>
     </div>
   </aside>
@@ -310,10 +281,9 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
     <div class="content">
       <div class="page-intro">
         <h1>Employee Management</h1>
-        <p>Manage employee access, roles, regions, and password recovery in one place.</p>
+        <p>Manage roles, regions, account status, and password recovery in one place.</p>
       </div>
 
-      <!-- Stat cards -->
       <section class="um-stats" aria-label="User overview">
         <article class="um-stat">
           <div class="um-stat-icon um-stat-purple">
@@ -330,19 +300,19 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
             <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
           </div>
           <div class="um-stat-body">
-            <span class="um-stat-label">Team Leaders</span>
-            <strong class="um-stat-value" id="umStatTL">—</strong>
-            <span class="um-stat-hint">From leave_users</span>
+            <span class="um-stat-label">Active</span>
+            <strong class="um-stat-value" id="umStatActive">—</strong>
+            <span class="um-stat-hint">Can log in</span>
           </div>
         </article>
         <article class="um-stat">
           <div class="um-stat-icon um-stat-red">
-            <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5 19 19 5"/></svg>
           </div>
           <div class="um-stat-body">
-            <span class="um-stat-label">Managers</span>
-            <strong class="um-stat-value" id="umStatMgr">—</strong>
-            <span class="um-stat-hint">From manager_leave_user</span>
+            <span class="um-stat-label">Inactive</span>
+            <strong class="um-stat-value" id="umStatInactive">—</strong>
+            <span class="um-stat-hint">Access suspended</span>
           </div>
         </article>
         <article class="um-stat">
@@ -350,19 +320,18 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
             <svg viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.3 8.2-8 10-4.7-1.8-8-5-8-10V6l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg>
           </div>
           <div class="um-stat-body">
-            <span class="um-stat-label">Admins</span>
+            <span class="um-stat-label">Admins &amp; Managers</span>
             <strong class="um-stat-value" id="umStatAdmin">—</strong>
             <span class="um-stat-hint">Elevated access</span>
           </div>
         </article>
       </section>
 
-      <!-- Panel -->
       <section class="um-panel">
         <div class="um-toolbar">
           <div class="um-search">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5"/><path d="m16 16 5 5"/></svg>
-            <input type="search" id="umSearch" placeholder="Search by name, email, or EMP ID…" autocomplete="off">
+            <input type="search" id="umSearch" placeholder="Search by name, email, or role…" autocomplete="off">
           </div>
 
           <select class="um-select" id="umRoleFilter" aria-label="Filter by role">
@@ -378,10 +347,17 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
             <option value="India">India</option>
           </select>
 
+          <select class="um-select" id="umStatusFilter" aria-label="Filter by status">
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+
           <select class="um-select" id="umSort" aria-label="Sort users">
             <option value="name">Name A–Z</option>
             <option value="role">Role</option>
             <option value="region">Region</option>
+            <option value="status">Status</option>
           </select>
 
           <div class="um-toolbar-actions">
@@ -399,7 +375,9 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
         <div class="um-bulk-bar" id="umBulkBar" hidden>
           <span class="um-bulk-count" id="umBulkCount">0 selected</span>
           <div class="um-bulk-actions">
-            <button type="button" class="um-bulk-btn danger" data-bulk="delete">Delete Selected</button>
+            <button type="button" class="um-bulk-btn" data-bulk="activate">Activate</button>
+            <button type="button" class="um-bulk-btn" data-bulk="deactivate">Deactivate</button>
+            <button type="button" class="um-bulk-btn danger" data-bulk="delete">Delete</button>
             <button type="button" class="um-bulk-btn ghost" data-bulk="clear">Clear</button>
           </div>
         </div>
@@ -413,11 +391,12 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
                 <th>Email</th>
                 <th>Role</th>
                 <th>Region</th>
+                <th>Status</th>
                 <th class="um-col-actions">Actions</th>
               </tr>
             </thead>
             <tbody id="umTableBody">
-              <tr><td colspan="6" class="um-loading-row"><span class="um-spinner"></span>Loading users…</td></tr>
+              <tr><td colspan="7" class="um-loading-row"><span class="um-spinner"></span>Loading users…</td></tr>
             </tbody>
           </table>
         </div>
@@ -437,12 +416,11 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
         <div class="um-footer-info" id="umFooterInfo"></div>
       </section>
 
-      <div class="page-footer" style="text-align:center;color:#6b7280;font-size:13px;padding:20px 0 8px;">© FedEx 2026</div>
+      <div style="text-align:center;color:#6b7280;font-size:13px;padding:20px 0 8px;">© FedEx 2026</div>
     </div>
   </main>
 </div>
 
-<!-- Add / Edit modal -->
 <div class="um-modal" id="umUserModal" hidden>
   <div class="um-modal-backdrop" data-close-modal="user"></div>
   <div class="um-modal-card" role="dialog" aria-modal="true" aria-labelledby="umModalTitle">
@@ -483,7 +461,7 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
             <option value="team_leader">Team Leader</option>
             <option value="manager">Manager</option>
           </select>
-          <span class="um-field-hint">Role cannot be changed after creation. Delete and re-add to change role.</span>
+          <span class="um-field-hint" id="umRoleHint">Team Leaders live in leave_users. Managers live in manager_leave_user.</span>
         </label>
         <label class="um-field">
           <span class="um-field-label">Region *</span>
@@ -494,6 +472,15 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
           </select>
         </label>
       </div>
+
+      <label class="um-field um-field-toggle">
+        <span class="um-field-label">Account Status</span>
+        <span class="um-toggle-wrap">
+          <input type="checkbox" id="umFieldActive" checked>
+          <span class="um-toggle"><span class="um-toggle-knob"></span></span>
+          <span class="um-toggle-label" id="umToggleLabel">Active — can log in</span>
+        </span>
+      </label>
 
       <div class="um-form-error" id="umFormError" role="alert" aria-live="polite"></div>
 
@@ -508,7 +495,6 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
   </div>
 </div>
 
-<!-- Delete modal -->
 <div class="um-modal" id="umDeleteModal" hidden>
   <div class="um-modal-backdrop" data-close-modal="delete"></div>
   <div class="um-modal-card um-modal-danger" role="dialog" aria-modal="true" aria-labelledby="umDeleteTitle">
@@ -543,9 +529,6 @@ body{font-family:"Inter",Arial,sans-serif;background:var(--bg);color:var(--text)
 <div class="um-toast" id="umToast" role="status" aria-live="polite"></div>
 
 <script>
-/* ============================================================
-   CONFIG
-   ============================================================ */
 const COLLECTIONS = {
   team_leader: "leave_users",
   manager: "manager_leave_user"
@@ -561,18 +544,14 @@ const INDIA_EMAILS = [
 
 const EXCLUDED_EMAILS = ["jake.agdeppa@iqor.com"];
 
-// Hardcoded role overrides — preserved from your current logic.
-// These users always display with the label shown regardless of collection.
+// Hardcoded role overrides — display-only label. These users' role cannot be changed here.
 const ROLE_OVERRIDES = {
-  "julanguinto@gmail.com":           { value: "super_saiyan_god", label: "Super Saiyan God",          className: "um-pill-role-god" },
-  "trevorbarry.imatong@iqor.com":    { value: "super_saiyan_god", label: "Admin Manager",             className: "um-pill-role-god" },
-  "jonie.kabigting@iqor.com":        { value: "super_saiyan_god", label: "Manager/Admin Team Leader", className: "um-pill-role-god" },
-  "vicky.das@iqor.com":              { value: "manager",          label: "Manager",                   className: "um-pill-role-manager" }
+  "julanguinto@gmail.com":        { value: "super_saiyan_god", label: "Super Saiyan God",          className: "um-pill-role-god" },
+  "trevorbarry.imatong@iqor.com": { value: "super_saiyan_god", label: "Admin Manager",             className: "um-pill-role-god" },
+  "jonie.kabigting@iqor.com":     { value: "super_saiyan_god", label: "Manager/Admin Team Leader", className: "um-pill-role-god" },
+  "vicky.das@iqor.com":           { value: "manager",          label: "Manager",                   className: "um-pill-role-manager" }
 };
 
-/* ============================================================
-   FIREBASE
-   ============================================================ */
 firebase.initializeApp({
   apiKey: "AIzaSyAFedbBDXSZomKX8MQkBfVBRfi6tl0LTcc",
   authDomain: "fedex-attendance-system.firebaseapp.com",
@@ -581,34 +560,22 @@ firebase.initializeApp({
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-/* ============================================================
-   ACCESS CONTROL
-   ============================================================ */
 const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-if (!currentUser) {
-  alert("Please login first");
-  location.href = "index.html";
-}
+if (!currentUser) { alert("Please login first"); location.href = "index.html"; }
 if (String(currentUser?.email || "").toLowerCase() !== "julanguinto@gmail.com") {
   alert("You are not authorized to access this page.");
   location.href = "admin.html";
 }
 
-/* ============================================================
-   STATE
-   ============================================================ */
 const state = {
   users: [],
   selected: new Set(),
-  filters: { search: "", role: "", region: "", sort: "name" },
+  filters: { search: "", role: "", region: "", status: "", sort: "name" },
   editing: null,
   deleting: null,
   loaded: false
 };
 
-/* ============================================================
-   HELPERS
-   ============================================================ */
 const $ = id => document.getElementById(id);
 
 function esc(v) {
@@ -648,7 +615,6 @@ function getProfilePictureCandidates(name) {
 
 function normalizeRegion(emp) {
   const direct = String(emp?.region || "").trim();
-  if (direct === "India" || direct === "Philippines") return direct;
   if (direct) return direct;
   const cleanEmail = String(emp?.email || "").toLowerCase();
   return INDIA_EMAILS.includes(cleanEmail) ? "India" : "Philippines";
@@ -667,6 +633,10 @@ function getRegionPillClass(region) {
   if (region === "India") return "um-pill-region-india";
   if (region === "Philippines") return "um-pill-region-ph";
   return "um-pill-region-other";
+}
+
+function isLockedRole(emp) {
+  return Boolean(ROLE_OVERRIDES[String(emp?.email || "").toLowerCase()]);
 }
 
 function showToast(msg, type = "success") {
@@ -698,27 +668,35 @@ function hideLoader() {
 }
 
 /* ============================================================
-   DATA LOADING — merge leave_users + manager_leave_user
+   LOAD — merge leave_users + manager_leave_user
    ============================================================ */
 let tlSnap = null, mgrSnap = null;
 let tlLoaded = false, mgrLoaded = false;
 
 function mergeEmployees() {
-  const tlDocs = (tlSnap?.docs || []).map(doc => ({
-    id: doc.id,
-    _collection: COLLECTIONS.team_leader,
-    _collections: [COLLECTIONS.team_leader],
-    ...doc.data(),
-    roleType: "team_leader"
-  }));
+  const tlDocs = (tlSnap?.docs || []).map(doc => {
+    const d = doc.data();
+    return {
+      id: doc.id,
+      _collection: COLLECTIONS.team_leader,
+      _collections: [COLLECTIONS.team_leader],
+      ...d,
+      active: d.active !== false,
+      roleType: "team_leader"
+    };
+  });
 
-  const mgrDocs = (mgrSnap?.docs || []).map(doc => ({
-    id: doc.id,
-    _collection: COLLECTIONS.manager,
-    _collections: [COLLECTIONS.manager],
-    ...doc.data(),
-    roleType: "manager"
-  }));
+  const mgrDocs = (mgrSnap?.docs || []).map(doc => {
+    const d = doc.data();
+    return {
+      id: doc.id,
+      _collection: COLLECTIONS.manager,
+      _collections: [COLLECTIONS.manager],
+      ...d,
+      active: d.active !== false,
+      roleType: "manager"
+    };
+  });
 
   const byEmail = new Map();
 
@@ -744,16 +722,14 @@ function mergeEmployees() {
         ? (existing.roleType === "manager" ? existing._collection : emp._collection)
         : existing._collection,
       _collections: [...new Set([...(existing._collections || []), emp._collection])],
+      active: existing.active === false || emp.active === false ? false : true,
       region: normalizeRegion({ email: existing.email || emp.email, region: existing.region || emp.region })
     });
   });
 
   state.users = Array.from(byEmail.values())
     .filter(emp => !EXCLUDED_EMAILS.includes(String(emp.email || "").toLowerCase()))
-    .map(emp => ({
-      ...emp,
-      _displayRole: getDisplayRole(emp)
-    }));
+    .map(emp => ({ ...emp, _displayRole: getDisplayRole(emp) }));
 
   state.loaded = tlLoaded && mgrLoaded;
 
@@ -765,15 +741,14 @@ function mergeEmployees() {
 
 db.collection(COLLECTIONS.team_leader).onSnapshot(
   snap => { tlSnap = snap; tlLoaded = true; mergeEmployees(); },
-  err => { console.error("leave_users listener failed:", err); showToast(describeError(err), "error"); hideLoader(); }
+  err => { console.error(err); showToast(describeError(err), "error"); hideLoader(); }
 );
 
 db.collection(COLLECTIONS.manager).onSnapshot(
   snap => { mgrSnap = snap; mgrLoaded = true; mergeEmployees(); },
-  err => { console.error("manager_leave_user listener failed:", err); showToast(describeError(err), "error"); hideLoader(); }
+  err => { console.error(err); showToast(describeError(err), "error"); hideLoader(); }
 );
 
-// Safety net: hide loader after 5s regardless
 setTimeout(hideLoader, 5000);
 
 /* ============================================================
@@ -782,8 +757,8 @@ setTimeout(hideLoader, 5000);
 function renderStats() {
   const users = state.users;
   $("umStatTotal").textContent = users.length;
-  $("umStatTL").textContent    = users.filter(u => u.roleType === "team_leader").length;
-  $("umStatMgr").textContent   = users.filter(u => u.roleType === "manager").length;
+  $("umStatActive").textContent = users.filter(u => u.active).length;
+  $("umStatInactive").textContent = users.filter(u => !u.active).length;
   $("umStatAdmin").textContent = users.filter(u => {
     const r = u._displayRole?.value;
     return r === "manager" || r === "super_saiyan_god";
@@ -800,6 +775,8 @@ function filteredUsers() {
   let rows = state.users.filter(u => {
     if (f.role && u._displayRole?.value !== f.role) return false;
     if (f.region && u.region !== f.region) return false;
+    if (f.status === "active" && !u.active) return false;
+    if (f.status === "inactive" && u.active) return false;
     if (q) {
       const hay = `${u.name} ${u.email} ${u.roleType} ${u.region} ${u._displayRole?.label}`.toLowerCase();
       if (!hay.includes(q)) return false;
@@ -808,14 +785,10 @@ function filteredUsers() {
   });
 
   switch (f.sort) {
-    case "role":
-      rows.sort((a, b) => (a._displayRole?.label || "").localeCompare(b._displayRole?.label || ""));
-      break;
-    case "region":
-      rows.sort((a, b) => (a.region || "").localeCompare(b.region || ""));
-      break;
-    default:
-      rows.sort((a, b) => (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }));
+    case "role":   rows.sort((a, b) => (a._displayRole?.label || "").localeCompare(b._displayRole?.label || "")); break;
+    case "region": rows.sort((a, b) => (a.region || "").localeCompare(b.region || "")); break;
+    case "status": rows.sort((a, b) => Number(b.active) - Number(a.active)); break;
+    default:       rows.sort((a, b) => (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }));
   }
   return rows;
 }
@@ -829,7 +802,7 @@ function renderTable() {
   const footer = $("umFooterInfo");
   const rows = filteredUsers();
   const hasAny = state.users.length > 0;
-  const hasFilters = state.filters.search || state.filters.role || state.filters.region;
+  const hasFilters = state.filters.search || state.filters.role || state.filters.region || state.filters.status;
 
   if (!rows.length) {
     tbody.innerHTML = "";
@@ -863,6 +836,8 @@ function rowHtml(u) {
   const role = u._displayRole || { label: "—", className: "um-pill-role-employee" };
   const region = u.region || "—";
   const picCandidates = JSON.stringify(getProfilePictureCandidates(u.name || ""));
+  const statusClass = u.active ? "um-pill-status-active" : "um-pill-status-inactive";
+  const statusLabel = u.active ? "Active" : "Inactive";
 
   return `
     <tr data-id="${esc(u.id)}" class="${isSelected ? "is-selected" : ""}">
@@ -884,6 +859,7 @@ function rowHtml(u) {
       <td>${esc(u.email || "—")}</td>
       <td><span class="um-pill ${role.className}">${esc(role.label)}</span></td>
       <td><span class="um-pill ${getRegionPillClass(region)}">${esc(region)}</span></td>
+      <td><span class="um-pill ${statusClass}">${esc(statusLabel)}</span></td>
       <td class="um-col-actions">
         <div class="um-row-actions">
           <button type="button" class="um-row-action warn" data-reset="${esc(u.email || "")}" title="Send password reset email">
@@ -975,6 +951,12 @@ function syncSelectionUI() {
 /* ============================================================
    ADD / EDIT MODAL
    ============================================================ */
+function updateToggleLabel() {
+  const cb = $("umFieldActive");
+  const label = $("umToggleLabel");
+  label.textContent = cb.checked ? "Active — can log in" : "Inactive — access blocked";
+}
+
 function openAddModal() {
   state.editing = null;
   $("umModalKicker").textContent = "NEW EMPLOYEE";
@@ -988,7 +970,10 @@ function openAddModal() {
   $("umFieldRole").value = "";
   $("umFieldRole").disabled = false;
   $("umFieldRegion").value = "Philippines";
+  $("umFieldActive").checked = true;
+  $("umRoleHint").textContent = "Team Leaders live in leave_users. Managers live in manager_leave_user.";
   $("umFormError").textContent = "";
+  updateToggleLabel();
 
   $("umUserModal").hidden = false;
   setTimeout(() => $("umFieldFirstName").focus(), 80);
@@ -1007,12 +992,20 @@ function openEditModal(user) {
   $("umFieldLastName").value  = user.lastName  || nameParts.slice(1).join(" ") || "";
   $("umFieldEmail").value = user.email || "";
 
-  // Lock the role — hardcoded overrides depend on email, so we can't freely change role
   $("umFieldRole").value = user.roleType;
-  $("umFieldRole").disabled = true;
+
+  if (isLockedRole(user)) {
+    $("umFieldRole").disabled = true;
+    $("umRoleHint").textContent = "This user has a hardcoded display role. Contact the developer to change it.";
+  } else {
+    $("umFieldRole").disabled = false;
+    $("umRoleHint").textContent = "Changing role will move this user between Team Leaders and Managers.";
+  }
 
   $("umFieldRegion").value = user.region || "Philippines";
+  $("umFieldActive").checked = user.active !== false;
   $("umFormError").textContent = "";
+  updateToggleLabel();
 
   $("umUserModal").hidden = false;
   setTimeout(() => $("umFieldFirstName").focus(), 80);
@@ -1033,6 +1026,7 @@ async function saveUser(e) {
   const email  = $("umFieldEmail").value.trim().toLowerCase();
   const role   = $("umFieldRole").value;
   const region = $("umFieldRegion").value;
+  const active = $("umFieldActive").checked;
 
   if (!first) return (errEl.textContent = "First name is required.");
   if (!last)  return (errEl.textContent = "Last name is required.");
@@ -1050,33 +1044,72 @@ async function saveUser(e) {
     const editing = state.editing;
 
     // Duplicate email check (ignore self)
-    const dupKey = email;
     const conflict = state.users.find(u =>
-      String(u.email || "").toLowerCase() === dupKey && u.id !== editingId
+      String(u.email || "").toLowerCase() === email && u.id !== editingId
     );
     if (conflict) {
       errEl.textContent = `Email "${email}" is already registered to another user.`;
       return;
     }
 
-    if (editingId) {
-      // EDIT — update in place (collection can't change, role can't change)
-      const payload = { name: fullName, firstName: first, lastName: last, email, region };
-      await db.collection(editing._collection).doc(editingId).update(payload);
-      showToast(`Updated ${fullName}.`, "success");
-    } else {
-      // ADD — write to the correct collection based on role
-      const collection = COLLECTIONS[role];
-      if (!collection) {
-        errEl.textContent = "Invalid role.";
-        return;
+    if (editingId && editing) {
+      const oldRole = editing.roleType;
+      const roleChanged = oldRole !== role;
+
+      if (roleChanged) {
+        // Role change → move the document to the new collection
+        const targetCollection = COLLECTIONS[role];
+        if (!targetCollection) { errEl.textContent = "Invalid role."; return; }
+
+        const payload = {
+          name: fullName,
+          firstName: first,
+          lastName: last,
+          email,
+          region,
+          active
+        };
+
+        // Preserve non-managed fields (createdAt etc.) from the original record
+        if (editing.createdAt) payload.createdAt = editing.createdAt;
+
+        // 1) Write to the target collection, keeping the same doc ID
+        await db.collection(targetCollection).doc(editingId).set(payload);
+
+        // 2) Delete from all old collections (skips the target)
+        const oldCollections = editing._collections || [editing._collection];
+        for (const col of oldCollections) {
+          if (col !== targetCollection) {
+            try { await db.collection(col).doc(editingId).delete(); }
+            catch (err) { console.warn("Could not delete from", col, err); }
+          }
+        }
+
+        showToast(`Updated ${fullName} and moved to ${role === "manager" ? "Managers" : "Team Leaders"}.`, "success");
+      } else {
+        // Same role — update in place
+        await db.collection(editing._collection).doc(editingId).update({
+          name: fullName,
+          firstName: first,
+          lastName: last,
+          email,
+          region,
+          active
+        });
+        showToast(`Updated ${fullName}.`, "success");
       }
+    } else {
+      // ADD
+      const collection = COLLECTIONS[role];
+      if (!collection) { errEl.textContent = "Invalid role."; return; }
+
       await db.collection(collection).add({
         name: fullName,
         firstName: first,
         lastName: last,
         email,
         region,
+        active,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       showToast(`Added ${fullName} to ${role === "manager" ? "Managers" : "Team Leaders"}.`, "success");
@@ -1093,7 +1126,7 @@ async function saveUser(e) {
 }
 
 /* ============================================================
-   DELETE MODAL
+   DELETE
    ============================================================ */
 function openDeleteModal(users) {
   state.deleting = { users };
@@ -1138,9 +1171,7 @@ async function confirmDelete() {
     const batch = db.batch();
     users.forEach(u => {
       const collections = u._collections || [u._collection];
-      collections.forEach(col => {
-        batch.delete(db.collection(col).doc(u.id));
-      });
+      collections.forEach(col => batch.delete(db.collection(col).doc(u.id)));
     });
     await batch.commit();
     users.forEach(u => state.selected.delete(u.id));
@@ -1157,7 +1188,51 @@ async function confirmDelete() {
 }
 
 /* ============================================================
-   RESET PASSWORD — via Firebase Auth (no backend needed)
+   BULK
+   ============================================================ */
+async function bulkAction(action) {
+  const ids = Array.from(state.selected);
+  if (!ids.length && action !== "clear") return;
+
+  if (action === "clear") {
+    state.selected.clear();
+    renderTable();
+    syncSelectionUI();
+    return;
+  }
+
+  if (action === "delete") {
+    const users = state.users.filter(u => ids.includes(u.id));
+    openDeleteModal(users);
+    return;
+  }
+
+  if (action === "activate" || action === "deactivate") {
+    const target = action === "activate";
+    const users = state.users.filter(u => ids.includes(u.id) && u.active !== target);
+    if (!users.length) {
+      showToast(`All selected users are already ${target ? "active" : "inactive"}.`, "success");
+      return;
+    }
+    try {
+      const batch = db.batch();
+      users.forEach(u => {
+        const collections = u._collections || [u._collection];
+        collections.forEach(col => {
+          batch.update(db.collection(col).doc(u.id), { active: target });
+        });
+      });
+      await batch.commit();
+      showToast(`${target ? "Activated" : "Deactivated"} ${users.length} user${users.length === 1 ? "" : "s"}.`, "success");
+    } catch (err) {
+      console.error(err);
+      showToast(describeError(err), "error");
+    }
+  }
+}
+
+/* ============================================================
+   RESET PASSWORD
    ============================================================ */
 async function resetPassword(email) {
   if (!email) return;
@@ -1169,46 +1244,24 @@ async function resetPassword(email) {
   } catch (err) {
     console.error("[emp-mgmt] reset failed:", err);
     const code = String(err.code || "").toLowerCase();
-    if (code.includes("user-not-found")) {
-      showToast(`No Firebase Auth account exists for ${email}.`, "error");
-    } else if (code.includes("invalid-email")) {
-      showToast("Invalid email address.", "error");
-    } else if (code.includes("too-many-requests")) {
-      showToast("Too many reset attempts. Please wait a minute.", "error");
-    } else {
-      showToast(describeError(err), "error");
-    }
+    if (code.includes("user-not-found")) showToast(`No Firebase Auth account for ${email}.`, "error");
+    else if (code.includes("invalid-email")) showToast("Invalid email address.", "error");
+    else if (code.includes("too-many-requests")) showToast("Too many reset attempts. Wait a minute.", "error");
+    else showToast(describeError(err), "error");
   }
 }
 
 /* ============================================================
-   BULK
-   ============================================================ */
-function bulkAction(action) {
-  const ids = Array.from(state.selected);
-  if (action === "clear") {
-    state.selected.clear();
-    renderTable();
-    syncSelectionUI();
-    return;
-  }
-  if (action === "delete") {
-    if (!ids.length) return;
-    const users = state.users.filter(u => ids.includes(u.id));
-    openDeleteModal(users);
-  }
-}
-
-/* ============================================================
-   EXPORT
+   EXPORT CSV
    ============================================================ */
 function exportCsv() {
   const rows = filteredUsers();
   if (!rows.length) { showToast("No users to export.", "error"); return; }
 
-  const header = ["Name", "Email", "Role", "Region", "Collection"];
+  const header = ["Name", "Email", "Role", "Region", "Status", "Collection"];
   const data = rows.map(u => [
-    u.name, u.email, u._displayRole?.label || u.roleType, u.region, u._collection
+    u.name, u.email, u._displayRole?.label || u.roleType, u.region,
+    u.active ? "Active" : "Inactive", u._collection
   ]);
   const csv = [header, ...data]
     .map(r => r.map(v => {
@@ -1230,7 +1283,7 @@ function exportCsv() {
 }
 
 /* ============================================================
-   EVENT WIRING
+   WIRE EVENTS
    ============================================================ */
 $("umAddUserBtn").addEventListener("click", openAddModal);
 $("umEmptyAddBtn").addEventListener("click", openAddModal);
@@ -1243,13 +1296,15 @@ $("umSearch").addEventListener("input", debounce(e => {
 }));
 $("umRoleFilter").addEventListener("change", e => {
   state.filters.role = e.target.value;
-  renderTable();
-  syncSelectionUI();
+  renderTable(); syncSelectionUI();
 });
 $("umRegionFilter").addEventListener("change", e => {
   state.filters.region = e.target.value;
-  renderTable();
-  syncSelectionUI();
+  renderTable(); syncSelectionUI();
+});
+$("umStatusFilter").addEventListener("change", e => {
+  state.filters.status = e.target.value;
+  renderTable(); syncSelectionUI();
 });
 $("umSort").addEventListener("change", e => {
   state.filters.sort = e.target.value;
@@ -1269,6 +1324,7 @@ document.querySelectorAll("[data-bulk]").forEach(btn => {
 });
 
 $("umUserForm").addEventListener("submit", saveUser);
+$("umFieldActive").addEventListener("change", updateToggleLabel);
 document.querySelectorAll('[data-close-modal="user"]').forEach(el => el.addEventListener("click", closeUserModal));
 document.querySelectorAll('[data-close-modal="delete"]').forEach(el => el.addEventListener("click", closeDeleteModal));
 
